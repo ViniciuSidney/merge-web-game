@@ -105,6 +105,48 @@
         color: #2f5638;
       }
 
+      .spawnPanel {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .spawnPopup {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 2px solid #1f8f48;
+        color: #16351f;
+        border-radius: 14px;
+        padding: 9px 13px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(31, 143, 72, 0.25);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .spawnPopup.show {
+        animation: spawnPopupAnim 1.2s ease forwards;
+      }
+
+      .spawnPopup.golden {
+        border-color: #ffd84d;
+        color: #8a6500;
+      }
+
+      .spawnPopup.double {
+        border-color: #236fbe;
+        color: #163d6d;
+      }
+
+      .spawnPopup.valuable {
+        border-color: #6c5ce7;
+        color: #2f235f;
+      }
+
       .barTrack {
         height: 10px;
         background: #dcebe0;
@@ -125,36 +167,36 @@
       }
 
       .levelUpPanel {
-      position: relative;
-      overflow: hidden;
+        position: relative;
+        overflow: hidden;
       }
 
       .levelUpPopup {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      background: #ffffff;
-      border: 2px solid #8e7cff;
-      color: #2f235f;
-      border-radius: 14px;
-      padding: 10px 14px;
-      font-weight: bold;
-      text-align: center;
-      box-shadow: 0 8px 18px rgba(108, 92, 231, 0.25);
-      opacity: 0;
-      pointer-events: none;
-      z-index: 5;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 2px solid #8e7cff;
+        color: #2f235f;
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(108, 92, 231, 0.25);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
       }
 
       .levelUpPopup.show {
-      animation: levelUpPopupAnim 1.75s ease forwards;
+        animation: levelUpPopupAnim 1.75s ease forwards;
       }
 
       .levelUpPopup small {
-      display: block;
-      margin-top: 4px;
-      color: #1f8f48;
+        display: block;
+        margin-top: 4px;
+        color: #1f8f48;
       }
 
       .levelBonus {
@@ -639,27 +681,48 @@
       }
 
       @keyframes levelUpPopupAnim {
-      0% {
-         opacity: 0;
-         transform: translate(-50%, 10%) scale(0.8);
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 10%) scale(0.8);
+        }
+
+        15% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        70% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -90%) scale(0.95);
+        }
       }
 
-      15% {
-         opacity: 1;
-         transform: translate(-50%, -50%) scale(1.08);
-      }
+      @keyframes spawnPopupAnim {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 10%) scale(0.85);
+        }
 
-      70% {
-         opacity: 1;
-         transform: translate(-50%, -50%) scale(1);
-      }
+        15% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.06);
+        }
 
-      100% {
-         opacity: 0;
-         transform: translate(-50%, -90%) scale(0.95);
-      }
-      }
+        70% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
 
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -90%) scale(0.95);
+        }
+      }
     </style>
   </head>
   <body>
@@ -683,7 +746,7 @@
         </div>
       </section>
 
-      <section class="progressPanel">
+      <section class="progressPanel spawnPanel">
         <div class="progressHeader">
           <span class="label-2">⏳ Próximo objeto</span>
           <strong id="spawnProgressText">3.00s / 3.00s</strong>
@@ -691,6 +754,7 @@
         <div class="barTrack">
           <div class="barFill" id="spawnProgressFill"></div>
         </div>
+        <div class="spawnPopup" id="spawnPopup"></div>
       </section>
 
       <section class="progressPanel levelUpPanel">
@@ -869,6 +933,7 @@
       const levelProgressFill = document.getElementById("levelProgressFill");
       const levelBonusText = document.getElementById("levelBonusText");
       const levelUpPopup = document.getElementById("levelUpPopup");
+      const spawnPopup = document.getElementById("spawnPopup");
 
       const GRID_SIZE = 16;
       const BASE_SPAWN_TIME = 6000;
@@ -1070,65 +1135,75 @@
       }
 
       function updateSpawnProgressBar() {
-         const total = getSpawnTime();
+        const total = getSpawnTime();
 
-         spawnProgress += SPAWN_TICK_RATE;
+        spawnProgress += SPAWN_TICK_RATE;
 
-         if (spawnProgress >= total) {
-            spawnProgress = total;
+        if (spawnProgress >= total) {
+          spawnProgress = total;
 
-            if (!isGridFull()) {
-               spawnObjects();
-               spawnProgress = 0;
-            }
-         }
+          if (!isGridFull()) {
+            spawnObjects();
+            spawnProgress = 0;
+          }
+        }
 
-         updateSpawnBarVisual();
+        updateSpawnBarVisual();
       }
 
       function updateSpawnBarVisual() {
-         const total = getSpawnTime();
-         const remaining = Math.max(0, total - spawnProgress);
-         const progress = Math.min(100, (spawnProgress / total) * 100);
+        const total = getSpawnTime();
+        const remaining = Math.max(0, total - spawnProgress);
+        const progress = Math.min(100, (spawnProgress / total) * 100);
 
-         spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
-         spawnProgressFill.style.width = `${progress}%`;
+        spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
+        spawnProgressFill.style.width = `${progress}%`;
+      }
+
+      function showSpawnPopup(message, type = "") {
+        spawnPopup.textContent = message;
+        spawnPopup.className = `spawnPopup ${type}`;
+
+        spawnPopup.classList.remove("show");
+        void spawnPopup.offsetWidth;
+        spawnPopup.classList.add("show");
       }
 
       function showLevelUpPopup(oldLevel, newLevel, reward) {
-      levelUpPopup.innerHTML = `
+        levelUpPopup.innerHTML = `
          Nível ${oldLevel} → Nível ${newLevel}
          <small>+${reward} estilhaços!</small>
       `;
 
-      levelUpPopup.classList.remove("show");
-      void levelUpPopup.offsetWidth;
-      levelUpPopup.classList.add("show");
+        levelUpPopup.classList.remove("show");
+        void levelUpPopup.offsetWidth;
+        levelUpPopup.classList.add("show");
       }
 
       function addMergeProgress() {
         mergeProgress++;
 
-      if (mergeProgress >= mergesNeeded) {
-         mergeProgress -= mergesNeeded;
+        if (mergeProgress >= mergesNeeded) {
+          mergeProgress -= mergesNeeded;
 
-         const oldLevel = playerLevel;
-         playerLevel++;
+          const oldLevel = playerLevel;
+          playerLevel++;
 
-         const reward = getShardsReward();
-         shards += reward;
+          const reward = getShardsReward();
+          shards += reward;
 
-         showLevelUpPopup(oldLevel, playerLevel, reward);
+          showLevelUpPopup(oldLevel, playerLevel, reward);
 
-         mergesNeeded = getNextMergeRequirement();
+          mergesNeeded = getNextMergeRequirement();
 
-         clearTimeout(saveTextTimer);
-         saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
+          clearTimeout(saveTextTimer);
+          saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
 
-         saveTextTimer = setTimeout(() => {
-            saveStatus.innerHTML = "Salvamento automático <strong>ativo</strong>";
-         }, 1600);
-      }
+          saveTextTimer = setTimeout(() => {
+            saveStatus.innerHTML =
+              "Salvamento automático <strong>ativo</strong>";
+          }, 1600);
+        }
 
         updateUI();
         saveGame(true);
@@ -1165,6 +1240,10 @@
         const chosenIndex = Number(chosenCell.dataset.index);
         const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
 
+        if (isGolden && cellIndex === null) {
+          showSpawnPopup("🌟 Objeto dourado apareceu!", "golden");
+        }
+
         const element = document.createElement("div");
         const item = {
           id: crypto.randomUUID(),
@@ -1183,16 +1262,33 @@
         return true;
       }
 
+      // function spawnObjects() {
+      //   if (isGridFull()) return;
+
+      //   createItem();
+
+      //   if (!isGridFull() && Math.random() < getDoubleSpawnChance()) {
+      //     createItem();
+      //   }
+
+      //   return true;
+      // }
+
       function spawnObjects() {
-        if (isGridFull()) return;
+        if (isGridFull()) return false;
 
-        createItem();
+        const firstSpawned = createItem();
 
-        if (!isGridFull() && Math.random() < getDoubleSpawnChance()) {
+        const canDoubleSpawn =
+          !isGridFull() && Math.random() < getDoubleSpawnChance();
+
+        if (canDoubleSpawn) {
           createItem();
+          showSpawnPopup("📦 Entrega dupla!", "double");
         }
 
-        return true;
+        lastSpawnTime = Date.now();
+        return firstSpawned;
       }
 
       function applySpawnSpeedUpgrade() {
@@ -1207,8 +1303,8 @@
       }
 
       function restartSpawnTimer() {
-         spawnProgress = 0;
-         updateSpawnBarVisual();
+        spawnProgress = 0;
+        updateSpawnBarVisual();
       }
 
       function addDragEvents(item) {
@@ -1407,6 +1503,8 @@
       }
 
       function incomeTick() {
+        let valuableShown = false;
+
         items.forEach((item) => {
           const base = getBaseItemValue(item.level);
           const goldenMultiplier = item.isGolden ? 2 : 1;
@@ -1414,6 +1512,11 @@
           const tickMultiplier = isDoubleTick ? 2 : 1;
           const gained =
             base * goldenMultiplier * tickMultiplier * getShardMultiplier();
+
+          if (isDoubleTick && !valuableShown) {
+            showSpawnPopup("💎 Momento valioso!", "valuable");
+            valuableShown = true;
+          }
 
           money += gained;
           createMoneyPopup(item, gained, isDoubleTick);
