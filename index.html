@@ -65,7 +65,19 @@
       .label {
         font-size: 12px;
         opacity: 0.75;
+        font-weight: 500;
         margin-bottom: 3px;
+      }
+
+      .label-2 {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+
+      #levelBonusText {
+        font-size: 12px;
+        font-weight: 500;
       }
 
       .value {
@@ -355,6 +367,7 @@
         height: 100vh;
         width: min(360px, 92vw);
         background: #ffffff;
+        opacity: 0.92;
         box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
         padding: 18px;
         transform: translateX(100%);
@@ -611,7 +624,7 @@
 
       <section class="progressPanel">
         <div class="progressHeader">
-          <span>⏳ Próximo objeto</span>
+          <span class="label-2">⏳ Próximo objeto</span>
           <strong id="spawnProgressText">3.00s / 3.00s</strong>
         </div>
         <div class="barTrack">
@@ -621,7 +634,7 @@
 
       <section class="progressPanel">
         <div class="progressHeader">
-          <span>⭐ Level <strong id="playerLevel">1</strong></span>
+          <span class="label-2">⭐ Level <strong id="playerLevel">1</strong></span>
           <strong id="levelProgressText">0 / 5 combinações</strong>
         </div>
         <div class="barTrack">
@@ -820,13 +833,17 @@
             "Diminui o tempo de espera para gerar novos objetos em 0.05s por nível. Mínimo: 2s.",
           level: 0,
           baseCost: 1000,
+          multiplier: 2,
+          tenMultiplier: 4          
         },
         startLevel: {
           name: "Forma melhorada",
           description:
             "Faz com que os objetos comecem 1 nível acima. Objetos antigos abaixo do novo nível também são atualizados.",
           level: 0,
-          baseCost: 2000,
+          baseCost: 4000,
+          multiplier: 5,
+          tenMultiplier: 10 
         },
         doubleSpawn: {
           name: "Entrega dupla",
@@ -834,6 +851,8 @@
             "Aumenta em 2% por nível a chance de nascerem 2 objetos ao mesmo tempo. Máximo: 50%.",
           level: 0,
           baseCost: 1500,
+          multiplier: 2,
+          tenMultiplier: 4
         },
         doubleMoney: {
           name: "Momento valioso",
@@ -841,6 +860,8 @@
             "Aumenta em 2% por nível a chance de um objeto gerar 2x polígonos naquele momento. Máximo: 50%.",
           level: 0,
           baseCost: 2000,
+          multiplier: 2,
+          tenMultiplier: 4 
         },
         goldenChance: {
           name: "Objeto dourado",
@@ -848,8 +869,10 @@
             "Aumenta em 2% por nível a chance de nascer um objeto dourado. Dourados geram 2x para sempre e mantêm o bônus ao combinar.",
           level: 0,
           baseCost: 10000,
-          noTenMultiplier: true,
-          golden: true,
+          multiplier: 4,
+          tenMultiplier: 8,
+          //noTenMultiplier: true,
+          golden: true
         },
       };
 
@@ -887,19 +910,21 @@
       }
 
       function getUpgradeCost(key) {
-        const upgrade = upgrades[key];
-        let cost = upgrade.baseCost;
+      const upgrade = upgrades[key];
+      let cost = upgrade.baseCost;
 
-        for (let i = 1; i <= upgrade.level; i++) {
-          if (key === "startLevel") {
-            // <-- Forma melhorada
-            cost *= i % 10 === 0 ? 10 : 5;
-          } else {
-            cost *= !upgrade.noTenMultiplier && i % 10 === 0 ? 4 : 2;
-          }
-        }
+      const baseMultiplier = upgrade.multiplier ?? 2;
+      const tenMultiplier = upgrade.tenMultiplier ?? 4;
 
-        return Math.floor(cost);
+      for (let i = 1; i <= upgrade.level; i++) {
+         if (!upgrade.noTenMultiplier && i % 10 === 0) {
+            cost *= tenMultiplier;
+         } else {
+            cost *= baseMultiplier;
+         }
+      }
+
+      return Math.floor(cost);
       }
 
       function getSpawnTime() {
