@@ -4,9 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
 
     <title>Merge Clicker - V5</title>
     <style>
@@ -605,7 +608,9 @@
   </head>
   <body>
     <main class="game">
-      <div class="saveStatus" id="saveStatus">Salvamento automático <strong>ativo</strong></div>
+      <div class="saveStatus" id="saveStatus">
+        Salvamento automático <strong>ativo</strong>
+      </div>
 
       <section class="top">
         <div class="panel">
@@ -634,7 +639,9 @@
 
       <section class="progressPanel">
         <div class="progressHeader">
-          <span class="label-2">⭐ Level <strong id="playerLevel">1</strong></span>
+          <span class="label-2"
+            >⭐ Level <strong id="playerLevel">1</strong></span
+          >
           <strong id="levelProgressText">0 / 5 combinações</strong>
         </div>
         <div class="barTrack">
@@ -806,23 +813,22 @@
       const levelBonusText = document.getElementById("levelBonusText");
 
       const GRID_SIZE = 16;
-      const BASE_SPAWN_TIME = 6000;
+      const BASE_SPAWN_TIME = 2000;
       const SAVE_KEY = "merge-clicker-prototype-save-v4";
+      const SPAWN_TICK_RATE = 100;
 
       let money = 0;
       let shards = 0;
       let playerLevel = 1;
       let mergeProgress = 0;
       let mergesNeeded = 5;
-      let lastSpawnTime = Date.now();
       let cells = [];
       let items = [];
       let draggedItem = null;
       let originalCellIndex = null;
       let offsetX = 0;
       let offsetY = 0;
-      let spawnTimer = null;
-      let spawnPausedByFull = false;
+      let spawnProgress = 0;
       let saveTextTimer = null;
 
       //* Variáveis de Melhoria *//
@@ -834,7 +840,7 @@
           level: 0,
           baseCost: 1000,
           multiplier: 2,
-          tenMultiplier: 4          
+          tenMultiplier: 4,
         },
         startLevel: {
           name: "Forma melhorada",
@@ -843,7 +849,7 @@
           level: 0,
           baseCost: 4000,
           multiplier: 5,
-          tenMultiplier: 10 
+          tenMultiplier: 10,
         },
         doubleSpawn: {
           name: "Entrega dupla",
@@ -852,7 +858,7 @@
           level: 0,
           baseCost: 1500,
           multiplier: 2,
-          tenMultiplier: 4
+          tenMultiplier: 4,
         },
         doubleMoney: {
           name: "Momento valioso",
@@ -861,7 +867,7 @@
           level: 0,
           baseCost: 2000,
           multiplier: 2,
-          tenMultiplier: 4 
+          tenMultiplier: 4,
         },
         goldenChance: {
           name: "Objeto dourado",
@@ -872,7 +878,7 @@
           multiplier: 4,
           tenMultiplier: 8,
           //noTenMultiplier: true,
-          golden: true
+          golden: true,
         },
       };
 
@@ -910,21 +916,21 @@
       }
 
       function getUpgradeCost(key) {
-      const upgrade = upgrades[key];
-      let cost = upgrade.baseCost;
+        const upgrade = upgrades[key];
+        let cost = upgrade.baseCost;
 
-      const baseMultiplier = upgrade.multiplier ?? 2;
-      const tenMultiplier = upgrade.tenMultiplier ?? 4;
+        const baseMultiplier = upgrade.multiplier ?? 2;
+        const tenMultiplier = upgrade.tenMultiplier ?? 4;
 
-      for (let i = 1; i <= upgrade.level; i++) {
-         if (!upgrade.noTenMultiplier && i % 10 === 0) {
+        for (let i = 1; i <= upgrade.level; i++) {
+          if (!upgrade.noTenMultiplier && i % 10 === 0) {
             cost *= tenMultiplier;
-         } else {
+          } else {
             cost *= baseMultiplier;
-         }
-      }
+          }
+        }
 
-      return Math.floor(cost);
+        return Math.floor(cost);
       }
 
       function getSpawnTime() {
@@ -1006,32 +1012,29 @@
       }
 
       function updateSpawnProgressBar() {
-        const total = getSpawnTime();
+         const total = getSpawnTime();
 
-        if (isGridFull()) {
-          spawnPausedByFull = true;
-          spawnProgressText.textContent = `0.00s / ${(total / 1000).toFixed(2)}s`;
-          spawnProgressFill.style.width = "100%";
-          return;
-        }
+         spawnProgress += SPAWN_TICK_RATE;
 
-        if (spawnPausedByFull) {
-          lastSpawnTime = Date.now();
-          spawnPausedByFull = false;
-        }
+         if (spawnProgress >= total) {
+            spawnProgress = total;
 
-        const elapsed = Date.now() - lastSpawnTime;
+            if (!isGridFull()) {
+               spawnObjects();
+               spawnProgress = 0;
+            }
+         }
 
-        if (elapsed >= total) {
-          spawnObjects();
-          return;
-        }
+         updateSpawnBarVisual();
+      }
 
-        const remaining = Math.max(0, total - elapsed);
-        const progress = Math.min(100, (elapsed / total) * 100);
+      function updateSpawnBarVisual() {
+         const total = getSpawnTime();
+         const remaining = Math.max(0, total - spawnProgress);
+         const progress = Math.min(100, (spawnProgress / total) * 100);
 
-        spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
-        spawnProgressFill.style.width = `${progress}%`;
+         spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
+         spawnProgressFill.style.width = `${progress}%`;
       }
 
       function addMergeProgress() {
@@ -1047,7 +1050,8 @@
           clearTimeout(saveTextTimer);
           saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
           saveTextTimer = setTimeout(() => {
-            saveStatus.innerHTML = "Salvamento automático <strong>ativo</strong>";
+            saveStatus.innerHTML =
+              "Salvamento automático <strong>ativo</strong>";
           }, 1600);
         }
 
@@ -1113,24 +1117,23 @@
           createItem();
         }
 
-        lastSpawnTime = Date.now();
+        return true;
       }
 
       function applySpawnSpeedUpgrade() {
-         const oldTotal = Date.now() - lastSpawnTime;
-         const newTotal = getSpawnTime();
+        const oldTotal = Date.now() - lastSpawnTime;
+        const newTotal = getSpawnTime();
 
-         if (oldTotal >= newTotal) {
-            spawnObjects();
-         }
+        if (oldTotal >= newTotal) {
+          spawnObjects();
+        }
 
-         updateSpawnProgressBar();
+        updateSpawnProgressBar();
       }
 
       function restartSpawnTimer() {
-        clearInterval(spawnTimer);
-        lastSpawnTime = Date.now();
-        spawnPausedByFull = false;
+         spawnProgress = 0;
+         updateSpawnBarVisual();
       }
 
       function addDragEvents(item) {
@@ -1302,13 +1305,13 @@
           card.className = `upgrade ${upgrade.golden ? "goldenUpgrade" : ""}`;
 
           card.innerHTML = `
-          <div class="upgradeTop">
-            <h3>${upgrade.name}</h3>
-            <span class="upgradeLevel">Nv. ${upgrade.level}</span>
-          </div>
-          <p>${upgrade.description}</p>
-          <button ${money < cost ? "disabled" : ""}>Comprar — ${formatMoney(cost)}</button>
-        `;
+                <div class="upgradeTop">
+                  <h3>${upgrade.name}</h3>
+                  <span class="upgradeLevel">Nv. ${upgrade.level}</span>
+                </div>
+                <p>${upgrade.description}</p>
+                <button ${money < cost ? "disabled" : ""}>Comprar — ${formatMoney(cost)}</button>
+              `;
 
           card
             .querySelector("button")
@@ -1371,7 +1374,8 @@
           clearTimeout(saveTextTimer);
           saveStatus.innerHTML = "Progresso <strong>salvo</strong> ✓";
           saveTextTimer = setTimeout(() => {
-            saveStatus.innerHTML = "Salvamento automático <strong>ativo</strong>";
+            saveStatus.innerHTML =
+              "Salvamento automático <strong>ativo</strong>";
           }, 1200);
         }
       }
