@@ -31,7 +31,7 @@
 
       .game {
         width: 100%;
-        max-width: 460px;
+        max-width: 480px;
         background: #ffffff;
         border-radius: 18px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
@@ -639,7 +639,7 @@
           <strong>🗑️ Lixeira</strong>
           <span>Arraste aqui</span>
         </div>
-        <button class="shop-open" id="openShopBtn">Loja</button>
+        <button class="shop-open" id="openShopBtn">Melhorias</button>
         <button class="guide-open" id="openGuideBtn">Guia</button>
         <button class="danger" id="resetBtn">Resetar Tudo! ⚠️</button>
       </section>
@@ -847,7 +847,7 @@
           description:
             "Aumenta em 2% por nível a chance de nascer um objeto dourado. Dourados geram 2x para sempre e mantêm o bônus ao combinar.",
           level: 0,
-          baseCost: 12000,
+          baseCost: 10000,
           noTenMultiplier: true,
           golden: true,
         },
@@ -893,7 +893,7 @@
         for (let i = 1; i <= upgrade.level; i++) {
           if (key === "startLevel") {
             // <-- Forma melhorada
-            cost *= i % 10 === 0 ? 8 : 4;
+            cost *= i % 10 === 0 ? 10 : 5;
           } else {
             cost *= !upgrade.noTenMultiplier && i % 10 === 0 ? 4 : 2;
           }
