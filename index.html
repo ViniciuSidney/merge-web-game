@@ -124,6 +124,39 @@
         background: linear-gradient(90deg, #6c5ce7, #a29bfe);
       }
 
+      .levelUpPanel {
+      position: relative;
+      overflow: hidden;
+      }
+
+      .levelUpPopup {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffffff;
+      border: 2px solid #8e7cff;
+      color: #2f235f;
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(108, 92, 231, 0.25);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 5;
+      }
+
+      .levelUpPopup.show {
+      animation: levelUpPopupAnim 1.75s ease forwards;
+      }
+
+      .levelUpPopup small {
+      display: block;
+      margin-top: 4px;
+      color: #1f8f48;
+      }
+
       .levelBonus {
         font-size: 12px;
         color: #45634d;
@@ -604,6 +637,29 @@
           opacity: 0;
         }
       }
+
+      @keyframes levelUpPopupAnim {
+      0% {
+         opacity: 0;
+         transform: translate(-50%, 10%) scale(0.8);
+      }
+
+      15% {
+         opacity: 1;
+         transform: translate(-50%, -50%) scale(1.08);
+      }
+
+      70% {
+         opacity: 1;
+         transform: translate(-50%, -50%) scale(1);
+      }
+
+      100% {
+         opacity: 0;
+         transform: translate(-50%, -90%) scale(0.95);
+      }
+      }
+
     </style>
   </head>
   <body>
@@ -637,7 +693,7 @@
         </div>
       </section>
 
-      <section class="progressPanel">
+      <section class="progressPanel levelUpPanel">
         <div class="progressHeader">
           <span class="label-2"
             >⭐ Level <strong id="playerLevel">1</strong></span
@@ -650,6 +706,7 @@
         <p class="levelBonus" id="levelBonusText">
           Multiplicador por estilhaços: <strong>1.0x</strong>
         </p>
+        <div class="levelUpPopup" id="levelUpPopup"></div>
       </section>
 
       <section class="grid" id="grid"></section>
@@ -811,9 +868,10 @@
       const levelProgressText = document.getElementById("levelProgressText");
       const levelProgressFill = document.getElementById("levelProgressFill");
       const levelBonusText = document.getElementById("levelBonusText");
+      const levelUpPopup = document.getElementById("levelUpPopup");
 
       const GRID_SIZE = 16;
-      const BASE_SPAWN_TIME = 2000;
+      const BASE_SPAWN_TIME = 6000;
       const SAVE_KEY = "merge-clicker-prototype-save-v4";
       const SPAWN_TICK_RATE = 100;
 
@@ -1037,23 +1095,40 @@
          spawnProgressFill.style.width = `${progress}%`;
       }
 
+      function showLevelUpPopup(oldLevel, newLevel, reward) {
+      levelUpPopup.innerHTML = `
+         Nível ${oldLevel} → Nível ${newLevel}
+         <small>+${reward} estilhaços!</small>
+      `;
+
+      levelUpPopup.classList.remove("show");
+      void levelUpPopup.offsetWidth;
+      levelUpPopup.classList.add("show");
+      }
+
       function addMergeProgress() {
         mergeProgress++;
 
-        if (mergeProgress >= mergesNeeded) {
-          mergeProgress -= mergesNeeded;
-          playerLevel++;
-          const reward = getShardsReward();
-          shards += reward;
-          mergesNeeded = getNextMergeRequirement();
+      if (mergeProgress >= mergesNeeded) {
+         mergeProgress -= mergesNeeded;
 
-          clearTimeout(saveTextTimer);
-          saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
-          saveTextTimer = setTimeout(() => {
-            saveStatus.innerHTML =
-              "Salvamento automático <strong>ativo</strong>";
-          }, 1600);
-        }
+         const oldLevel = playerLevel;
+         playerLevel++;
+
+         const reward = getShardsReward();
+         shards += reward;
+
+         showLevelUpPopup(oldLevel, playerLevel, reward);
+
+         mergesNeeded = getNextMergeRequirement();
+
+         clearTimeout(saveTextTimer);
+         saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
+
+         saveTextTimer = setTimeout(() => {
+            saveStatus.innerHTML = "Salvamento automático <strong>ativo</strong>";
+         }, 1600);
+      }
 
         updateUI();
         saveGame(true);
