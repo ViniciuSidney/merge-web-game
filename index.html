@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Merge Clicker - V3</title>
+      <title>Merge Clicker - V4</title>
       <style>
          * {
             box-sizing: border-box;
@@ -216,8 +216,10 @@
 
          .footer {
             margin-top: 14px;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr 0.85fr 0.85fr;
             gap: 10px;
+            align-items: stretch;
          }
 
          button {
@@ -251,6 +253,36 @@
          .shop-open {
             background: #236fbe;
          }
+         .guide-open {
+            background: #6c5ce7;
+         }
+
+         .trash {
+            border: 2px dashed #c0392b;
+            background: #fff1ef;
+            color: #9f2f24;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            font-size: 12px;
+            transition:
+               transform 0.15s ease,
+               background 0.15s ease,
+               border-color 0.15s ease;
+         }
+
+         .trash strong {
+            font-size: 13px;
+         }
+
+         .trash.active {
+            background: #ffd8d2;
+            border-color: #e74c3c;
+            transform: scale(1.03);
+         }
 
          .hint {
             font-size: 13px;
@@ -275,6 +307,7 @@
             pointer-events: auto;
          }
 
+         .guide,
          .shop {
             position: fixed;
             top: 0;
@@ -290,8 +323,33 @@
             overflow-y: auto;
          }
 
+         .guide.active,
          .shop.active {
             transform: translateX(0);
+         }
+
+         .guideSection {
+            border: 2px solid #e1eee5;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fbfffc;
+         }
+
+         .guideSection h3 {
+            font-size: 15px;
+            margin-bottom: 6px;
+         }
+
+         .guideSection p,
+         .guideSection li {
+            font-size: 13px;
+            color: #45634d;
+            line-height: 1.45;
+         }
+
+         .guideSection ul {
+            padding-left: 18px;
          }
 
          .shopHeader {
@@ -516,20 +574,18 @@
          <section class="grid" id="grid"></section>
 
          <section class="footer">
-            <button id="spawnBtn">Gerar objeto</button>
+            <div class="trash" id="trashZone">
+               <strong>🗑️ Lixeira</strong>
+               <span>Arraste aqui</span>
+            </div>
             <button class="shop-open" id="openShopBtn">Loja</button>
+            <button class="guide-open" id="openGuideBtn">Guia</button>
             <button class="danger" id="resetBtn">Resetar</button>
          </section>
-
-         <p class="hint">
-            Arraste um objeto sobre outro do mesmo nível e solte para fazer
-            merge.<br />
-            Objetos dourados geram 2x para sempre. O bônus 2x comum vale apenas
-            por tick.
-         </p>
       </main>
 
       <div class="shopOverlay" id="shopOverlay"></div>
+      <div class="shopOverlay" id="guideOverlay"></div>
 
       <aside class="shop" id="shop">
          <div class="shopHeader">
@@ -561,18 +617,104 @@
          <div id="upgrades"></div>
       </aside>
 
+      <aside class="guide" id="guide">
+         <div class="shopHeader">
+            <h2>Guia rápido</h2>
+            <button class="closeBtn" id="closeGuideBtn">✕</button>
+         </div>
+
+         <section class="guideSection">
+            <h3>🎯 Objetivo</h3>
+            <p>
+               Combine objetos iguais para criar objetos de nível maior e
+               aumentar seu dinheiro por segundo.
+            </p>
+         </section>
+
+         <section class="guideSection">
+            <h3>🔁 Merge</h3>
+            <ul>
+               <li>Arraste um objeto sobre outro do mesmo nível.</li>
+               <li>
+                  Solte para combinar os dois em um objeto de nível superior.
+               </li>
+               <li>
+                  Objetos de níveis diferentes não combinam e geram um aviso
+                  vermelho.
+               </li>
+            </ul>
+         </section>
+
+         <section class="guideSection">
+            <h3>💰 Dinheiro</h3>
+            <ul>
+               <li>
+                  Cada objeto gera dinheiro automaticamente a cada segundo.
+               </li>
+               <li>O popup acima do objeto mostra quanto ele gerou no tick.</li>
+               <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
+            </ul>
+         </section>
+
+         <section class="guideSection">
+            <h3>🌟 Objetos dourados</h3>
+            <ul>
+               <li>Objetos dourados geram 2x dinheiro para sempre.</li>
+               <li>Ao combinar, o efeito dourado continua no novo objeto.</li>
+               <li>
+                  O upgrade de objeto dourado aumenta a chance deles aparecerem.
+               </li>
+            </ul>
+         </section>
+
+         <section class="guideSection">
+            <h3>🗑️ Lixeira</h3>
+            <ul>
+               <li>
+                  Arraste um objeto para a lixeira para removê-lo da grade.
+               </li>
+               <li>
+                  Ao excluir, você recebe metade do valor que ele gerava por
+                  segundo.
+               </li>
+               <li>
+                  Use isso para liberar espaço quando a grade estiver travando.
+               </li>
+            </ul>
+         </section>
+
+         <section class="guideSection">
+            <h3>🛒 Loja</h3>
+            <ul>
+               <li>Compre upgrades para acelerar o spawn.</li>
+               <li>Aumente o nível dos objetos gerados.</li>
+               <li>
+                  Aumente a chance de spawn duplo, tick 2x e objetos dourados.
+               </li>
+               <li>
+                  Quando o nível inicial sobe, objetos antigos abaixo desse
+                  nível são atualizados automaticamente.
+               </li>
+            </ul>
+         </section>
+      </aside>
+
       <script>
          const grid = document.getElementById('grid');
          const moneyEl = document.getElementById('money');
          const incomeEl = document.getElementById('income');
          const bestLevelEl = document.getElementById('bestLevel');
          const saveStatus = document.getElementById('saveStatus');
-         const spawnBtn = document.getElementById('spawnBtn');
+         const trashZone = document.getElementById('trashZone');
          const resetBtn = document.getElementById('resetBtn');
          const openShopBtn = document.getElementById('openShopBtn');
+         const openGuideBtn = document.getElementById('openGuideBtn');
          const closeShopBtn = document.getElementById('closeShopBtn');
+         const closeGuideBtn = document.getElementById('closeGuideBtn');
          const shop = document.getElementById('shop');
+         const guide = document.getElementById('guide');
          const shopOverlay = document.getElementById('shopOverlay');
+         const guideOverlay = document.getElementById('guideOverlay');
          const shopMoney = document.getElementById('shopMoney');
          const upgradesEl = document.getElementById('upgrades');
          const spawnTimeStat = document.getElementById('spawnTimeStat');
@@ -676,6 +818,26 @@
 
          function getStartLevel() {
             return 1 + Math.floor(upgrades.startLevel.level / 3);
+         }
+
+         function upgradeOldItemsToStartLevel() {
+            const startLevel = getStartLevel();
+            let changed = false;
+
+            items.forEach((item) => {
+               if (item.level < startLevel) {
+                  item.level = startLevel;
+                  item.element.dataset.level = startLevel;
+                  item.element.className = `item level-${Math.min(startLevel, 7)} pop ${item.isGolden ? 'golden' : ''}`;
+                  item.element.innerHTML = `Lv ${startLevel}${item.isGolden ? '<small>★ 2x</small>' : ''}`;
+                  changed = true;
+               }
+            });
+
+            if (changed) {
+               updateUI();
+               saveGame(true);
+            }
          }
 
          function getDoubleSpawnChance() {
@@ -858,6 +1020,31 @@
             setTimeout(() => ring.remove(), 500);
          }
 
+         function isPointerOverTrash(x, y) {
+            const rect = trashZone.getBoundingClientRect();
+            return (
+               x >= rect.left &&
+               x <= rect.right &&
+               y >= rect.top &&
+               y <= rect.bottom
+            );
+         }
+
+         function deleteDraggedItem() {
+            const refund = getItemPotentialValue(draggedItem) / 2;
+            const center = getElementCenter(trashZone);
+
+            money += refund;
+            draggedItem.element.remove();
+            items = items.filter((item) => item !== draggedItem);
+            createRing(center.x, center.y, 'error');
+
+            draggedItem = null;
+            trashZone.classList.remove('active');
+            updateUI();
+            saveGame(true);
+         }
+
          function flashError(targetItem, targetCell) {
             const center = getElementCenter(targetItem.element);
             createRing(center.x, center.y, 'error');
@@ -910,6 +1097,7 @@
             upgrades[key].level++;
 
             if (key === 'spawnSpeed') restartSpawnTimer();
+            if (key === 'startLevel') upgradeOldItemsToStartLevel();
             updateUI();
             saveGame(true);
          }
@@ -1029,6 +1217,13 @@
             moveDraggedItem(event.clientX, event.clientY);
             clearHighlights();
 
+            if (isPointerOverTrash(event.clientX, event.clientY)) {
+               trashZone.classList.add('active');
+               return;
+            }
+
+            trashZone.classList.remove('active');
+
             const cell = getCellUnderPointer(event.clientX, event.clientY);
             if (!cell) return;
 
@@ -1043,6 +1238,13 @@
 
             const cell = getCellUnderPointer(event.clientX, event.clientY);
             clearHighlights();
+
+            if (isPointerOverTrash(event.clientX, event.clientY)) {
+               deleteDraggedItem();
+               return;
+            }
+
+            trashZone.classList.remove('active');
 
             if (!cell) {
                returnToOriginalCell();
@@ -1080,8 +1282,6 @@
             draggedItem = null;
          });
 
-         spawnBtn.addEventListener('click', spawnObjects);
-
          resetBtn.addEventListener('click', () => {
             money = 0;
             items.forEach((item) => item.element.remove());
@@ -1109,6 +1309,19 @@
 
          closeShopBtn.addEventListener('click', closeShop);
          shopOverlay.addEventListener('click', closeShop);
+
+         openGuideBtn.addEventListener('click', () => {
+            guide.classList.add('active');
+            guideOverlay.classList.add('active');
+         });
+
+         function closeGuide() {
+            guide.classList.remove('active');
+            guideOverlay.classList.remove('active');
+         }
+
+         closeGuideBtn.addEventListener('click', closeGuide);
+         guideOverlay.addEventListener('click', closeGuide);
 
          setInterval(incomeTick, 1000);
 
