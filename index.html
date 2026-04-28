@@ -1116,6 +1116,17 @@
         lastSpawnTime = Date.now();
       }
 
+      function applySpawnSpeedUpgrade() {
+         const oldTotal = Date.now() - lastSpawnTime;
+         const newTotal = getSpawnTime();
+
+         if (oldTotal >= newTotal) {
+            spawnObjects();
+         }
+
+         updateSpawnProgressBar();
+      }
+
       function restartSpawnTimer() {
         clearInterval(spawnTimer);
         lastSpawnTime = Date.now();
@@ -1276,7 +1287,7 @@
         money -= cost;
         upgrades[key].level++;
 
-        if (key === "spawnSpeed") restartSpawnTimer();
+        if (key === "spawnSpeed") applySpawnSpeedUpgrade();
         if (key === "startLevel") upgradeOldItemsToStartLevel();
         updateUI();
         saveGame(true);
