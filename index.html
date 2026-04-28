@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Merge Clicker - V2</title>
+      <title>Merge Clicker - V3</title>
       <style>
          * {
             box-sizing: border-box;
@@ -33,6 +33,13 @@
             padding: 18px;
             position: relative;
             overflow: hidden;
+         }
+
+         .saveStatus {
+            text-align: center;
+            font-size: 12px;
+            color: #5c735f;
+            margin-bottom: 10px;
          }
 
          .top {
@@ -88,6 +95,10 @@
             border-color: #d8a900;
          }
 
+         .cell.errorFlash {
+            animation: errorCell 0.35s ease;
+         }
+
          .item {
             width: 76%;
             height: 76%;
@@ -112,7 +123,24 @@
 
          .item small {
             font-size: 10px;
-            opacity: 0.9;
+            opacity: 0.92;
+         }
+
+         .item.golden {
+            box-shadow:
+               0 0 0 3px #ffd84d,
+               0 0 18px #ffd84d,
+               inset 0 -6px rgba(0, 0, 0, 0.12),
+               0 6px 12px rgba(0, 0, 0, 0.16);
+            animation: goldenGlow 1.2s ease-in-out infinite alternate;
+         }
+
+         .item.mergeBurst {
+            animation: mergeBurst 0.28s ease;
+         }
+
+         .item.shakeError {
+            animation: shakeError 0.32s ease;
          }
 
          .item:active {
@@ -147,6 +175,43 @@
          }
          .level-7 {
             background: linear-gradient(145deg, #2c3e50, #17202a);
+         }
+
+         .moneyPopup {
+            position: fixed;
+            z-index: 2000;
+            pointer-events: none;
+            font-weight: bold;
+            font-size: 13px;
+            color: #1f8f48;
+            text-shadow: 0 1px 0 #fff;
+            animation: floatMoney 0.85s ease-out forwards;
+         }
+
+         .moneyPopup.double {
+            color: #236fbe;
+            font-size: 15px;
+         }
+
+         .moneyPopup.goldenText {
+            color: #d49b00;
+         }
+
+         .effectRing {
+            position: fixed;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 3px solid #ffd84d;
+            pointer-events: none;
+            z-index: 1500;
+            transform: translate(-50%, -50%);
+            animation: ringEffect 0.42s ease-out forwards;
+         }
+
+         .effectRing.error {
+            border-color: #e74c3c;
+            animation: ringError 0.38s ease-out forwards;
          }
 
          .footer {
@@ -268,6 +333,11 @@
             background: #fbfffc;
          }
 
+         .upgrade.goldenUpgrade {
+            border-color: #ffe08a;
+            background: #fffaf0;
+         }
+
          .upgradeTop {
             display: flex;
             justify-content: space-between;
@@ -332,10 +402,102 @@
                opacity: 1;
             }
          }
+
+         @keyframes floatMoney {
+            0% {
+               transform: translateY(0) scale(0.9);
+               opacity: 0;
+            }
+            15% {
+               opacity: 1;
+            }
+            100% {
+               transform: translateY(-42px) scale(1.1);
+               opacity: 0;
+            }
+         }
+
+         @keyframes goldenGlow {
+            from {
+               filter: brightness(1);
+            }
+            to {
+               filter: brightness(1.18);
+            }
+         }
+
+         @keyframes mergeBurst {
+            0% {
+               transform: scale(0.75);
+            }
+            70% {
+               transform: scale(1.16);
+            }
+            100% {
+               transform: scale(1);
+            }
+         }
+
+         @keyframes shakeError {
+            0%,
+            100% {
+               transform: translateX(0);
+            }
+            25% {
+               transform: translateX(-5px);
+            }
+            50% {
+               transform: translateX(5px);
+            }
+            75% {
+               transform: translateX(-3px);
+            }
+         }
+
+         @keyframes errorCell {
+            0%,
+            100% {
+               background: rgba(255, 255, 255, 0.55);
+            }
+            50% {
+               background: rgba(231, 76, 60, 0.25);
+               border-color: #e74c3c;
+            }
+         }
+
+         @keyframes ringEffect {
+            0% {
+               width: 10px;
+               height: 10px;
+               opacity: 1;
+            }
+            100% {
+               width: 92px;
+               height: 92px;
+               opacity: 0;
+            }
+         }
+
+         @keyframes ringError {
+            0% {
+               width: 10px;
+               height: 10px;
+               opacity: 1;
+            }
+            100% {
+               width: 74px;
+               height: 74px;
+               opacity: 0;
+            }
+         }
       </style>
    </head>
    <body>
       <main class="game">
+         <div class="saveStatus" id="saveStatus">
+            Salvamento automático ativo
+         </div>
+
          <section class="top">
             <div class="panel">
                <div class="label">Dinheiro</div>
@@ -362,7 +524,8 @@
          <p class="hint">
             Arraste um objeto sobre outro do mesmo nível e solte para fazer
             merge.<br />
-            A cada alguns segundos nasce um novo objeto, se houver espaço livre.
+            Objetos dourados geram 2x para sempre. O bônus 2x comum vale apenas
+            por tick.
          </p>
       </main>
 
@@ -387,8 +550,12 @@
                Chance dupla<strong id="doubleSpawnStat">0%</strong>
             </div>
             <div class="stat">
-               Bônus 2x<strong id="doubleMoneyStat">0%</strong>
+               Bônus 2x tick<strong id="doubleMoneyStat">0%</strong>
             </div>
+            <div class="stat">
+               Dourado<strong id="goldenChanceStat">0%</strong>
+            </div>
+            <div class="stat">Objetos<strong id="itemsStat">0/16</strong></div>
          </div>
 
          <div id="upgrades"></div>
@@ -399,6 +566,7 @@
          const moneyEl = document.getElementById('money');
          const incomeEl = document.getElementById('income');
          const bestLevelEl = document.getElementById('bestLevel');
+         const saveStatus = document.getElementById('saveStatus');
          const spawnBtn = document.getElementById('spawnBtn');
          const resetBtn = document.getElementById('resetBtn');
          const openShopBtn = document.getElementById('openShopBtn');
@@ -411,9 +579,12 @@
          const startLevelStat = document.getElementById('startLevelStat');
          const doubleSpawnStat = document.getElementById('doubleSpawnStat');
          const doubleMoneyStat = document.getElementById('doubleMoneyStat');
+         const goldenChanceStat = document.getElementById('goldenChanceStat');
+         const itemsStat = document.getElementById('itemsStat');
 
          const GRID_SIZE = 16;
          const BASE_SPAWN_TIME = 3000;
+         const SAVE_KEY = 'merge-clicker-prototype-save-v3';
 
          let money = 0;
          let cells = [];
@@ -423,6 +594,7 @@
          let offsetX = 0;
          let offsetY = 0;
          let spawnTimer = null;
+         let saveTextTimer = null;
 
          const upgrades = {
             spawnSpeed: {
@@ -447,15 +619,26 @@
                baseCost: 1500,
             },
             doubleMoney: {
-               name: 'Sucata valiosa',
+               name: 'Tick valioso',
                description:
-                  'Aumenta em 4% por nível a chance do objeto gerar 2x mais dinheiro. Máximo: 80%.',
+                  'Aumenta em 4% por nível a chance de um objeto gerar 2x dinheiro naquele tick. Máximo: 80%.',
                level: 0,
                baseCost: 2000,
+            },
+            goldenChance: {
+               name: 'Objeto dourado',
+               description:
+                  'Aumenta em 2% por nível a chance de nascer um objeto dourado. Dourados geram 2x para sempre e mantêm o bônus ao combinar.',
+               level: 0,
+               baseCost: 12000,
+               noTenMultiplier: true,
+               golden: true,
             },
          };
 
          function formatMoney(value) {
+            if (value >= 1_000_000_000)
+               return `$${(value / 1_000_000_000).toFixed(2)}B`;
             if (value >= 1_000_000)
                return `$${(value / 1_000_000).toFixed(2)}M`;
             if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
@@ -480,7 +663,7 @@
             let cost = upgrade.baseCost;
 
             for (let i = 1; i <= upgrade.level; i++) {
-               cost *= i % 10 === 0 ? 4 : 2;
+               cost *= !upgrade.noTenMultiplier && i % 10 === 0 ? 4 : 2;
             }
 
             return Math.floor(cost);
@@ -503,13 +686,23 @@
             return Math.min(0.8, upgrades.doubleMoney.level * 0.04);
          }
 
-         function getItemValue(item) {
-            const base = Math.pow(3, item.level - 1);
-            return item.hasDoubleMoney ? base * 2 : base;
+         function getGoldenChance() {
+            return Math.min(0.7, upgrades.goldenChance.level * 0.02);
          }
 
-         function getTotalIncome() {
-            return items.reduce((total, item) => total + getItemValue(item), 0);
+         function getBaseItemValue(level) {
+            return Math.pow(3, level - 1);
+         }
+
+         function getItemPotentialValue(item) {
+            return getBaseItemValue(item.level) * (item.isGolden ? 2 : 1);
+         }
+
+         function getTotalIncomePreview() {
+            return items.reduce(
+               (total, item) => total + getItemPotentialValue(item),
+               0,
+            );
          }
 
          function getBestLevel() {
@@ -519,13 +712,15 @@
 
          function updateUI() {
             moneyEl.textContent = formatMoney(money);
-            incomeEl.textContent = `${formatMoney(getTotalIncome())}/s`;
+            incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
             bestLevelEl.textContent = getBestLevel();
             shopMoney.textContent = `Dinheiro: ${formatMoney(money)}`;
             spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
             startLevelStat.textContent = `Lv ${getStartLevel()}`;
             doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
             doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
+            goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
+            itemsStat.textContent = `${items.length}/16`;
             renderUpgrades();
          }
 
@@ -537,7 +732,7 @@
          function createItem(
             level = getStartLevel(),
             cellIndex = null,
-            forcedDoubleMoney = null,
+            forcedGolden = null,
          ) {
             const freeCells = getFreeCells();
             if (freeCells.length === 0 && cellIndex === null) return false;
@@ -548,12 +743,11 @@
                   : freeCells[Math.floor(Math.random() * freeCells.length)];
 
             const chosenIndex = Number(chosenCell.dataset.index);
-            const hasDoubleMoney =
-               forcedDoubleMoney ?? Math.random() < getDoubleMoneyChance();
+            const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
 
             const element = document.createElement('div');
-            element.className = `item level-${Math.min(level, 7)} pop`;
-            element.innerHTML = `Lv ${level}${hasDoubleMoney ? '<small>2x</small>' : ''}`;
+            element.className = `item level-${Math.min(level, 7)} pop ${isGolden ? 'golden' : ''}`;
+            element.innerHTML = `Lv ${level}${isGolden ? '<small>★ 2x</small>' : ''}`;
             element.dataset.level = level;
 
             chosenCell.appendChild(element);
@@ -562,13 +756,14 @@
                id: crypto.randomUUID(),
                level,
                cellIndex: chosenIndex,
-               hasDoubleMoney,
+               isGolden,
                element,
             };
 
             items.push(item);
             addDragEvents(item);
             updateUI();
+            saveGame();
             return true;
          }
 
@@ -646,13 +841,43 @@
             draggedItem.element.style.height = '';
          }
 
+         function getElementCenter(element) {
+            const rect = element.getBoundingClientRect();
+            return {
+               x: rect.left + rect.width / 2,
+               y: rect.top + rect.height / 2,
+            };
+         }
+
+         function createRing(x, y, type = 'merge') {
+            const ring = document.createElement('div');
+            ring.className = `effectRing ${type === 'error' ? 'error' : ''}`;
+            ring.style.left = `${x}px`;
+            ring.style.top = `${y}px`;
+            document.body.appendChild(ring);
+            setTimeout(() => ring.remove(), 500);
+         }
+
+         function flashError(targetItem, targetCell) {
+            const center = getElementCenter(targetItem.element);
+            createRing(center.x, center.y, 'error');
+            targetCell.classList.add('errorFlash');
+            targetItem.element.classList.add('shakeError');
+            draggedItem.element.classList.add('shakeError');
+
+            setTimeout(() => {
+               targetCell.classList.remove('errorFlash');
+               targetItem.element.classList.remove('shakeError');
+               if (draggedItem)
+                  draggedItem.element.classList.remove('shakeError');
+            }, 360);
+         }
+
          function mergeItems(targetItem) {
             const newLevel = draggedItem.level + 1;
             const targetCellIndex = targetItem.cellIndex;
-            const newHasDoubleMoney =
-               draggedItem.hasDoubleMoney ||
-               targetItem.hasDoubleMoney ||
-               Math.random() < getDoubleMoneyChance();
+            const newIsGolden = draggedItem.isGolden || targetItem.isGolden;
+            const center = getElementCenter(targetItem.element);
 
             draggedItem.element.remove();
             targetItem.element.remove();
@@ -662,10 +887,19 @@
             );
 
             draggedItem = null;
-            createItem(newLevel, targetCellIndex, newHasDoubleMoney);
-            money +=
-               Math.pow(3, newLevel - 1) * (newHasDoubleMoney ? 2 : 1) * 5;
+            createItem(newLevel, targetCellIndex, newIsGolden);
+
+            const newItem = getItemByExactCell(targetCellIndex);
+            if (newItem) newItem.element.classList.add('mergeBurst');
+            createRing(center.x, center.y, 'merge');
+
+            money += getBaseItemValue(newLevel) * (newIsGolden ? 2 : 1) * 5;
             updateUI();
+            saveGame();
+         }
+
+         function getItemByExactCell(cellIndex) {
+            return items.find((item) => item.cellIndex === cellIndex);
          }
 
          function buyUpgrade(key) {
@@ -677,6 +911,7 @@
 
             if (key === 'spawnSpeed') restartSpawnTimer();
             updateUI();
+            saveGame(true);
          }
 
          function renderUpgrades() {
@@ -685,22 +920,107 @@
             Object.entries(upgrades).forEach(([key, upgrade]) => {
                const cost = getUpgradeCost(key);
                const card = document.createElement('div');
-               card.className = 'upgrade';
+               card.className = `upgrade ${upgrade.golden ? 'goldenUpgrade' : ''}`;
 
                card.innerHTML = `
-         <div class="upgradeTop">
+          <div class="upgradeTop">
             <h3>${upgrade.name}</h3>
             <span class="upgradeLevel">Nv. ${upgrade.level}</span>
-         </div>
-         <p>${upgrade.description}</p>
-         <button ${money < cost ? 'disabled' : ''}>Comprar — ${formatMoney(cost)}</button>
-         `;
+          </div>
+          <p>${upgrade.description}</p>
+          <button ${money < cost ? 'disabled' : ''}>Comprar — ${formatMoney(cost)}</button>
+        `;
 
                card
                   .querySelector('button')
                   .addEventListener('click', () => buyUpgrade(key));
                upgradesEl.appendChild(card);
             });
+         }
+
+         function createMoneyPopup(item, amount, isDoubleTick) {
+            const rect = item.element.getBoundingClientRect();
+            const popup = document.createElement('div');
+            popup.className = `moneyPopup ${isDoubleTick ? 'double' : ''} ${item.isGolden ? 'goldenText' : ''}`;
+            popup.textContent = `+${formatMoney(amount)}/s${isDoubleTick ? ' 2x!' : ''}`;
+            popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
+            popup.style.top = `${rect.top - 4}px`;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 900);
+         }
+
+         function incomeTick() {
+            items.forEach((item) => {
+               const base = getBaseItemValue(item.level);
+               const goldenMultiplier = item.isGolden ? 2 : 1;
+               const isDoubleTick = Math.random() < getDoubleMoneyChance();
+               const tickMultiplier = isDoubleTick ? 2 : 1;
+               const gained = base * goldenMultiplier * tickMultiplier;
+
+               money += gained;
+               createMoneyPopup(item, gained, isDoubleTick);
+            });
+
+            updateUI();
+            saveGame();
+         }
+
+         function saveGame(showText = false) {
+            const saveData = {
+               money,
+               items: items.map((item) => ({
+                  level: item.level,
+                  cellIndex: item.cellIndex,
+                  isGolden: item.isGolden,
+               })),
+               upgrades: Object.fromEntries(
+                  Object.entries(upgrades).map(([key, upgrade]) => [
+                     key,
+                     upgrade.level,
+                  ]),
+               ),
+            };
+
+            localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+
+            if (showText) {
+               clearTimeout(saveTextTimer);
+               saveStatus.textContent = 'Progresso salvo ✓';
+               saveTextTimer = setTimeout(() => {
+                  saveStatus.textContent = 'Salvamento automático ativo';
+               }, 1200);
+            }
+         }
+
+         function loadGame() {
+            const rawSave = localStorage.getItem(SAVE_KEY);
+            if (!rawSave) return false;
+
+            try {
+               const saveData = JSON.parse(rawSave);
+               money = saveData.money ?? 0;
+
+               if (saveData.upgrades) {
+                  Object.entries(saveData.upgrades).forEach(([key, level]) => {
+                     if (upgrades[key]) upgrades[key].level = level;
+                  });
+               }
+
+               if (Array.isArray(saveData.items)) {
+                  saveData.items.forEach((savedItem) => {
+                     createItem(
+                        savedItem.level,
+                        savedItem.cellIndex,
+                        savedItem.isGolden,
+                     );
+                  });
+               }
+
+               return true;
+            } catch (error) {
+               console.warn('Erro ao carregar save:', error);
+               return false;
+            }
          }
 
          document.addEventListener('pointermove', (event) => {
@@ -738,6 +1058,13 @@
                return;
             }
 
+            if (targetItem && targetItem.level !== draggedItem.level) {
+               flashError(targetItem, cell);
+               returnToOriginalCell();
+               draggedItem = null;
+               return;
+            }
+
             const freeTarget = !targetItem;
             if (freeTarget) {
                cell.appendChild(draggedItem.element);
@@ -745,6 +1072,7 @@
                resetDraggedStyles();
                draggedItem = null;
                updateUI();
+               saveGame();
                return;
             }
 
@@ -760,11 +1088,13 @@
             items = [];
 
             Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
+            localStorage.removeItem(SAVE_KEY);
 
-            createItem(1);
-            createItem(1);
+            createItem(1, null, false);
+            createItem(1, null, false);
             restartSpawnTimer();
             updateUI();
+            saveGame(true);
          });
 
          openShopBtn.addEventListener('click', () => {
@@ -780,14 +1110,16 @@
          closeShopBtn.addEventListener('click', closeShop);
          shopOverlay.addEventListener('click', closeShop);
 
-         setInterval(() => {
-            money += getTotalIncome();
-            updateUI();
-         }, 1000);
+         setInterval(incomeTick, 1000);
 
          createGrid();
-         createItem(1);
-         createItem(1);
+         const loaded = loadGame();
+
+         if (!loaded || items.length === 0) {
+            createItem(1, null, false);
+            createItem(1, null, false);
+         }
+
          restartSpawnTimer();
          updateUI();
       </script>
