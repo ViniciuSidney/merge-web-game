@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Merge Clicker - Protótipo</title>
+      <title>Merge Clicker - V2</title>
       <style>
          * {
             box-sizing: border-box;
@@ -21,6 +21,7 @@
             align-items: center;
             padding: 20px;
             color: #16351f;
+            overflow-x: hidden;
          }
 
          .game {
@@ -30,17 +31,18 @@
             border-radius: 18px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
             padding: 18px;
+            position: relative;
+            overflow: hidden;
          }
 
          .top {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 14px;
          }
 
          .panel {
-            flex: 1;
             background: #dff3e5;
             border: 2px solid #b8dfc2;
             border-radius: 12px;
@@ -55,7 +57,7 @@
          }
 
          .value {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
          }
 
@@ -93,6 +95,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
+            gap: 2px;
             font-weight: bold;
             color: white;
             cursor: grab;
@@ -104,6 +108,11 @@
             transition:
                transform 0.15s ease,
                box-shadow 0.15s ease;
+         }
+
+         .item small {
+            font-size: 10px;
+            opacity: 0.9;
          }
 
          .item:active {
@@ -165,8 +174,17 @@
             opacity: 0.95;
          }
 
+         button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+         }
+
          .danger {
             background: #c0392b;
+         }
+         .shop-open {
+            background: #236fbe;
          }
 
          .hint {
@@ -175,6 +193,129 @@
             margin-top: 12px;
             color: #45634d;
             line-height: 1.35;
+         }
+
+         .shopOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1000;
+         }
+
+         .shopOverlay.active {
+            opacity: 1;
+            pointer-events: auto;
+         }
+
+         .shop {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: min(360px, 92vw);
+            background: #ffffff;
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+            padding: 18px;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            z-index: 1001;
+            overflow-y: auto;
+         }
+
+         .shop.active {
+            transform: translateX(0);
+         }
+
+         .shopHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+         }
+
+         .shopHeader h2 {
+            font-size: 22px;
+         }
+
+         .closeBtn {
+            flex: unset;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            background: #eef5f0;
+            color: #16351f;
+            border: 1px solid #d7e8dc;
+         }
+
+         .shopMoney {
+            background: #dff3e5;
+            border: 2px solid #b8dfc2;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: center;
+         }
+
+         .upgrade {
+            border: 2px solid #e1eee5;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fbfffc;
+         }
+
+         .upgradeTop {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 7px;
+         }
+
+         .upgrade h3 {
+            font-size: 15px;
+         }
+
+         .upgradeLevel {
+            font-size: 12px;
+            font-weight: bold;
+            color: #1f8f48;
+            white-space: nowrap;
+         }
+
+         .upgrade p {
+            font-size: 13px;
+            color: #45634d;
+            line-height: 1.35;
+            margin-bottom: 10px;
+         }
+
+         .upgrade button {
+            width: 100%;
+         }
+
+         .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+         }
+
+         .stat {
+            background: #f2f8f4;
+            border-radius: 10px;
+            padding: 8px;
+            font-size: 12px;
+            text-align: center;
+         }
+
+         .stat strong {
+            display: block;
+            font-size: 14px;
+            margin-top: 3px;
          }
 
          .pop {
@@ -214,15 +355,44 @@
 
          <section class="footer">
             <button id="spawnBtn">Gerar objeto</button>
+            <button class="shop-open" id="openShopBtn">Loja</button>
             <button class="danger" id="resetBtn">Resetar</button>
          </section>
 
          <p class="hint">
             Arraste um objeto sobre outro do mesmo nível e solte para fazer
             merge.<br />
-            A cada 3 segundos nasce um novo objeto, se houver espaço livre.
+            A cada alguns segundos nasce um novo objeto, se houver espaço livre.
          </p>
       </main>
+
+      <div class="shopOverlay" id="shopOverlay"></div>
+
+      <aside class="shop" id="shop">
+         <div class="shopHeader">
+            <h2>Loja</h2>
+            <button class="closeBtn" id="closeShopBtn">✕</button>
+         </div>
+
+         <div class="shopMoney" id="shopMoney">Dinheiro: $0</div>
+
+         <div class="stats">
+            <div class="stat">
+               Spawn<strong id="spawnTimeStat">3.00s</strong>
+            </div>
+            <div class="stat">
+               Nível inicial<strong id="startLevelStat">Lv 1</strong>
+            </div>
+            <div class="stat">
+               Chance dupla<strong id="doubleSpawnStat">0%</strong>
+            </div>
+            <div class="stat">
+               Bônus 2x<strong id="doubleMoneyStat">0%</strong>
+            </div>
+         </div>
+
+         <div id="upgrades"></div>
+      </aside>
 
       <script>
          const grid = document.getElementById('grid');
@@ -231,9 +401,19 @@
          const bestLevelEl = document.getElementById('bestLevel');
          const spawnBtn = document.getElementById('spawnBtn');
          const resetBtn = document.getElementById('resetBtn');
+         const openShopBtn = document.getElementById('openShopBtn');
+         const closeShopBtn = document.getElementById('closeShopBtn');
+         const shop = document.getElementById('shop');
+         const shopOverlay = document.getElementById('shopOverlay');
+         const shopMoney = document.getElementById('shopMoney');
+         const upgradesEl = document.getElementById('upgrades');
+         const spawnTimeStat = document.getElementById('spawnTimeStat');
+         const startLevelStat = document.getElementById('startLevelStat');
+         const doubleSpawnStat = document.getElementById('doubleSpawnStat');
+         const doubleMoneyStat = document.getElementById('doubleMoneyStat');
 
          const GRID_SIZE = 16;
-         const SPAWN_INTERVAL = 3000;
+         const BASE_SPAWN_TIME = 3000;
 
          let money = 0;
          let cells = [];
@@ -242,6 +422,45 @@
          let originalCellIndex = null;
          let offsetX = 0;
          let offsetY = 0;
+         let spawnTimer = null;
+
+         const upgrades = {
+            spawnSpeed: {
+               name: 'Esteira mais rápida',
+               description:
+                  'Diminui o tempo de espera para gerar novos objetos em 0.15s por nível. Mínimo: 0.75s.',
+               level: 0,
+               baseCost: 1200,
+            },
+            startLevel: {
+               name: 'Sucata melhor',
+               description:
+                  'A cada 3 níveis deste upgrade, os objetos começam 1 nível acima.',
+               level: 0,
+               baseCost: 1800,
+            },
+            doubleSpawn: {
+               name: 'Entrega dupla',
+               description:
+                  'Aumenta em 5% por nível a chance de nascerem 2 objetos ao mesmo tempo. Máximo: 75%.',
+               level: 0,
+               baseCost: 1500,
+            },
+            doubleMoney: {
+               name: 'Sucata valiosa',
+               description:
+                  'Aumenta em 4% por nível a chance do objeto gerar 2x mais dinheiro. Máximo: 80%.',
+               level: 0,
+               baseCost: 2000,
+            },
+         };
+
+         function formatMoney(value) {
+            if (value >= 1_000_000)
+               return `$${(value / 1_000_000).toFixed(2)}M`;
+            if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
+            return `$${Math.floor(value)}`;
+         }
 
          function createGrid() {
             grid.innerHTML = '';
@@ -256,15 +475,41 @@
             }
          }
 
-         function getItemValue(level) {
-            return Math.pow(3, level - 1);
+         function getUpgradeCost(key) {
+            const upgrade = upgrades[key];
+            let cost = upgrade.baseCost;
+
+            for (let i = 1; i <= upgrade.level; i++) {
+               cost *= i % 10 === 0 ? 4 : 2;
+            }
+
+            return Math.floor(cost);
+         }
+
+         function getSpawnTime() {
+            const reduction = upgrades.spawnSpeed.level * 150;
+            return Math.max(750, BASE_SPAWN_TIME - reduction);
+         }
+
+         function getStartLevel() {
+            return 1 + Math.floor(upgrades.startLevel.level / 3);
+         }
+
+         function getDoubleSpawnChance() {
+            return Math.min(0.75, upgrades.doubleSpawn.level * 0.05);
+         }
+
+         function getDoubleMoneyChance() {
+            return Math.min(0.8, upgrades.doubleMoney.level * 0.04);
+         }
+
+         function getItemValue(item) {
+            const base = Math.pow(3, item.level - 1);
+            return item.hasDoubleMoney ? base * 2 : base;
          }
 
          function getTotalIncome() {
-            return items.reduce(
-               (total, item) => total + getItemValue(item.level),
-               0,
-            );
+            return items.reduce((total, item) => total + getItemValue(item), 0);
          }
 
          function getBestLevel() {
@@ -273,9 +518,15 @@
          }
 
          function updateUI() {
-            moneyEl.textContent = `$${Math.floor(money)}`;
-            incomeEl.textContent = `$${getTotalIncome()}/s`;
+            moneyEl.textContent = formatMoney(money);
+            incomeEl.textContent = `${formatMoney(getTotalIncome())}/s`;
             bestLevelEl.textContent = getBestLevel();
+            shopMoney.textContent = `Dinheiro: ${formatMoney(money)}`;
+            spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
+            startLevelStat.textContent = `Lv ${getStartLevel()}`;
+            doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
+            doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
+            renderUpgrades();
          }
 
          function getFreeCells() {
@@ -283,9 +534,13 @@
             return cells.filter((_, index) => !occupied.includes(index));
          }
 
-         function createItem(level = 1, cellIndex = null) {
+         function createItem(
+            level = getStartLevel(),
+            cellIndex = null,
+            forcedDoubleMoney = null,
+         ) {
             const freeCells = getFreeCells();
-            if (freeCells.length === 0 && cellIndex === null) return;
+            if (freeCells.length === 0 && cellIndex === null) return false;
 
             const chosenCell =
                cellIndex !== null
@@ -293,10 +548,12 @@
                   : freeCells[Math.floor(Math.random() * freeCells.length)];
 
             const chosenIndex = Number(chosenCell.dataset.index);
+            const hasDoubleMoney =
+               forcedDoubleMoney ?? Math.random() < getDoubleMoneyChance();
 
             const element = document.createElement('div');
             element.className = `item level-${Math.min(level, 7)} pop`;
-            element.textContent = `Lv ${level}`;
+            element.innerHTML = `Lv ${level}${hasDoubleMoney ? '<small>2x</small>' : ''}`;
             element.dataset.level = level;
 
             chosenCell.appendChild(element);
@@ -305,12 +562,27 @@
                id: crypto.randomUUID(),
                level,
                cellIndex: chosenIndex,
+               hasDoubleMoney,
                element,
             };
 
             items.push(item);
             addDragEvents(item);
             updateUI();
+            return true;
+         }
+
+         function spawnObjects() {
+            createItem();
+
+            if (Math.random() < getDoubleSpawnChance()) {
+               createItem();
+            }
+         }
+
+         function restartSpawnTimer() {
+            clearInterval(spawnTimer);
+            spawnTimer = setInterval(spawnObjects, getSpawnTime());
          }
 
          function addDragEvents(item) {
@@ -377,6 +649,10 @@
          function mergeItems(targetItem) {
             const newLevel = draggedItem.level + 1;
             const targetCellIndex = targetItem.cellIndex;
+            const newHasDoubleMoney =
+               draggedItem.hasDoubleMoney ||
+               targetItem.hasDoubleMoney ||
+               Math.random() < getDoubleMoneyChance();
 
             draggedItem.element.remove();
             targetItem.element.remove();
@@ -386,9 +662,45 @@
             );
 
             draggedItem = null;
-            createItem(newLevel, targetCellIndex);
-            money += getItemValue(newLevel) * 5;
+            createItem(newLevel, targetCellIndex, newHasDoubleMoney);
+            money +=
+               Math.pow(3, newLevel - 1) * (newHasDoubleMoney ? 2 : 1) * 5;
             updateUI();
+         }
+
+         function buyUpgrade(key) {
+            const cost = getUpgradeCost(key);
+            if (money < cost) return;
+
+            money -= cost;
+            upgrades[key].level++;
+
+            if (key === 'spawnSpeed') restartSpawnTimer();
+            updateUI();
+         }
+
+         function renderUpgrades() {
+            upgradesEl.innerHTML = '';
+
+            Object.entries(upgrades).forEach(([key, upgrade]) => {
+               const cost = getUpgradeCost(key);
+               const card = document.createElement('div');
+               card.className = 'upgrade';
+
+               card.innerHTML = `
+         <div class="upgradeTop">
+            <h3>${upgrade.name}</h3>
+            <span class="upgradeLevel">Nv. ${upgrade.level}</span>
+         </div>
+         <p>${upgrade.description}</p>
+         <button ${money < cost ? 'disabled' : ''}>Comprar — ${formatMoney(cost)}</button>
+         `;
+
+               card
+                  .querySelector('button')
+                  .addEventListener('click', () => buyUpgrade(key));
+               upgradesEl.appendChild(card);
+            });
          }
 
          document.addEventListener('pointermove', (event) => {
@@ -440,20 +752,33 @@
             draggedItem = null;
          });
 
-         spawnBtn.addEventListener('click', () => createItem(1));
+         spawnBtn.addEventListener('click', spawnObjects);
 
          resetBtn.addEventListener('click', () => {
             money = 0;
             items.forEach((item) => item.element.remove());
             items = [];
+
+            Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
+
             createItem(1);
             createItem(1);
+            restartSpawnTimer();
             updateUI();
          });
 
-         setInterval(() => {
-            createItem(1);
-         }, SPAWN_INTERVAL);
+         openShopBtn.addEventListener('click', () => {
+            shop.classList.add('active');
+            shopOverlay.classList.add('active');
+         });
+
+         function closeShop() {
+            shop.classList.remove('active');
+            shopOverlay.classList.remove('active');
+         }
+
+         closeShopBtn.addEventListener('click', closeShop);
+         shopOverlay.addEventListener('click', closeShop);
 
          setInterval(() => {
             money += getTotalIncome();
@@ -463,6 +788,7 @@
          createGrid();
          createItem(1);
          createItem(1);
+         restartSpawnTimer();
          updateUI();
       </script>
    </body>
