@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Merge Clicker - V4</title>
+      <title>Merge Clicker - V5</title>
       <style>
          * {
             box-sizing: border-box;
@@ -46,7 +46,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
          }
 
          .panel {
@@ -66,6 +66,49 @@
          .value {
             font-size: 17px;
             font-weight: bold;
+         }
+
+         .progressPanel {
+            background: #f2f8f4;
+            border: 2px solid #d7e8dc;
+            border-radius: 14px;
+            padding: 10px;
+            margin-bottom: 10px;
+         }
+
+         .progressHeader {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 13px;
+            margin-bottom: 7px;
+            color: #2f5638;
+         }
+
+         .barTrack {
+            height: 10px;
+            background: #dcebe0;
+            border-radius: 999px;
+            overflow: hidden;
+         }
+
+         .barFill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #1f8f48, #71d68b);
+            border-radius: 999px;
+            transition: width 0.12s linear;
+         }
+
+         .levelFill {
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+         }
+
+         .levelBonus {
+            font-size: 12px;
+            color: #45634d;
+            margin-top: 6px;
+            text-align: center;
          }
 
          .grid {
@@ -179,7 +222,7 @@
 
          .moneyPopup {
             position: fixed;
-            z-index: 2000;
+            z-index: 1000;
             pointer-events: none;
             font-weight: bold;
             font-size: 13px;
@@ -282,14 +325,6 @@
             background: #ffd8d2;
             border-color: #e74c3c;
             transform: scale(1.03);
-         }
-
-         .hint {
-            font-size: 13px;
-            text-align: center;
-            margin-top: 12px;
-            color: #45634d;
-            line-height: 1.35;
          }
 
          .shopOverlay {
@@ -558,17 +593,40 @@
 
          <section class="top">
             <div class="panel">
-               <div class="label">Dinheiro</div>
-               <div class="value" id="money">$0</div>
+               <div class="label">Polígonos</div>
+               <div class="value" id="money">◆0</div>
             </div>
             <div class="panel">
                <div class="label">Ganho / segundo</div>
-               <div class="value" id="income">$0/s</div>
+               <div class="value" id="income">◆0/s</div>
             </div>
             <div class="panel">
-               <div class="label">Maior nível</div>
-               <div class="value" id="bestLevel">1</div>
+               <div class="label">Estilhaços</div>
+               <div class="value" id="shards">✦0</div>
             </div>
+         </section>
+
+         <section class="progressPanel">
+            <div class="progressHeader">
+               <span>⏳ Próximo objeto</span>
+               <strong id="spawnProgressText">3.00s / 3.00s</strong>
+            </div>
+            <div class="barTrack">
+               <div class="barFill" id="spawnProgressFill"></div>
+            </div>
+         </section>
+
+         <section class="progressPanel">
+            <div class="progressHeader">
+               <span>⭐ Level <strong id="playerLevel">1</strong></span>
+               <strong id="levelProgressText">0 / 5 merges</strong>
+            </div>
+            <div class="barTrack">
+               <div class="barFill levelFill" id="levelProgressFill"></div>
+            </div>
+            <p class="levelBonus" id="levelBonusText">
+               Multiplicador por estilhaços: 1.0x
+            </p>
          </section>
 
          <section class="grid" id="grid"></section>
@@ -593,7 +651,9 @@
             <button class="closeBtn" id="closeShopBtn">✕</button>
          </div>
 
-         <div class="shopMoney" id="shopMoney">Dinheiro: $0</div>
+         <div class="shopMoney" id="shopMoney">
+            Polígonos: ◆0 | Estilhaços: ✦0
+         </div>
 
          <div class="stats">
             <div class="stat">
@@ -611,7 +671,11 @@
             <div class="stat">
                Dourado<strong id="goldenChanceStat">0%</strong>
             </div>
+            <div class="stat">
+               Multiplicador<strong id="multiplierStat">1.0x</strong>
+            </div>
             <div class="stat">Objetos<strong id="itemsStat">0/16</strong></div>
+            <div class="stat">Level<strong id="levelStat">1</strong></div>
          </div>
 
          <div id="upgrades"></div>
@@ -626,8 +690,8 @@
          <section class="guideSection">
             <h3>🎯 Objetivo</h3>
             <p>
-               Combine objetos iguais para criar objetos de nível maior e
-               aumentar seu dinheiro por segundo.
+               Combine objetos iguais para criar objetos de nível maior, gerar
+               mais polígonos e subir de level.
             </p>
          </section>
 
@@ -638,6 +702,7 @@
                <li>
                   Solte para combinar os dois em um objeto de nível superior.
                </li>
+               <li>Cada merge aumenta a barra de Level Up.</li>
                <li>
                   Objetos de níveis diferentes não combinam e geram um aviso
                   vermelho.
@@ -646,10 +711,10 @@
          </section>
 
          <section class="guideSection">
-            <h3>💰 Dinheiro</h3>
+            <h3>💠 Polígonos</h3>
             <ul>
                <li>
-                  Cada objeto gera dinheiro automaticamente a cada segundo.
+                  Cada objeto gera polígonos automaticamente a cada segundo.
                </li>
                <li>O popup acima do objeto mostra quanto ele gerou no tick.</li>
                <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
@@ -657,9 +722,20 @@
          </section>
 
          <section class="guideSection">
+            <h3>✦ Estilhaços</h3>
+            <ul>
+               <li>Você ganha estilhaços ao subir de level.</li>
+               <li>
+                  A recompensa é múltipla de 5 e aumenta conforme seu level.
+               </li>
+               <li>Cada estilhaço aumenta em 0.1x o ganho de polígonos.</li>
+            </ul>
+         </section>
+
+         <section class="guideSection">
             <h3>🌟 Objetos dourados</h3>
             <ul>
-               <li>Objetos dourados geram 2x dinheiro para sempre.</li>
+               <li>Objetos dourados geram 2x polígonos para sempre.</li>
                <li>Ao combinar, o efeito dourado continua no novo objeto.</li>
                <li>
                   O upgrade de objeto dourado aumenta a chance deles aparecerem.
@@ -675,7 +751,7 @@
                </li>
                <li>
                   Ao excluir, você recebe metade do valor que ele gerava por
-                  segundo.
+                  segundo em polígonos.
                </li>
                <li>
                   Use isso para liberar espaço quando a grade estiver travando.
@@ -703,7 +779,7 @@
          const grid = document.getElementById('grid');
          const moneyEl = document.getElementById('money');
          const incomeEl = document.getElementById('income');
-         const bestLevelEl = document.getElementById('bestLevel');
+         const shardsEl = document.getElementById('shards');
          const saveStatus = document.getElementById('saveStatus');
          const trashZone = document.getElementById('trashZone');
          const resetBtn = document.getElementById('resetBtn');
@@ -722,13 +798,26 @@
          const doubleSpawnStat = document.getElementById('doubleSpawnStat');
          const doubleMoneyStat = document.getElementById('doubleMoneyStat');
          const goldenChanceStat = document.getElementById('goldenChanceStat');
+         const multiplierStat = document.getElementById('multiplierStat');
          const itemsStat = document.getElementById('itemsStat');
+         const levelStat = document.getElementById('levelStat');
+         const spawnProgressText = document.getElementById('spawnProgressText');
+         const spawnProgressFill = document.getElementById('spawnProgressFill');
+         const playerLevelEl = document.getElementById('playerLevel');
+         const levelProgressText = document.getElementById('levelProgressText');
+         const levelProgressFill = document.getElementById('levelProgressFill');
+         const levelBonusText = document.getElementById('levelBonusText');
 
          const GRID_SIZE = 16;
-         const BASE_SPAWN_TIME = 3000;
-         const SAVE_KEY = 'merge-clicker-prototype-save-v3';
+         const BASE_SPAWN_TIME = 6000;
+         const SAVE_KEY = 'merge-clicker-prototype-save-v4';
 
          let money = 0;
+         let shards = 0;
+         let playerLevel = 1;
+         let mergeProgress = 0;
+         let mergesNeeded = 5;
+         let lastSpawnTime = Date.now();
          let cells = [];
          let items = [];
          let draggedItem = null;
@@ -736,20 +825,21 @@
          let offsetX = 0;
          let offsetY = 0;
          let spawnTimer = null;
+         let spawnPausedByFull = false;
          let saveTextTimer = null;
 
          const upgrades = {
             spawnSpeed: {
                name: 'Esteira mais rápida',
                description:
-                  'Diminui o tempo de espera para gerar novos objetos em 0.15s por nível. Mínimo: 0.75s.',
+                  'Diminui o tempo de espera para gerar novos objetos em 0.05s por nível. Mínimo: 2s.',
                level: 0,
                baseCost: 1200,
             },
             startLevel: {
                name: 'Sucata melhor',
                description:
-                  'A cada 3 níveis deste upgrade, os objetos começam 1 nível acima.',
+                  'A cada 3 níveis deste upgrade, os objetos começam 1 nível acima. Objetos antigos abaixo do novo nível também são atualizados.',
                level: 0,
                baseCost: 1800,
             },
@@ -763,7 +853,7 @@
             doubleMoney: {
                name: 'Tick valioso',
                description:
-                  'Aumenta em 4% por nível a chance de um objeto gerar 2x dinheiro naquele tick. Máximo: 80%.',
+                  'Aumenta em 4% por nível a chance de um objeto gerar 2x polígonos naquele tick. Máximo: 80%.',
                level: 0,
                baseCost: 2000,
             },
@@ -780,11 +870,23 @@
 
          function formatMoney(value) {
             if (value >= 1_000_000_000)
-               return `$${(value / 1_000_000_000).toFixed(2)}B`;
+               return `◆${(value / 1_000_000_000).toFixed(2)}B`;
             if (value >= 1_000_000)
-               return `$${(value / 1_000_000).toFixed(2)}M`;
-            if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
-            return `$${Math.floor(value)}`;
+               return `◆${(value / 1_000_000).toFixed(2)}M`;
+            if (value >= 1_000) return `◆${(value / 1_000).toFixed(2)}K`;
+            return `◆${Math.floor(value)}`;
+         }
+
+         function getShardMultiplier() {
+            return 1 + shards * 0.1;
+         }
+
+         function getShardsReward() {
+            return playerLevel * 5;
+         }
+
+         function getNextMergeRequirement() {
+            return Math.ceil(mergesNeeded * 1.7);
          }
 
          function createGrid() {
@@ -812,8 +914,8 @@
          }
 
          function getSpawnTime() {
-            const reduction = upgrades.spawnSpeed.level * 150;
-            return Math.max(750, BASE_SPAWN_TIME - reduction);
+            const reduction = upgrades.spawnSpeed.level * 50;
+            return Math.max(2000, BASE_SPAWN_TIME - reduction);
          }
 
          function getStartLevel() {
@@ -827,9 +929,7 @@
             items.forEach((item) => {
                if (item.level < startLevel) {
                   item.level = startLevel;
-                  item.element.dataset.level = startLevel;
-                  item.element.className = `item level-${Math.min(startLevel, 7)} pop ${item.isGolden ? 'golden' : ''}`;
-                  item.element.innerHTML = `Lv ${startLevel}${item.isGolden ? '<small>★ 2x</small>' : ''}`;
+                  updateItemElement(item);
                   changed = true;
                }
             });
@@ -857,7 +957,11 @@
          }
 
          function getItemPotentialValue(item) {
-            return getBaseItemValue(item.level) * (item.isGolden ? 2 : 1);
+            return (
+               getBaseItemValue(item.level) *
+               (item.isGolden ? 2 : 1) *
+               getShardMultiplier()
+            );
          }
 
          function getTotalIncomePreview() {
@@ -867,28 +971,89 @@
             );
          }
 
-         function getBestLevel() {
-            if (items.length === 0) return 1;
-            return Math.max(...items.map((item) => item.level));
-         }
-
          function updateUI() {
             moneyEl.textContent = formatMoney(money);
             incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-            bestLevelEl.textContent = getBestLevel();
-            shopMoney.textContent = `Dinheiro: ${formatMoney(money)}`;
+            shardsEl.textContent = `✦${shards}`;
+            shopMoney.textContent = `Polígonos: ${formatMoney(money)} | Estilhaços: ✦${shards}`;
             spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
             startLevelStat.textContent = `Lv ${getStartLevel()}`;
             doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
             doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
             goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
+            multiplierStat.textContent = `${getShardMultiplier().toFixed(1)}x`;
             itemsStat.textContent = `${items.length}/16`;
+            levelStat.textContent = playerLevel;
+            playerLevelEl.textContent = playerLevel;
+            levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} merges`;
+            levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
+            levelBonusText.textContent = `Multiplicador por estilhaços: ${getShardMultiplier().toFixed(1)}x`;
             renderUpgrades();
+         }
+
+         function updateSpawnProgressBar() {
+            const total = getSpawnTime();
+
+            if (isGridFull()) {
+               spawnPausedByFull = true;
+               spawnProgressText.textContent = `0.00s / ${(total / 1000).toFixed(2)}s`;
+               spawnProgressFill.style.width = '100%';
+               return;
+            }
+
+            if (spawnPausedByFull) {
+               lastSpawnTime = Date.now();
+               spawnPausedByFull = false;
+            }
+
+            const elapsed = Date.now() - lastSpawnTime;
+
+            if (elapsed >= total) {
+               spawnObjects();
+               return;
+            }
+
+            const remaining = Math.max(0, total - elapsed);
+            const progress = Math.min(100, (elapsed / total) * 100);
+
+            spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
+            spawnProgressFill.style.width = `${progress}%`;
+         }
+
+         function addMergeProgress() {
+            mergeProgress++;
+
+            if (mergeProgress >= mergesNeeded) {
+               mergeProgress -= mergesNeeded;
+               playerLevel++;
+               const reward = getShardsReward();
+               shards += reward;
+               mergesNeeded = getNextMergeRequirement();
+
+               clearTimeout(saveTextTimer);
+               saveStatus.textContent = `Level up! +${reward} estilhaços ✦`;
+               saveTextTimer = setTimeout(() => {
+                  saveStatus.textContent = 'Salvamento automático ativo';
+               }, 1600);
+            }
+
+            updateUI();
+            saveGame(true);
          }
 
          function getFreeCells() {
             const occupied = items.map((item) => item.cellIndex);
             return cells.filter((_, index) => !occupied.includes(index));
+         }
+
+         function isGridFull() {
+            return items.length >= GRID_SIZE;
+         }
+
+         function updateItemElement(item) {
+            item.element.className = `item level-${Math.min(item.level, 7)} pop ${item.isGolden ? 'golden' : ''}`;
+            item.element.innerHTML = `Lv ${item.level}${item.isGolden ? '<small>★ 2x</small>' : ''}`;
+            item.element.dataset.level = item.level;
          }
 
          function createItem(
@@ -908,12 +1073,6 @@
             const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
 
             const element = document.createElement('div');
-            element.className = `item level-${Math.min(level, 7)} pop ${isGolden ? 'golden' : ''}`;
-            element.innerHTML = `Lv ${level}${isGolden ? '<small>★ 2x</small>' : ''}`;
-            element.dataset.level = level;
-
-            chosenCell.appendChild(element);
-
             const item = {
                id: crypto.randomUUID(),
                level,
@@ -922,6 +1081,8 @@
                element,
             };
 
+            updateItemElement(item);
+            chosenCell.appendChild(element);
             items.push(item);
             addDragEvents(item);
             updateUI();
@@ -930,16 +1091,21 @@
          }
 
          function spawnObjects() {
+            if (isGridFull()) return;
+
             createItem();
 
-            if (Math.random() < getDoubleSpawnChance()) {
+            if (!isGridFull() && Math.random() < getDoubleSpawnChance()) {
                createItem();
             }
+
+            lastSpawnTime = Date.now();
          }
 
          function restartSpawnTimer() {
             clearInterval(spawnTimer);
-            spawnTimer = setInterval(spawnObjects, getSpawnTime());
+            lastSpawnTime = Date.now();
+            spawnPausedByFull = false;
          }
 
          function addDragEvents(item) {
@@ -982,6 +1148,10 @@
             return items.find(
                (item) => item.cellIndex === cellIndex && item !== draggedItem,
             );
+         }
+
+         function getItemByExactCell(cellIndex) {
+            return items.find((item) => item.cellIndex === cellIndex);
          }
 
          function clearHighlights() {
@@ -1068,7 +1238,6 @@
 
             draggedItem.element.remove();
             targetItem.element.remove();
-
             items = items.filter(
                (item) => item !== draggedItem && item !== targetItem,
             );
@@ -1080,13 +1249,14 @@
             if (newItem) newItem.element.classList.add('mergeBurst');
             createRing(center.x, center.y, 'merge');
 
-            money += getBaseItemValue(newLevel) * (newIsGolden ? 2 : 1) * 5;
+            money +=
+               getBaseItemValue(newLevel) *
+               (newIsGolden ? 2 : 1) *
+               5 *
+               getShardMultiplier();
+            addMergeProgress();
             updateUI();
             saveGame();
-         }
-
-         function getItemByExactCell(cellIndex) {
-            return items.find((item) => item.cellIndex === cellIndex);
          }
 
          function buyUpgrade(key) {
@@ -1143,7 +1313,11 @@
                const goldenMultiplier = item.isGolden ? 2 : 1;
                const isDoubleTick = Math.random() < getDoubleMoneyChance();
                const tickMultiplier = isDoubleTick ? 2 : 1;
-               const gained = base * goldenMultiplier * tickMultiplier;
+               const gained =
+                  base *
+                  goldenMultiplier *
+                  tickMultiplier *
+                  getShardMultiplier();
 
                money += gained;
                createMoneyPopup(item, gained, isDoubleTick);
@@ -1156,6 +1330,10 @@
          function saveGame(showText = false) {
             const saveData = {
                money,
+               shards,
+               playerLevel,
+               mergeProgress,
+               mergesNeeded,
                items: items.map((item) => ({
                   level: item.level,
                   cellIndex: item.cellIndex,
@@ -1187,6 +1365,10 @@
             try {
                const saveData = JSON.parse(rawSave);
                money = saveData.money ?? 0;
+               shards = saveData.shards ?? 0;
+               playerLevel = saveData.playerLevel ?? 1;
+               mergeProgress = saveData.mergeProgress ?? 0;
+               mergesNeeded = saveData.mergesNeeded ?? 5;
 
                if (saveData.upgrades) {
                   Object.entries(saveData.upgrades).forEach(([key, level]) => {
@@ -1267,8 +1449,7 @@
                return;
             }
 
-            const freeTarget = !targetItem;
-            if (freeTarget) {
+            if (!targetItem) {
                cell.appendChild(draggedItem.element);
                draggedItem.cellIndex = targetCellIndex;
                resetDraggedStyles();
@@ -1284,6 +1465,10 @@
 
          resetBtn.addEventListener('click', () => {
             money = 0;
+            shards = 0;
+            playerLevel = 1;
+            mergeProgress = 0;
+            mergesNeeded = 5;
             items.forEach((item) => item.element.remove());
             items = [];
 
@@ -1324,6 +1509,7 @@
          guideOverlay.addEventListener('click', closeGuide);
 
          setInterval(incomeTick, 1000);
+         setInterval(updateSpawnProgressBar, 100);
 
          createGrid();
          const loaded = loadGame();
@@ -1335,6 +1521,7 @@
 
          restartSpawnTimer();
          updateUI();
+         updateSpawnProgressBar();
       </script>
    </body>
 </html>
