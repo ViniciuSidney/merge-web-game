@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="pt-BR">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Merge Clicker - Protótipo</title>
+      <style>
+         * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            user-select: none;
+         }
+
+         body {
+            min-height: 100vh;
+            background: #e8f5ec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #16351f;
+         }
+
+         .game {
+            width: 100%;
+            max-width: 460px;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            padding: 18px;
+         }
+
+         .top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+         }
+
+         .panel {
+            flex: 1;
+            background: #dff3e5;
+            border: 2px solid #b8dfc2;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+         }
+
+         .label {
+            font-size: 12px;
+            opacity: 0.75;
+            margin-bottom: 3px;
+         }
+
+         .value {
+            font-size: 18px;
+            font-weight: bold;
+         }
+
+         .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            background: #b7e3bf;
+            padding: 12px;
+            border-radius: 16px;
+            position: relative;
+            touch-action: none;
+         }
+
+         .cell {
+            aspect-ratio: 1 / 1;
+            background: rgba(255, 255, 255, 0.55);
+            border: 2px dashed rgba(30, 90, 45, 0.22);
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+         }
+
+         .cell.highlight {
+            background: #fff7c2;
+            border-color: #d8a900;
+         }
+
+         .item {
+            width: 76%;
+            height: 76%;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            cursor: grab;
+            position: absolute;
+            z-index: 2;
+            box-shadow:
+               inset 0 -6px rgba(0, 0, 0, 0.12),
+               0 6px 12px rgba(0, 0, 0, 0.16);
+            transition:
+               transform 0.15s ease,
+               box-shadow 0.15s ease;
+         }
+
+         .item:active {
+            cursor: grabbing;
+         }
+
+         .item.dragging {
+            position: fixed;
+            z-index: 999;
+            pointer-events: none;
+            transform: scale(1.08);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+         }
+
+         .level-1 {
+            background: linear-gradient(145deg, #7f8c8d, #606c6d);
+         }
+         .level-2 {
+            background: linear-gradient(145deg, #27ae60, #1d8048);
+         }
+         .level-3 {
+            background: linear-gradient(145deg, #2980b9, #1d5d86);
+         }
+         .level-4 {
+            background: linear-gradient(145deg, #8e44ad, #67317e);
+         }
+         .level-5 {
+            background: linear-gradient(145deg, #e67e22, #ad5d19);
+         }
+         .level-6 {
+            background: linear-gradient(145deg, #c0392b, #8e2b20);
+         }
+         .level-7 {
+            background: linear-gradient(145deg, #2c3e50, #17202a);
+         }
+
+         .footer {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+         }
+
+         button {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #1f8f48;
+            color: white;
+            transition:
+               transform 0.15s ease,
+               opacity 0.15s ease;
+         }
+
+         button:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+         }
+
+         .danger {
+            background: #c0392b;
+         }
+
+         .hint {
+            font-size: 13px;
+            text-align: center;
+            margin-top: 12px;
+            color: #45634d;
+            line-height: 1.35;
+         }
+
+         .pop {
+            animation: pop 0.25s ease;
+         }
+
+         @keyframes pop {
+            0% {
+               transform: scale(0.8);
+               opacity: 0.6;
+            }
+            100% {
+               transform: scale(1);
+               opacity: 1;
+            }
+         }
+      </style>
+   </head>
+   <body>
+      <main class="game">
+         <section class="top">
+            <div class="panel">
+               <div class="label">Dinheiro</div>
+               <div class="value" id="money">$0</div>
+            </div>
+            <div class="panel">
+               <div class="label">Ganho / segundo</div>
+               <div class="value" id="income">$0/s</div>
+            </div>
+            <div class="panel">
+               <div class="label">Maior nível</div>
+               <div class="value" id="bestLevel">1</div>
+            </div>
+         </section>
+
+         <section class="grid" id="grid"></section>
+
+         <section class="footer">
+            <button id="spawnBtn">Gerar objeto</button>
+            <button class="danger" id="resetBtn">Resetar</button>
+         </section>
+
+         <p class="hint">
+            Arraste um objeto sobre outro do mesmo nível e solte para fazer
+            merge.<br />
+            A cada 3 segundos nasce um novo objeto, se houver espaço livre.
+         </p>
+      </main>
+
+      <script>
+         const grid = document.getElementById('grid');
+         const moneyEl = document.getElementById('money');
+         const incomeEl = document.getElementById('income');
+         const bestLevelEl = document.getElementById('bestLevel');
+         const spawnBtn = document.getElementById('spawnBtn');
+         const resetBtn = document.getElementById('resetBtn');
+
+         const GRID_SIZE = 16;
+         const SPAWN_INTERVAL = 3000;
+
+         let money = 0;
+         let cells = [];
+         let items = [];
+         let draggedItem = null;
+         let originalCellIndex = null;
+         let offsetX = 0;
+         let offsetY = 0;
+
+         function createGrid() {
+            grid.innerHTML = '';
+            cells = [];
+
+            for (let i = 0; i < GRID_SIZE; i++) {
+               const cell = document.createElement('div');
+               cell.className = 'cell';
+               cell.dataset.index = i;
+               grid.appendChild(cell);
+               cells.push(cell);
+            }
+         }
+
+         function getItemValue(level) {
+            return Math.pow(3, level - 1);
+         }
+
+         function getTotalIncome() {
+            return items.reduce(
+               (total, item) => total + getItemValue(item.level),
+               0,
+            );
+         }
+
+         function getBestLevel() {
+            if (items.length === 0) return 1;
+            return Math.max(...items.map((item) => item.level));
+         }
+
+         function updateUI() {
+            moneyEl.textContent = `$${Math.floor(money)}`;
+            incomeEl.textContent = `$${getTotalIncome()}/s`;
+            bestLevelEl.textContent = getBestLevel();
+         }
+
+         function getFreeCells() {
+            const occupied = items.map((item) => item.cellIndex);
+            return cells.filter((_, index) => !occupied.includes(index));
+         }
+
+         function createItem(level = 1, cellIndex = null) {
+            const freeCells = getFreeCells();
+            if (freeCells.length === 0 && cellIndex === null) return;
+
+            const chosenCell =
+               cellIndex !== null
+                  ? cells[cellIndex]
+                  : freeCells[Math.floor(Math.random() * freeCells.length)];
+
+            const chosenIndex = Number(chosenCell.dataset.index);
+
+            const element = document.createElement('div');
+            element.className = `item level-${Math.min(level, 7)} pop`;
+            element.textContent = `Lv ${level}`;
+            element.dataset.level = level;
+
+            chosenCell.appendChild(element);
+
+            const item = {
+               id: crypto.randomUUID(),
+               level,
+               cellIndex: chosenIndex,
+               element,
+            };
+
+            items.push(item);
+            addDragEvents(item);
+            updateUI();
+         }
+
+         function addDragEvents(item) {
+            item.element.addEventListener('pointerdown', (event) => {
+               draggedItem = item;
+               originalCellIndex = item.cellIndex;
+
+               const rect = item.element.getBoundingClientRect();
+               offsetX = event.clientX - rect.left;
+               offsetY = event.clientY - rect.top;
+
+               item.element.classList.add('dragging');
+               item.element.style.width = `${rect.width}px`;
+               item.element.style.height = `${rect.height}px`;
+               document.body.appendChild(item.element);
+
+               moveDraggedItem(event.clientX, event.clientY);
+            });
+         }
+
+         function moveDraggedItem(x, y) {
+            if (!draggedItem) return;
+            draggedItem.element.style.left = `${x - offsetX}px`;
+            draggedItem.element.style.top = `${y - offsetY}px`;
+         }
+
+         function getCellUnderPointer(x, y) {
+            return cells.find((cell) => {
+               const rect = cell.getBoundingClientRect();
+               return (
+                  x >= rect.left &&
+                  x <= rect.right &&
+                  y >= rect.top &&
+                  y <= rect.bottom
+               );
+            });
+         }
+
+         function getItemByCellIndex(cellIndex) {
+            return items.find(
+               (item) => item.cellIndex === cellIndex && item !== draggedItem,
+            );
+         }
+
+         function clearHighlights() {
+            cells.forEach((cell) => cell.classList.remove('highlight'));
+         }
+
+         function returnToOriginalCell() {
+            const originalCell = cells[originalCellIndex];
+            originalCell.appendChild(draggedItem.element);
+            draggedItem.cellIndex = originalCellIndex;
+            resetDraggedStyles();
+         }
+
+         function resetDraggedStyles() {
+            draggedItem.element.classList.remove('dragging');
+            draggedItem.element.style.left = '';
+            draggedItem.element.style.top = '';
+            draggedItem.element.style.width = '';
+            draggedItem.element.style.height = '';
+         }
+
+         function mergeItems(targetItem) {
+            const newLevel = draggedItem.level + 1;
+            const targetCellIndex = targetItem.cellIndex;
+
+            draggedItem.element.remove();
+            targetItem.element.remove();
+
+            items = items.filter(
+               (item) => item !== draggedItem && item !== targetItem,
+            );
+
+            draggedItem = null;
+            createItem(newLevel, targetCellIndex);
+            money += getItemValue(newLevel) * 5;
+            updateUI();
+         }
+
+         document.addEventListener('pointermove', (event) => {
+            if (!draggedItem) return;
+
+            moveDraggedItem(event.clientX, event.clientY);
+            clearHighlights();
+
+            const cell = getCellUnderPointer(event.clientX, event.clientY);
+            if (!cell) return;
+
+            const targetItem = getItemByCellIndex(Number(cell.dataset.index));
+            if (targetItem && targetItem.level === draggedItem.level) {
+               cell.classList.add('highlight');
+            }
+         });
+
+         document.addEventListener('pointerup', (event) => {
+            if (!draggedItem) return;
+
+            const cell = getCellUnderPointer(event.clientX, event.clientY);
+            clearHighlights();
+
+            if (!cell) {
+               returnToOriginalCell();
+               draggedItem = null;
+               return;
+            }
+
+            const targetCellIndex = Number(cell.dataset.index);
+            const targetItem = getItemByCellIndex(targetCellIndex);
+
+            if (targetItem && targetItem.level === draggedItem.level) {
+               mergeItems(targetItem);
+               return;
+            }
+
+            const freeTarget = !targetItem;
+            if (freeTarget) {
+               cell.appendChild(draggedItem.element);
+               draggedItem.cellIndex = targetCellIndex;
+               resetDraggedStyles();
+               draggedItem = null;
+               updateUI();
+               return;
+            }
+
+            returnToOriginalCell();
+            draggedItem = null;
+         });
+
+         spawnBtn.addEventListener('click', () => createItem(1));
+
+         resetBtn.addEventListener('click', () => {
+            money = 0;
+            items.forEach((item) => item.element.remove());
+            items = [];
+            createItem(1);
+            createItem(1);
+            updateUI();
+         });
+
+         setInterval(() => {
+            createItem(1);
+         }, SPAWN_INTERVAL);
+
+         setInterval(() => {
+            money += getTotalIncome();
+            updateUI();
+         }, 1000);
+
+         createGrid();
+         createItem(1);
+         createItem(1);
+         updateUI();
+      </script>
+   </body>
+</html>
