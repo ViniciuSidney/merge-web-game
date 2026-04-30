@@ -131,7 +131,7 @@
          }
 
          .spawnPopup.show {
-            animation: spawnPopupAnim 3s ease forwards;
+            animation: spawnPopupAnim 2.5s ease forwards;
          }
 
          .spawnPopup.upgrade {
@@ -197,7 +197,7 @@
          }
 
          .levelUpPopup.show {
-            animation: levelUpPopupAnim 1.75s ease forwards;
+            animation: levelUpPopupAnim 2s ease forwards;
          }
 
          .levelUpPopup small {
@@ -298,28 +298,6 @@
             pointer-events: none;
             transform: scale(1.08);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
-         }
-
-         .level-1 {
-            background: linear-gradient(145deg, #7f8c8d, #606c6d);
-         }
-         .level-2 {
-            background: linear-gradient(145deg, #27ae60, #1d8048);
-         }
-         .level-3 {
-            background: linear-gradient(145deg, #2980b9, #1d5d86);
-         }
-         .level-4 {
-            background: linear-gradient(145deg, #8e44ad, #67317e);
-         }
-         .level-5 {
-            background: linear-gradient(145deg, #e67e22, #ad5d19);
-         }
-         .level-6 {
-            background: linear-gradient(145deg, #c0392b, #8e2b20);
-         }
-         .level-7 {
-            background: linear-gradient(145deg, #2c3e50, #17202a);
          }
 
          .moneyPopup {
@@ -712,12 +690,12 @@
          @keyframes spawnPopupAnim {
             0% {
                opacity: 0;
-               transform: translate(-50%, 10%) scale(0.85);
+               transform: translate(-50%, 10%) scale(0.8);
             }
 
             15% {
                opacity: 1;
-               transform: translate(-50%, -50%) scale(1.06);
+               transform: translate(-50%, -50%) scale(1.08);
             }
 
             70% {
@@ -966,6 +944,24 @@
          const SAVE_KEY = 'merge-clicker-prototype-save-v4';
          const SPAWN_TICK_RATE = 100;
 
+         const LEVEL_COLORS = [
+            { name: 'Branco', bg: '#f8f9fa', text: '#1f2933' },
+            { name: 'Ciano', bg: '#22d3ee', text: '#06323a' },
+            { name: 'Azul claro', bg: '#60a5fa', text: '#0f2748' },
+            { name: 'Azul escuro', bg: '#2563eb', text: '#ffffff' },
+            { name: 'Roxo', bg: '#7c3aed', text: '#ffffff' },
+            { name: 'Vermelho claro', bg: '#f87171', text: '#4a1010' },
+            { name: 'Rosa', bg: '#ec4899', text: '#ffffff' },
+            { name: 'Vinho', bg: '#881337', text: '#ffffff' },
+            { name: 'Marrom', bg: '#92400e', text: '#ffffff' },
+            { name: 'Laranja', bg: '#f97316', text: '#ffffff' },
+            { name: 'Amarelo', bg: '#facc15', text: '#3f3300' },
+            { name: 'Verde claro', bg: '#86efac', text: '#064e3b' },
+            { name: 'Verde escuro', bg: '#15803d', text: '#ffffff' },
+            { name: 'Cinza', bg: '#6b7280', text: '#ffffff' },
+            { name: 'Preto', bg: '#111827', text: '#ffffff' },
+         ];
+
          let money = 0;
          let shards = 0;
          let playerLevel = 1;
@@ -1030,6 +1026,18 @@
                golden: true,
             },
          };
+
+         function getLevelVisual(level) {
+            const colorIndex = (level - 1) % LEVEL_COLORS.length;
+            const cycle = Math.floor((level - 1) / LEVEL_COLORS.length);
+            const color = LEVEL_COLORS[colorIndex];
+
+            return {
+               bg: color.bg,
+               text: color.text,
+               cycle,
+            };
+         }
 
          function formatMoney(value) {
             if (value >= 1_000_000_000)
@@ -1161,6 +1169,32 @@
             renderUpgrades();
          }
 
+         function getLevelShadow(cycle, isGolden) {
+            const baseShadow = `
+               inset 0 -6px rgba(0, 0, 0, 0.12),
+               0 6px 12px rgba(0, 0, 0, 0.16)
+            `;
+
+            const cycleEffects = [
+               '',
+               '0 0 0 3px rgba(255, 255, 255, 0.8)',
+               '0 0 0 3px rgba(108, 92, 231, 0.9), 0 0 16px rgba(108, 92, 231, 0.45)',
+               '0 0 0 3px rgba(255, 216, 77, 0.95), 0 0 20px rgba(255, 216, 77, 0.55)',
+               '0 0 0 4px rgba(255, 255, 255, 0.9), 0 0 24px rgba(31, 143, 72, 0.6)',
+            ];
+
+            const cycleShadow =
+               cycleEffects[Math.min(cycle, cycleEffects.length - 1)];
+
+            const goldenShadow = isGolden
+               ? '0 0 0 3px #ffd84d, 0 0 18px #ffd84d'
+               : '';
+
+            return [goldenShadow, cycleShadow, baseShadow]
+               .filter(Boolean)
+               .join(',');
+         }  
+
          function updateSpawnProgressBar() {
             const total = getSpawnTime();
 
@@ -1187,18 +1221,13 @@
             spawnProgressFill.style.width = `${progress}%`;
          }
 
-         function showSpawnPopup(message, type = '', duration = 1200) {
+         function showSpawnPopup(message, type = '') {
             spawnPopup.innerHTML = message;
             spawnPopup.className = `spawnPopup ${type}`;
 
             spawnPopup.classList.remove('show');
             void spawnPopup.offsetWidth;
             spawnPopup.classList.add('show');
-
-            clearTimeout(spawnPopup.timer);
-            spawnPopup.timer = setTimeout(() => {
-               spawnPopup.classList.remove('show');
-            }, duration);
          }
 
          function showLevelUpPopup(oldLevel, newLevel, reward) {
@@ -1251,9 +1280,31 @@
          }
 
          function updateItemElement(item) {
-            item.element.className = `item level-${Math.min(item.level, 7)} pop ${item.isGolden ? 'golden' : ''}`;
-            item.element.innerHTML = `Lv ${item.level}${item.isGolden ? '<small>★ 2x</small>' : ''}`;
+            const visual = getLevelVisual(item.level);
+
+            item.element.className = `item pop ${item.isGolden ? 'golden' : ''}`;
             item.element.dataset.level = item.level;
+
+            item.element.style.background = `
+               linear-gradient(
+                  145deg,
+                  ${visual.bg},
+                  color-mix(in srgb, ${visual.bg} 70%, #000 30%)
+               )
+            `;
+
+            item.element.style.color = visual.text;
+
+            item.element.style.boxShadow = getLevelShadow(
+               visual.cycle,
+               item.isGolden,
+            );
+
+            item.element.innerHTML = `
+               Lv ${item.level}
+               ${visual.cycle > 0 ? `<small>✦ Ciclo ${visual.cycle + 1}</small>` : ''}
+               ${item.isGolden ? '<small>★ 2x</small>' : ''}
+            `;
          }
 
          function createItem(
@@ -1293,18 +1344,6 @@
             saveGame();
             return true;
          }
-
-         // function spawnObjects() {
-         //   if (isGridFull()) return;
-
-         //   createItem();
-
-         //   if (!isGridFull() && Math.random() < getDoubleSpawnChance()) {
-         //     createItem();
-         //   }
-
-         //   return true;
-         // }
 
          function spawnObjects() {
             if (isGridFull()) return false;
