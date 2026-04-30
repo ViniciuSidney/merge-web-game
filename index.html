@@ -1,1488 +1,1517 @@
 <!doctype html>
 <html lang="pt-BR">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      <link
-         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-         rel="stylesheet"
-      />
-
-      <title>Merge Clicker - V5</title>
-      <style>
-         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Montserrat';
-            user-select: none;
-         }
-
-         body {
-            min-height: 100vh;
-            background: #e8f5ec;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            color: #16351f;
-            overflow-x: hidden;
-         }
-
-         .game {
-            width: 100%;
-            max-width: 480px;
-            background: #ffffff;
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            padding: 18px;
-            position: relative;
-            overflow: hidden;
-         }
-
-         .saveStatus {
-            text-align: center;
-            font-size: 12px;
-            color: #5c735f;
-            margin-bottom: 10px;
-         }
-
-         .top {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 10px;
-         }
-
-         .panel {
-            background: #dff3e5;
-            border: 2px solid #b8dfc2;
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-         }
-
-         .label {
-            font-size: 12px;
-            opacity: 0.75;
-            font-weight: 500;
-            margin-bottom: 3px;
-         }
-
-         .label-2 {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 3px;
-         }
-
-         #levelBonusText {
-            font-size: 12px;
-            font-weight: 500;
-         }
-
-         .value {
-            font-size: 17px;
-            font-weight: bold;
-         }
-
-         .progressPanel {
-            background: #f2f8f4;
-            border: 2px solid #d7e8dc;
-            border-radius: 14px;
-            padding: 10px;
-            margin-bottom: 10px;
-         }
-
-         .progressHeader {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 13px;
-            margin-bottom: 7px;
-            color: #2f5638;
-         }
-
-         .spawnPanel {
-            position: relative;
-            overflow: hidden;
-         }
-
-         .spawnPopup {
-            position: absolute;
-            width: 50%;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background: #ffffff;
-            border: 2px solid #1f8f48;
-            color: #16351f;
-            border-radius: 14px;
-            padding: 9px 13px;
-            font-size: 65%;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 8px 18px rgba(31, 143, 72, 0.25);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 5;
-         }
-
-         .spawnPopup.show {
-            animation: spawnPopupAnim 2.5s ease forwards;
-         }
-
-         .spawnPopup.upgrade {
-            border-color: #6c5ce7;
-            color: #2f235f;
-         }
-
-         .spawnPopup.golden {
-            border-color: #ffd84d;
-            color: #8a6500;
-         }
-
-         .spawnPopup.double {
-            border-color: #236fbe;
-            color: #163d6d;
-         }
-
-         .spawnPopup.valuable {
-            border-color: #6c5ce7;
-            color: #2f235f;
-         }
-
-         .barTrack {
-            height: 10px;
-            background: #dcebe0;
-            border-radius: 999px;
-            overflow: hidden;
-         }
-
-         .barFill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #1f8f48, #71d68b);
-            border-radius: 999px;
-            transition: width 0.12s linear;
-         }
-
-         .levelFill {
-            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
-         }
-
-         .levelUpPanel {
-            position: relative;
-            overflow: hidden;
-         }
-
-         .levelUpPopup {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            background: #ffffff;
-            border: 2px solid #8e7cff;
-            color: #2f235f;
-            border-radius: 14px;
-            padding: 10px 14px;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 8px 18px rgba(108, 92, 231, 0.25);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 5;
-         }
-
-         .levelUpPopup.show {
-            animation: levelUpPopupAnim 2s ease forwards;
-         }
-
-         .levelUpPopup small {
-            display: block;
-            margin-top: 4px;
-            color: #1f8f48;
-         }
-
-         .levelBonus {
-            font-size: 12px;
-            color: #45634d;
-            margin-top: 6px;
-            text-align: center;
-         }
-
-         .grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            background: #b7e3bf;
-            padding: 12px;
-            border-radius: 16px;
-            position: relative;
-            touch-action: none;
-         }
-
-         .cell {
-            aspect-ratio: 1 / 1;
-            background: rgba(255, 255, 255, 0.55);
-            border: 2px dashed rgba(30, 90, 45, 0.22);
-            border-radius: 12px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-         }
-
-         .cell.highlight {
-            background: #fff7c2;
-            border-color: #d8a900;
-         }
-
-         .cell.errorFlash {
-            animation: errorCell 0.35s ease;
-         }
-
-         .item {
-            width: 76%;
-            height: 76%;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 2px;
-            font-weight: bold;
-            color: white;
-            cursor: grab;
-            position: absolute;
-            z-index: 2;
-            box-shadow:
-               inset 0 -6px rgba(0, 0, 0, 0.12),
-               0 6px 12px rgba(0, 0, 0, 0.16);
-            transition:
-               transform 0.15s ease,
-               box-shadow 0.15s ease;
-         }
-
-         .item small {
-            font-size: 10px;
-            opacity: 0.92;
-         }
-
-         .item.golden {
-            box-shadow:
-               0 0 0 3px #ffd84d,
-               0 0 18px #ffd84d,
-               inset 0 -6px rgba(0, 0, 0, 0.12),
-               0 6px 12px rgba(0, 0, 0, 0.16);
-            animation: goldenGlow 1.2s ease-in-out infinite alternate;
-         }
-
-         .item.mergeBurst {
-            animation: mergeBurst 0.28s ease;
-         }
-
-         .item.shakeError {
-            animation: shakeError 0.32s ease;
-         }
-
-         .item:active {
-            cursor: grabbing;
-         }
-
-         .item.dragging {
-            position: fixed;
-            z-index: 999;
-            pointer-events: none;
-            transform: scale(1.08);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
-         }
-
-         .moneyPopup {
-            position: fixed;
-            z-index: 1000;
-            pointer-events: none;
-            font-weight: bold;
-            font-size: 13px;
-            color: #1f8f48;
-            text-shadow: 0 1px 0 #fff;
-            animation: floatMoney 0.85s ease-out forwards;
-         }
-
-         .moneyPopup.double {
-            color: #236fbe;
-            font-size: 15px;
-         }
-
-         .moneyPopup.goldenText {
-            color: #d49b00;
-         }
-
-         .effectRing {
-            position: fixed;
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            border: 3px solid #ffd84d;
-            pointer-events: none;
-            z-index: 1500;
-            transform: translate(-50%, -50%);
-            animation: ringEffect 0.42s ease-out forwards;
-         }
-
-         .effectRing.error {
-            border-color: #e74c3c;
-            animation: ringError 0.38s ease-out forwards;
-         }
-
-         .footer {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: 1.1fr 0.75fr 0.75fr 0.75fr 0.75fr;
-            gap: 10px;
-            align-items: stretch;
-         }
-
-         button {
-            flex: 1;
-            border: none;
-            border-radius: 12px;
-            padding: 12px;
-            font-weight: bold;
-            font-size: 70%;
-            cursor: pointer;
-            background: #1f8f48;
-            color: white;
-            transition:
-               transform 0.15s ease,
-               opacity 0.15s ease;
-         }
-
-         button:hover {
-            transform: translateY(-1px);
-            opacity: 0.95;
-         }
-
-         button:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-            transform: none;
-         }
-
-         .danger {
-            background: #c0392b;
-         }
-         .shop-open {
-            background: #236fbe;
-         }
-         .guide-open {
-            background: #6c5ce7;
-         }
-
-         .trash {
-            border: 2px dashed #c0392b;
-            background: #fff1ef;
-            color: #9f2f24;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 44px;
-            font-size: 12px;
-            transition:
-               transform 0.15s ease,
-               background 0.15s ease,
-               border-color 0.15s ease;
-         }
-
-         .trash strong {
-            font-size: 13px;
-         }
-
-         .trash.active {
-            background: #ffd8d2;
-            border-color: #e74c3c;
-            transform: scale(1.03);
-         }
-
-         .shopOverlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.25);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-            z-index: 1000;
-         }
-
-         .shopOverlay.active {
-            opacity: 1;
-            pointer-events: auto;
-         }
-
-         .guide,
-         .shop {
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100vh;
-            width: min(360px, 92vw);
-            background: #ffffff;
-            opacity: 0.92;
-            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
-            padding: 18px;
-            transform: translateX(100%);
-            transition: transform 0.25s ease;
-            z-index: 1001;
-            overflow-y: auto;
-         }
-
-         .guide.active,
-         .shop.active {
-            transform: translateX(0);
-         }
-
-         .guideSection {
-            border: 2px solid #e1eee5;
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: #fbfffc;
-         }
-
-         .guideSection h3 {
-            font-size: 15px;
-            margin-bottom: 6px;
-         }
-
-         .guideSection p,
-         .guideSection li {
-            font-size: 13px;
-            color: #45634d;
-            line-height: 1.45;
-         }
-
-         .guideSection ul {
-            padding-left: 18px;
-         }
-
-         .shopHeader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-         }
-
-         .shopHeader h2 {
-            font-size: 22px;
-         }
-
-         .closeBtn {
-            flex: unset;
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            background: #eef5f0;
-            color: #16351f;
-            border: 1px solid #d7e8dc;
-         }
-
-         .shopMoney {
-            background: #dff3e5;
-            border: 2px solid #b8dfc2;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 12px;
-            font-weight: bold;
-            text-align: center;
-         }
-
-         .upgrade {
-            border: 2px solid #e1eee5;
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: #fbfffc;
-         }
-
-         .upgrade.goldenUpgrade {
-            border-color: #ffe08a;
-            background: #fffaf0;
-         }
-
-         .upgradeTop {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 7px;
-         }
-
-         .upgrade h3 {
-            font-size: 15px;
-         }
-
-         .upgradeLevel {
-            font-size: 12px;
-            font-weight: bold;
-            color: #1f8f48;
-            white-space: nowrap;
-         }
-
-         .upgrade p {
-            font-size: 13px;
-            color: #45634d;
-            line-height: 1.35;
-            margin-bottom: 10px;
-         }
-
-         .upgrade button {
-            width: 100%;
-         }
-
-         .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 12px;
-         }
-
-         .stat {
-            background: #f2f8f4;
-            border-radius: 10px;
-            padding: 8px;
-            font-size: 12px;
-            text-align: center;
-         }
-
-         .stat strong {
-            display: block;
-            font-size: 14px;
-            margin-top: 3px;
-         }
-
-         .pop {
-            animation: pop 0.25s ease;
-         }
-
-         .dev-open {
-            background: #111827;
-         }
-
-         .devPanel {
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100vh;
-            width: min(380px, 94vw);
-            background: #ffffff;
-            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
-            padding: 18px;
-            transform: translateX(100%);
-            transition: transform 0.25s ease;
-            z-index: 1001;
-            overflow-y: auto;
-         }
-
-         .devPanel.active {
-            transform: translateX(0);
-         }
-
-         .devSection {
-            border: 2px solid #e1eee5;
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 10px;
-            background: #fbfffc;
-         }
-
-         .devSection h3 {
-            font-size: 15px;
-            margin-bottom: 10px;
-         }
-
-         .devGrid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-         }
-
-         .devGrid button {
-            padding: 10px;
-            font-size: 12px;
-            border-radius: 10px;
-            background: #111827;
-         }
-
-         .devInput {
-            width: 100%;
-            padding: 11px;
-            border: 2px solid #e1eee5;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            outline: none;
-         }
-
-         .devInput:focus {
-            border-color: #111827;
-         }
-
-         .devError {
-            font-size: 12px;
-            color: #c0392b;
-            margin-top: 8px;
-            min-height: 16px;
-         }
-
-         .devContent.locked {
-            display: none;
-         }
-
-         @keyframes pop {
-            0% {
-               transform: scale(0.8);
-               opacity: 0.6;
-            }
-            100% {
-               transform: scale(1);
-               opacity: 1;
-            }
-         }
-
-         @keyframes floatMoney {
-            0% {
-               transform: translateY(0) scale(0.9);
-               opacity: 0;
-            }
-            15% {
-               opacity: 1;
-            }
-            100% {
-               transform: translateY(-42px) scale(1.1);
-               opacity: 0;
-            }
-         }
-
-         @keyframes goldenGlow {
-            from {
-               filter: brightness(1);
-            }
-            to {
-               filter: brightness(1.18);
-            }
-         }
-
-         @keyframes mergeBurst {
-            0% {
-               transform: scale(0.75);
-            }
-            70% {
-               transform: scale(1.16);
-            }
-            100% {
-               transform: scale(1);
-            }
-         }
-
-         @keyframes shakeError {
-            0%,
-            100% {
-               transform: translateX(0);
-            }
-            25% {
-               transform: translateX(-5px);
-            }
-            50% {
-               transform: translateX(5px);
-            }
-            75% {
-               transform: translateX(-3px);
-            }
-         }
-
-         @keyframes errorCell {
-            0%,
-            100% {
-               background: rgba(255, 255, 255, 0.55);
-            }
-            50% {
-               background: rgba(231, 76, 60, 0.25);
-               border-color: #e74c3c;
-            }
-         }
-
-         @keyframes ringEffect {
-            0% {
-               width: 10px;
-               height: 10px;
-               opacity: 1;
-            }
-            100% {
-               width: 92px;
-               height: 92px;
-               opacity: 0;
-            }
-         }
-
-         @keyframes ringError {
-            0% {
-               width: 10px;
-               height: 10px;
-               opacity: 1;
-            }
-            100% {
-               width: 74px;
-               height: 74px;
-               opacity: 0;
-            }
-         }
-
-         @keyframes levelUpPopupAnim {
-            0% {
-               opacity: 0;
-               transform: translate(-50%, 10%) scale(0.8);
-            }
-
-            15% {
-               opacity: 1;
-               transform: translate(-50%, -50%) scale(1.08);
-            }
-
-            70% {
-               opacity: 1;
-               transform: translate(-50%, -50%) scale(1);
-            }
-
-            100% {
-               opacity: 0;
-               transform: translate(-50%, -90%) scale(0.95);
-            }
-         }
-
-         @keyframes spawnPopupAnim {
-            0% {
-               opacity: 0;
-               transform: translate(-50%, 10%) scale(0.8);
-            }
-
-            15% {
-               opacity: 1;
-               transform: translate(-50%, -50%) scale(1.08);
-            }
-
-            70% {
-               opacity: 1;
-               transform: translate(-50%, -50%) scale(1);
-            }
-
-            100% {
-               opacity: 0;
-               transform: translate(-50%, -90%) scale(0.95);
-            }
-         }
-      </style>
-   </head>
-   <body>
-      <main class="game">
-         <div class="saveStatus" id="saveStatus">
-            Salvamento automático <strong>ativo</strong>
-         </div>
-
-         <section class="top">
-            <div class="panel">
-               <div class="label">Polígonos</div>
-               <div class="value" id="money">◆0</div>
-            </div>
-            <div class="panel">
-               <div class="label">Ganho / segundo</div>
-               <div class="value" id="income">◆0/s</div>
-            </div>
-            <div class="panel">
-               <div class="label">Estilhaços</div>
-               <div class="value" id="shards">✦0</div>
-            </div>
-         </section>
-
-         <section class="progressPanel spawnPanel">
-            <div class="progressHeader">
-               <span class="label-2">⏳ Próximo objeto</span>
-               <strong id="spawnProgressText">3.00s / 3.00s</strong>
-            </div>
-            <div class="barTrack">
-               <div class="barFill" id="spawnProgressFill"></div>
-            </div>
-            <div class="spawnPopup" id="spawnPopup"></div>
-         </section>
-
-         <section class="progressPanel levelUpPanel">
-            <div class="progressHeader">
-               <span class="label-2"
-                  >⭐ Level <strong id="playerLevel">1</strong></span
-               >
-               <strong id="levelProgressText">0 / 5 combinações</strong>
-            </div>
-            <div class="barTrack">
-               <div class="barFill levelFill" id="levelProgressFill"></div>
-            </div>
-            <p class="levelBonus" id="levelBonusText">
-               Multiplicador por estilhaços: <strong>1.0x</strong>
-            </p>
-            <div class="levelUpPopup" id="levelUpPopup"></div>
-         </section>
-
-         <section class="grid" id="grid"></section>
-
-         <section class="footer">
-            <div class="trash" id="trashZone">
-               <strong>🗑️ Lixeira</strong>
-               <span>Arraste aqui</span>
-            </div>
-            <button class="shop-open" id="openShopBtn">Melhorias</button>
-            <button class="guide-open" id="openGuideBtn">Guia</button>
-            <button class="danger" id="resetBtn">Resetar Tudo! ⚠️</button>
-            <button class="dev-open" id="openDevBtn">Apenas Dev</button>
-         </section>
-      </main>
-
-      <div class="shopOverlay" id="shopOverlay"></div>
-      <div class="shopOverlay" id="guideOverlay"></div>
-      <div class="shopOverlay" id="devOverlay"></div>
-
-      <aside class="shop" id="shop">
-         <div class="shopHeader">
-            <h2>Loja</h2>
-            <button class="closeBtn" id="closeShopBtn">✕</button>
-         </div>
-
-         <div class="shopMoney" id="shopMoney">
-            Polígonos: ◆0 | Estilhaços: ✦0
-         </div>
-
-         <div class="stats">
-            <div class="stat">
-               Spawn<strong id="spawnTimeStat">3.00s</strong>
-            </div>
-            <div class="stat">
-               Nível inicial<strong id="startLevelStat">Lv 1</strong>
-            </div>
-            <div class="stat">
-               Chance dupla<strong id="doubleSpawnStat">0%</strong>
-            </div>
-            <div class="stat">
-               Bônus 2x tick<strong id="doubleMoneyStat">0%</strong>
-            </div>
-            <div class="stat">
-               Dourado<strong id="goldenChanceStat">0%</strong>
-            </div>
-            <div class="stat">
-               Multiplicador<strong id="multiplierStat">1.0x</strong>
-            </div>
-            <div class="stat">Objetos<strong id="itemsStat">0/16</strong></div>
-            <div class="stat">Level<strong id="levelStat">1</strong></div>
-         </div>
-
-         <div id="upgrades"></div>
-      </aside>
-
-      <aside class="guide" id="guide">
-         <div class="shopHeader">
-            <h2>Guia rápido</h2>
-            <button class="closeBtn" id="closeGuideBtn">✕</button>
-         </div>
-
-         <section class="guideSection">
-            <h3>🎯 Objetivo</h3>
-            <p>
-               Combine objetos iguais para criar objetos de nível maior, gerar
-               mais polígonos e subir de level.
-            </p>
-         </section>
-
-         <section class="guideSection">
-            <h3>🔁 Merge</h3>
-            <ul>
-               <li>Arraste um objeto sobre outro do mesmo nível.</li>
-               <li>
-                  Solte para combinar os dois em um objeto de nível superior.
-               </li>
-               <li>Cada merge aumenta a barra de Level Up.</li>
-               <li>
-                  Objetos de níveis diferentes não combinam e geram um aviso
-                  vermelho.
-               </li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>💠 Polígonos</h3>
-            <ul>
-               <li>
-                  Cada objeto gera polígonos automaticamente a cada segundo.
-               </li>
-               <li>O popup acima do objeto mostra quanto ele gerou no tick.</li>
-               <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>✦ Estilhaços</h3>
-            <ul>
-               <li>Você ganha estilhaços ao subir de level.</li>
-               <li>
-                  A recompensa é múltipla de 5 e aumenta conforme seu level.
-               </li>
-               <li>Cada estilhaço aumenta em 0.01x o ganho de polígonos.</li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>🌟 Objetos dourados</h3>
-            <ul>
-               <li>Objetos dourados geram 2x polígonos para sempre.</li>
-               <li>Ao combinar, o efeito dourado continua no novo objeto.</li>
-               <li>
-                  O upgrade de objeto dourado aumenta a chance deles aparecerem.
-               </li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>🗑️ Lixeira</h3>
-            <ul>
-               <li>
-                  Arraste um objeto para a lixeira para removê-lo da grade.
-               </li>
-               <li>
-                  Ao excluir, você recebe metade do valor que ele gerava por
-                  segundo em polígonos.
-               </li>
-               <li>
-                  Use isso para liberar espaço quando a grade estiver travando.
-               </li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>🛒 Loja</h3>
-            <ul>
-               <li>Compre upgrades para acelerar o spawn.</li>
-               <li>Aumente o nível dos objetos gerados.</li>
-               <li>
-                  Aumente a chance de spawn duplo, tick 2x e objetos dourados.
-               </li>
-               <li>
-                  Quando o nível inicial sobe, objetos antigos abaixo desse
-                  nível são atualizados automaticamente.
-               </li>
-            </ul>
-         </section>
-      </aside>
-
-      <aside class="devPanel" id="devPanel">
-         <div class="shopHeader">
-            <h2>Dev Tools</h2>
-            <button class="closeBtn" id="closeDevBtn">✕</button>
-         </div>
-
-         <section class="devSection" id="devLoginSection">
-            <h3>🔐 Acesso Dev</h3>
-
-            <input
-               type="password"
-               id="devPasswordInput"
-               placeholder="Digite a senha dev"
-               class="devInput"
-            />
-
-            <button id="devLoginBtn">Entrar</button>
-            <p class="devError" id="devErrorText"></p>
-         </section>
-
-         <div id="devContent" class="devContent locked">
-            <section class="devSection">
-               <h3>💠 Economia</h3>
-               <div class="devGrid">
-                  <button id="devAddPolygons1K">+1K Polígonos</button>
-                  <button id="devAddPolygons100K">+100K Polígonos</button>
-                  <button id="devAddShards5">+5 Estilhaços</button>
-                  <button id="devAddShards50">+50 Estilhaços</button>
-               </div>
-            </section>
-
-            <section class="devSection">
-               <h3>🔁 Spawn e Grade</h3>
-               <div class="devGrid">
-                  <button id="devSpawnOne">Gerar 1</button>
-                  <button id="devSpawnGolden">Gerar Dourado</button>
-                  <button id="devFillGrid">Preencher Grid</button>
-                  <button id="devClearGrid">Limpar Grid</button>
-               </div>
-            </section>
-
-            <section class="devSection">
-               <h3>⚙️ Upgrades</h3>
-               <div class="devGrid">
-                  <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
-                  <button id="devLevelUpForm">+1 Forma</button>
-                  <button id="devResetUpgrades">Reset Upgrades</button>
-                  <button id="devAllUpgrades5">Todos Nv. 5</button>
-               </div>
-            </section>
-
-            <section class="devSection">
-               <h3>⭐ Level</h3>
-               <div class="devGrid">
-                  <button id="devAddMerge">+1 Merge</button>
-                  <button id="devForceLevelUp">Forçar Level Up</button>
-               </div>
-            </section>
-         </div>
-      </aside>
-
-      <script>
-         const grid = document.getElementById('grid');
-         const moneyEl = document.getElementById('money');
-         const incomeEl = document.getElementById('income');
-         const shardsEl = document.getElementById('shards');
-         const saveStatus = document.getElementById('saveStatus');
-         const trashZone = document.getElementById('trashZone');
-         const resetBtn = document.getElementById('resetBtn');
-         const openShopBtn = document.getElementById('openShopBtn');
-         const openGuideBtn = document.getElementById('openGuideBtn');
-         const closeShopBtn = document.getElementById('closeShopBtn');
-         const closeGuideBtn = document.getElementById('closeGuideBtn');
-         const shop = document.getElementById('shop');
-         const guide = document.getElementById('guide');
-         const shopOverlay = document.getElementById('shopOverlay');
-         const guideOverlay = document.getElementById('guideOverlay');
-         const shopMoney = document.getElementById('shopMoney');
-         const upgradesEl = document.getElementById('upgrades');
-         const spawnTimeStat = document.getElementById('spawnTimeStat');
-         const startLevelStat = document.getElementById('startLevelStat');
-         const doubleSpawnStat = document.getElementById('doubleSpawnStat');
-         const doubleMoneyStat = document.getElementById('doubleMoneyStat');
-         const goldenChanceStat = document.getElementById('goldenChanceStat');
-         const multiplierStat = document.getElementById('multiplierStat');
-         const itemsStat = document.getElementById('itemsStat');
-         const levelStat = document.getElementById('levelStat');
-         const spawnProgressText = document.getElementById('spawnProgressText');
-         const spawnProgressFill = document.getElementById('spawnProgressFill');
-         const playerLevelEl = document.getElementById('playerLevel');
-         const levelProgressText = document.getElementById('levelProgressText');
-         const levelProgressFill = document.getElementById('levelProgressFill');
-         const levelBonusText = document.getElementById('levelBonusText');
-         const levelUpPopup = document.getElementById('levelUpPopup');
-         const spawnPopup = document.getElementById('spawnPopup');
-
-         const openDevBtn = document.getElementById('openDevBtn');
-         const closeDevBtn = document.getElementById('closeDevBtn');
-         const devPanel = document.getElementById('devPanel');
-         const devOverlay = document.getElementById('devOverlay');
-
-         const devAddPolygons1K = document.getElementById('devAddPolygons1K');
-         const devAddPolygons100K =
-            document.getElementById('devAddPolygons100K');
-         const devAddShards5 = document.getElementById('devAddShards5');
-         const devAddShards50 = document.getElementById('devAddShards50');
-         const devSpawnOne = document.getElementById('devSpawnOne');
-         const devSpawnGolden = document.getElementById('devSpawnGolden');
-         const devFillGrid = document.getElementById('devFillGrid');
-         const devClearGrid = document.getElementById('devClearGrid');
-         const devMaxSpawnSpeed = document.getElementById('devMaxSpawnSpeed');
-         const devLevelUpForm = document.getElementById('devLevelUpForm');
-         const devResetUpgrades = document.getElementById('devResetUpgrades');
-         const devAllUpgrades5 = document.getElementById('devAllUpgrades5');
-         const devAddMerge = document.getElementById('devAddMerge');
-         const devForceLevelUp = document.getElementById('devForceLevelUp');
-         const devPasswordInput = document.getElementById('devPasswordInput');
-         const devLoginBtn = document.getElementById('devLoginBtn');
-         const devErrorText = document.getElementById('devErrorText');
-         const devLoginSection = document.getElementById('devLoginSection');
-         const devContent = document.getElementById('devContent');
-
-         const GRID_SIZE = 16;
-         const BASE_SPAWN_TIME = 6000;
-         const SAVE_KEY = 'merge-clicker-prototype-save-v4';
-         const SPAWN_TICK_RATE = 100;
-         const DEV_PASSWORD = 'senha67';
-
-         const LEVEL_COLORS = [
-            { name: 'Branco', bg: '#f8f9fa', text: '#1f2933' },
-            { name: 'Ciano', bg: '#22d3ee', text: '#06323a' },
-            { name: 'Azul claro', bg: '#60a5fa', text: '#0f2748' },
-            { name: 'Azul escuro', bg: '#2563eb', text: '#ffffff' },
-            { name: 'Roxo', bg: '#7c3aed', text: '#ffffff' },
-            { name: 'Vermelho claro', bg: '#f87171', text: '#4a1010' },
-            { name: 'Rosa', bg: '#ec4899', text: '#ffffff' },
-            { name: 'Vinho', bg: '#881337', text: '#ffffff' },
-            { name: 'Marrom', bg: '#92400e', text: '#ffffff' },
-            { name: 'Laranja', bg: '#f97316', text: '#ffffff' },
-            { name: 'Amarelo', bg: '#facc15', text: '#3f3300' },
-            { name: 'Verde claro', bg: '#86efac', text: '#064e3b' },
-            { name: 'Verde escuro', bg: '#15803d', text: '#ffffff' },
-            { name: 'Cinza', bg: '#6b7280', text: '#ffffff' },
-            { name: 'Preto', bg: '#111827', text: '#ffffff' },
-         ];
-
-         let money = 0;
-         let shards = 0;
-         let playerLevel = 1;
-         let mergeProgress = 0;
-         let mergesNeeded = 5;
-         let cells = [];
-         let items = [];
-         let draggedItem = null;
-         let originalCellIndex = null;
-         let offsetX = 0;
-         let offsetY = 0;
-         let spawnProgress = 0;
-         let saveTextTimer = null;
-
-         //* Variáveis de Melhoria *//
-         const upgrades = {
-            spawnSpeed: {
-               name: 'Esteira mais rápida',
-               description:
-                  'Diminui o tempo de espera para gerar novos objetos em 0.1s por nível. Mínimo: 2s.',
-               level: 0,
-               baseCost: 2000,
-               multiplier: 2,
-               tenMultiplier: 4,
-            },
-            startLevel: {
-               name: 'Forma melhorada',
-               description:
-                  'Faz com que os objetos comecem 1 nível acima. Objetos antigos abaixo do novo nível também são atualizados.',
-               level: 0,
-               baseCost: 5000,
-               multiplier: 5,
-               tenMultiplier: 10,
-            },
-            doubleSpawn: {
-               name: 'Entrega dupla',
-               description:
-                  'Aumenta em 2% por nível a chance de nascerem 2 objetos ao mesmo tempo. Máximo: 50%.',
-               level: 0,
-               baseCost: 1500,
-               multiplier: 2,
-               tenMultiplier: 4,
-            },
-            doubleMoney: {
-               name: 'Momento valioso',
-               description:
-                  'Aumenta em 2% por nível a chance de um objeto gerar 2x polígonos naquele momento. Máximo: 50%.',
-               level: 0,
-               baseCost: 2000,
-               multiplier: 2,
-               tenMultiplier: 4,
-            },
-            goldenChance: {
-               name: 'Objeto dourado',
-               description:
-                  'Aumenta em 2% por nível a chance de nascer um objeto dourado. Dourados geram 2x para sempre e mantêm o bônus ao combinar.',
-               level: 0,
-               baseCost: 10000,
-               multiplier: 4,
-               tenMultiplier: 8,
-               //noTenMultiplier: true,
-               golden: true,
-            },
-         };
-
-         function unlockDevTools() {
-            const typedPassword = devPasswordInput.value;
-
-            if (typedPassword !== DEV_PASSWORD) {
-               devErrorText.textContent = 'Senha incorreta.';
-               devPasswordInput.value = '';
-               return;
-            }
-
-            devErrorText.textContent = '';
-            devLoginSection.style.display = 'none';
-            devContent.classList.remove('locked');
-         }
-
-         function devRefresh() {
-            updateUI();
-            updateSpawnBarVisual?.();
-            saveGame(true);
-         }
-
-         function clearAllItems() {
-            items.forEach((item) => item.element.remove());
-            items = [];
-         }
-
-         function devSetSpawnToMinimum() {
-            const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 50);
-            upgrades.spawnSpeed.level = Math.max(
-               upgrades.spawnSpeed.level,
-               neededLevel,
-            );
-         }
-
-         function getLevelVisual(level) {
-            const colorIndex = (level - 1) % LEVEL_COLORS.length;
-            const cycle = Math.floor((level - 1) / LEVEL_COLORS.length);
-            const color = LEVEL_COLORS[colorIndex];
-
-            return {
-               bg: color.bg,
-               text: color.text,
-               cycle,
-            };
-         }
-
-         function formatMoney(value) {
-            if (value >= 1_000_000_000)
-               return `◆${(value / 1_000_000_000).toFixed(2)}B`;
-            if (value >= 1_000_000)
-               return `◆${(value / 1_000_000).toFixed(2)}M`;
-            if (value >= 1_000) return `◆${(value / 1_000).toFixed(2)}K`;
-            return `◆${Math.floor(value)}`;
-         }
-
-         function getShardMultiplier() {
-            return 1 + shards * 0.01;
-         }
-
-         function getShardsReward() {
-            return (playerLevel - 1) * 5;
-         }
-
-         function getNextMergeRequirement() {
-            return Math.ceil(mergesNeeded * 1.5);
-         }
-
-         function createGrid() {
-            grid.innerHTML = '';
-            cells = [];
-
-            for (let i = 0; i < GRID_SIZE; i++) {
-               const cell = document.createElement('div');
-               cell.className = 'cell';
-               cell.dataset.index = i;
-               grid.appendChild(cell);
-               cells.push(cell);
-            }
-         }
-
-         function getUpgradeCost(key) {
-            const upgrade = upgrades[key];
-            let cost = upgrade.baseCost;
-
-            const baseMultiplier = upgrade.multiplier ?? 2;
-            const tenMultiplier = upgrade.tenMultiplier ?? 4;
-
-            for (let i = 1; i <= upgrade.level; i++) {
-               if (!upgrade.noTenMultiplier && i % 10 === 0) {
-                  cost *= tenMultiplier;
-               } else {
-                  cost *= baseMultiplier;
-               }
-            }
-
-            return Math.floor(cost);
-         }
-
-         function getSpawnTime() {
-            const reduction = upgrades.spawnSpeed.level * 100;
-            return Math.max(2000, BASE_SPAWN_TIME - reduction);
-         }
-
-         function getStartLevel() {
-            return 1 + upgrades.startLevel.level;
-         }
-
-         function upgradeOldItemsToStartLevel() {
-            const startLevel = getStartLevel();
-            let changed = false;
-
-            items.forEach((item) => {
-               if (item.level < startLevel) {
-                  item.level = startLevel;
-                  updateItemElement(item);
-                  changed = true;
-               }
-            });
-
-            if (changed) {
-               updateUI();
-               saveGame(true);
-            }
-         }
-
-         function getDoubleSpawnChance() {
-            return Math.min(0.5, upgrades.doubleSpawn.level * 0.02);
-         }
-
-         function getDoubleMoneyChance() {
-            return Math.min(0.5, upgrades.doubleMoney.level * 0.02);
-         }
-
-         function getGoldenChance() {
-            return Math.min(0.5, upgrades.goldenChance.level * 0.02);
-         }
-
-         function getBaseItemValue(level) {
-            return Math.pow(3, level - 1);
-         }
-
-         function getItemPotentialValue(item) {
-            return (
-               getBaseItemValue(item.level) *
-               (item.isGolden ? 2 : 1) *
-               getShardMultiplier()
-            );
-         }
-
-         function getTotalIncomePreview() {
-            return items.reduce(
-               (total, item) => total + getItemPotentialValue(item),
-               0,
-            );
-         }
-
-         function updateUI() {
-            moneyEl.textContent = formatMoney(money);
-            incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-            shardsEl.textContent = `✦${shards}`;
-            shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ✦${shards}`;
-            spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
-            startLevelStat.textContent = `Lv ${getStartLevel()}`;
-            doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
-            doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
-            goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
-            multiplierStat.textContent = `${getShardMultiplier().toFixed(1)}x`;
-            itemsStat.textContent = `${items.length}/16`;
-            levelStat.textContent = playerLevel;
-            playerLevelEl.textContent = playerLevel;
-            levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} combinações`;
-            levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
-            levelBonusText.innerHTML = `Multiplicador por estilhaços: <strong>${getShardMultiplier().toFixed(1)}x</strong>`;
-            renderUpgrades();
-         }
-
-         function getLevelShadow(cycle, isGolden) {
-            const baseShadow = `
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <title>Merge Clicker - V5</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat";
+        user-select: none;
+      }
+
+      body {
+        min-height: 100vh;
+        background: #e8f5ec;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #16351f;
+        overflow-x: hidden;
+      }
+
+      .game {
+        width: 100%;
+        max-width: 480px;
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .saveStatus {
+        text-align: center;
+        font-size: 12px;
+        color: #5c735f;
+        margin-bottom: 10px;
+      }
+
+      .top {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .panel {
+        background: #dff3e5;
+        border: 2px solid #b8dfc2;
+        border-radius: 12px;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .label {
+        font-size: 12px;
+        opacity: 0.75;
+        font-weight: 500;
+        margin-bottom: 3px;
+      }
+
+      .label-2 {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+
+      #levelBonusText {
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 17px;
+        font-weight: bold;
+      }
+
+      .progressPanel {
+        background: #f2f8f4;
+        border: 2px solid #d7e8dc;
+        border-radius: 14px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .progressHeader {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 13px;
+        margin-bottom: 7px;
+        color: #2f5638;
+      }
+
+      .spawnPanel {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .spawnPopup {
+        position: absolute;
+        width: 50%;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 2px solid #1f8f48;
+        color: #16351f;
+        border-radius: 14px;
+        padding: 9px 13px;
+        font-size: 65%;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(31, 143, 72, 0.25);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .spawnPopup.show {
+        animation: spawnPopupAnim 2.5s ease forwards;
+      }
+
+      .spawnPopup.upgrade {
+        border-color: #6c5ce7;
+        color: #2f235f;
+      }
+
+      .spawnPopup.golden {
+        border-color: #ffd84d;
+        color: #8a6500;
+      }
+
+      .spawnPopup.double {
+        border-color: #236fbe;
+        color: #163d6d;
+      }
+
+      .spawnPopup.valuable {
+        border-color: #6c5ce7;
+        color: #2f235f;
+      }
+
+      .barTrack {
+        height: 10px;
+        background: #dcebe0;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .barFill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #1f8f48, #71d68b);
+        border-radius: 999px;
+        transition: width 0.12s linear;
+      }
+
+      .levelFill {
+        background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+      }
+
+      .levelUpPanel {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .levelUpPopup {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #ffffff;
+        border: 2px solid #8e7cff;
+        color: #2f235f;
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(108, 92, 231, 0.25);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .levelUpPopup.show {
+        animation: levelUpPopupAnim 2s ease forwards;
+      }
+
+      .levelUpPopup small {
+        display: block;
+        margin-top: 4px;
+        color: #1f8f48;
+      }
+
+      .levelBonus {
+        font-size: 12px;
+        color: #45634d;
+        margin-top: 6px;
+        text-align: center;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        background: #b7e3bf;
+        padding: 12px;
+        border-radius: 16px;
+        position: relative;
+        touch-action: none;
+      }
+
+      .cell {
+        aspect-ratio: 1 / 1;
+        background: rgba(255, 255, 255, 0.55);
+        border: 2px dashed rgba(30, 90, 45, 0.22);
+        border-radius: 12px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .cell.highlight {
+        background: #fff7c2;
+        border-color: #d8a900;
+      }
+
+      .cell.errorFlash {
+        animation: errorCell 0.35s ease;
+      }
+
+      .item {
+        width: 76%;
+        height: 76%;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 2px;
+        font-weight: bold;
+        color: white;
+        cursor: grab;
+        position: absolute;
+        z-index: 2;
+        box-shadow:
+          inset 0 -6px rgba(0, 0, 0, 0.12),
+          0 6px 12px rgba(0, 0, 0, 0.16);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+
+      .item {
+        overflow: visible;
+      }
+
+      .cycleBadge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        border-radius: 7px;
+        background: #ffffff;
+        color: #111827;
+        border: 2px solid rgba(17, 24, 39, 0.25);
+        font-size: 10px;
+        font-weight: 900;
+        line-height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+        z-index: 4;
+      }
+
+      .itemLevelText {
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .item small {
+        font-size: 10px;
+        opacity: 0.92;
+      }
+
+      .item.golden {
+        box-shadow:
+          0 0 0 3px #ffd84d,
+          0 0 18px #ffd84d,
+          inset 0 -6px rgba(0, 0, 0, 0.12),
+          0 6px 12px rgba(0, 0, 0, 0.16);
+        animation: goldenGlow 1.2s ease-in-out infinite alternate;
+      }
+
+      .item.mergeBurst {
+        animation: mergeBurst 0.28s ease;
+      }
+
+      .item.shakeError {
+        animation: shakeError 0.32s ease;
+      }
+
+      .item:active {
+        cursor: grabbing;
+      }
+
+      .item.dragging {
+        position: fixed;
+        z-index: 999;
+        pointer-events: none;
+        transform: scale(1.08);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+      }
+
+      .moneyPopup {
+        position: fixed;
+        z-index: 1000;
+        pointer-events: none;
+        font-weight: bold;
+        font-size: 13px;
+        color: #1f8f48;
+        text-shadow: 0 1px 0 #fff;
+        animation: floatMoney 0.85s ease-out forwards;
+      }
+
+      .moneyPopup.double {
+        color: #236fbe;
+        font-size: 15px;
+      }
+
+      .moneyPopup.goldenText {
+        color: #d49b00;
+      }
+
+      .effectRing {
+        position: fixed;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 3px solid #ffd84d;
+        pointer-events: none;
+        z-index: 1500;
+        transform: translate(-50%, -50%);
+        animation: ringEffect 0.42s ease-out forwards;
+      }
+
+      .effectRing.error {
+        border-color: #e74c3c;
+        animation: ringError 0.38s ease-out forwards;
+      }
+
+      .footer {
+        margin-top: 14px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.75fr 0.75fr 0.75fr 0.75fr;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      button {
+        flex: 1;
+        border: none;
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: bold;
+        font-size: 70%;
+        cursor: pointer;
+        background: #1f8f48;
+        color: white;
+        transition:
+          transform 0.15s ease,
+          opacity 0.15s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        opacity: 0.95;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        transform: none;
+      }
+
+      .danger {
+        background: #c0392b;
+      }
+      .shop-open {
+        background: #236fbe;
+      }
+      .guide-open {
+        background: #6c5ce7;
+      }
+
+      .trash {
+        border: 2px dashed #c0392b;
+        background: #fff1ef;
+        color: #9f2f24;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        font-size: 12px;
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease,
+          border-color 0.15s ease;
+      }
+
+      .trash strong {
+        font-size: 13px;
+      }
+
+      .trash.active {
+        background: #ffd8d2;
+        border-color: #e74c3c;
+        transform: scale(1.03);
+      }
+
+      .shopOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+        z-index: 1000;
+      }
+
+      .shopOverlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .guide,
+      .shop {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: min(360px, 92vw);
+        background: #ffffff;
+        opacity: 0.92;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+        padding: 18px;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        z-index: 1001;
+        overflow-y: auto;
+      }
+
+      .guide.active,
+      .shop.active {
+        transform: translateX(0);
+      }
+
+      .guideSection {
+        border: 2px solid #e1eee5;
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #fbfffc;
+      }
+
+      .guideSection h3 {
+        font-size: 15px;
+        margin-bottom: 6px;
+      }
+
+      .guideSection p,
+      .guideSection li {
+        font-size: 13px;
+        color: #45634d;
+        line-height: 1.45;
+      }
+
+      .guideSection ul {
+        padding-left: 18px;
+      }
+
+      .shopHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .shopHeader h2 {
+        font-size: 22px;
+      }
+
+      .closeBtn {
+        flex: unset;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        background: #eef5f0;
+        color: #16351f;
+        border: 1px solid #d7e8dc;
+      }
+
+      .shopMoney {
+        background: #dff3e5;
+        border: 2px solid #b8dfc2;
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 12px;
+        font-weight: bold;
+        text-align: center;
+      }
+
+      .upgrade {
+        border: 2px solid #e1eee5;
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #fbfffc;
+      }
+
+      .upgrade.goldenUpgrade {
+        border-color: #ffe08a;
+        background: #fffaf0;
+      }
+
+      .upgradeTop {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 7px;
+      }
+
+      .upgrade h3 {
+        font-size: 15px;
+      }
+
+      .upgradeLevel {
+        font-size: 12px;
+        font-weight: bold;
+        color: #1f8f48;
+        white-space: nowrap;
+      }
+
+      .upgrade p {
+        font-size: 13px;
+        color: #45634d;
+        line-height: 1.35;
+        margin-bottom: 10px;
+      }
+
+      .upgrade button {
+        width: 100%;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .stat {
+        background: #f2f8f4;
+        border-radius: 10px;
+        padding: 8px;
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 14px;
+        margin-top: 3px;
+      }
+
+      .pop {
+        animation: pop 0.25s ease;
+      }
+
+      .dev-open {
+        background: #111827;
+      }
+
+      .devPanel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: min(380px, 94vw);
+        background: #ffffff;
+        box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+        padding: 18px;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        z-index: 1001;
+        overflow-y: auto;
+      }
+
+      .devPanel.active {
+        transform: translateX(0);
+      }
+
+      .devSection {
+        border: 2px solid #e1eee5;
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 10px;
+        background: #fbfffc;
+      }
+
+      .devSection h3 {
+        font-size: 15px;
+        margin-bottom: 10px;
+      }
+
+      .devGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .devGrid button {
+        padding: 10px;
+        font-size: 12px;
+        border-radius: 10px;
+        background: #111827;
+      }
+
+      .devInput {
+        width: 100%;
+        padding: 11px;
+        border: 2px solid #e1eee5;
+        border-radius: 10px;
+        margin-bottom: 8px;
+        outline: none;
+      }
+
+      .devInput:focus {
+        border-color: #111827;
+      }
+
+      .devError {
+        font-size: 12px;
+        color: #c0392b;
+        margin-top: 8px;
+        min-height: 16px;
+      }
+
+      .devContent.locked {
+        display: none;
+      }
+
+      @keyframes pop {
+        0% {
+          transform: scale(0.8);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes floatMoney {
+        0% {
+          transform: translateY(0) scale(0.9);
+          opacity: 0;
+        }
+        15% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-42px) scale(1.1);
+          opacity: 0;
+        }
+      }
+
+      @keyframes goldenGlow {
+        from {
+          filter: brightness(1);
+        }
+        to {
+          filter: brightness(1.18);
+        }
+      }
+
+      @keyframes mergeBurst {
+        0% {
+          transform: scale(0.75);
+        }
+        70% {
+          transform: scale(1.16);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes shakeError {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        50% {
+          transform: translateX(5px);
+        }
+        75% {
+          transform: translateX(-3px);
+        }
+      }
+
+      @keyframes errorCell {
+        0%,
+        100% {
+          background: rgba(255, 255, 255, 0.55);
+        }
+        50% {
+          background: rgba(231, 76, 60, 0.25);
+          border-color: #e74c3c;
+        }
+      }
+
+      @keyframes ringEffect {
+        0% {
+          width: 10px;
+          height: 10px;
+          opacity: 1;
+        }
+        100% {
+          width: 92px;
+          height: 92px;
+          opacity: 0;
+        }
+      }
+
+      @keyframes ringError {
+        0% {
+          width: 10px;
+          height: 10px;
+          opacity: 1;
+        }
+        100% {
+          width: 74px;
+          height: 74px;
+          opacity: 0;
+        }
+      }
+
+      @keyframes levelUpPopupAnim {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 10%) scale(0.8);
+        }
+
+        15% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        70% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -90%) scale(0.95);
+        }
+      }
+
+      @keyframes spawnPopupAnim {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, 10%) scale(0.8);
+        }
+
+        15% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.08);
+        }
+
+        70% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -90%) scale(0.95);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="game">
+      <div class="saveStatus" id="saveStatus">
+        Salvamento automático <strong>ativo</strong>
+      </div>
+
+      <section class="top">
+        <div class="panel">
+          <div class="label">Polígonos</div>
+          <div class="value" id="money">◆0</div>
+        </div>
+        <div class="panel">
+          <div class="label">Ganho / segundo</div>
+          <div class="value" id="income">◆0/s</div>
+        </div>
+        <div class="panel">
+          <div class="label">Estilhaços</div>
+          <div class="value" id="shards">✦0</div>
+        </div>
+      </section>
+
+      <section class="progressPanel spawnPanel">
+        <div class="progressHeader">
+          <span class="label-2">⏳ Próximo objeto</span>
+          <strong id="spawnProgressText">3.00s / 3.00s</strong>
+        </div>
+        <div class="barTrack">
+          <div class="barFill" id="spawnProgressFill"></div>
+        </div>
+        <div class="spawnPopup" id="spawnPopup"></div>
+      </section>
+
+      <section class="progressPanel levelUpPanel">
+        <div class="progressHeader">
+          <span class="label-2"
+            >⭐ Level <strong id="playerLevel">1</strong></span
+          >
+          <strong id="levelProgressText">0 / 5 combinações</strong>
+        </div>
+        <div class="barTrack">
+          <div class="barFill levelFill" id="levelProgressFill"></div>
+        </div>
+        <p class="levelBonus" id="levelBonusText">
+          Multiplicador por estilhaços: <strong>1.0x</strong>
+        </p>
+        <div class="levelUpPopup" id="levelUpPopup"></div>
+      </section>
+
+      <section class="grid" id="grid"></section>
+
+      <section class="footer">
+        <div class="trash" id="trashZone">
+          <strong>🗑️ Lixeira</strong>
+          <span>Arraste aqui</span>
+        </div>
+        <button class="shop-open" id="openShopBtn">Melhorias</button>
+        <button class="guide-open" id="openGuideBtn">Guia</button>
+        <button class="danger" id="resetBtn">Resetar Tudo! ⚠️</button>
+        <button class="dev-open" id="openDevBtn">Apenas Dev</button>
+      </section>
+    </main>
+
+    <div class="shopOverlay" id="shopOverlay"></div>
+    <div class="shopOverlay" id="guideOverlay"></div>
+    <div class="shopOverlay" id="devOverlay"></div>
+
+    <aside class="shop" id="shop">
+      <div class="shopHeader">
+        <h2>Loja</h2>
+        <button class="closeBtn" id="closeShopBtn">✕</button>
+      </div>
+
+      <div class="shopMoney" id="shopMoney">Polígonos: ◆0 | Estilhaços: ✦0</div>
+
+      <div class="stats">
+        <div class="stat">Spawn<strong id="spawnTimeStat">3.00s</strong></div>
+        <div class="stat">
+          Nível inicial<strong id="startLevelStat">Lv 1</strong>
+        </div>
+        <div class="stat">
+          Chance dupla<strong id="doubleSpawnStat">0%</strong>
+        </div>
+        <div class="stat">
+          Bônus 2x tick<strong id="doubleMoneyStat">0%</strong>
+        </div>
+        <div class="stat">Dourado<strong id="goldenChanceStat">0%</strong></div>
+        <div class="stat">
+          Multiplicador<strong id="multiplierStat">1.0x</strong>
+        </div>
+        <div class="stat">Objetos<strong id="itemsStat">0/16</strong></div>
+        <div class="stat">Level<strong id="levelStat">1</strong></div>
+      </div>
+
+      <div id="upgrades"></div>
+    </aside>
+
+    <aside class="guide" id="guide">
+      <div class="shopHeader">
+        <h2>Guia rápido</h2>
+        <button class="closeBtn" id="closeGuideBtn">✕</button>
+      </div>
+
+      <section class="guideSection">
+        <h3>🎯 Objetivo</h3>
+        <p>
+          Combine objetos iguais para criar objetos de nível maior, gerar mais
+          polígonos e subir de level.
+        </p>
+      </section>
+
+      <section class="guideSection">
+        <h3>🔁 Merge</h3>
+        <ul>
+          <li>Arraste um objeto sobre outro do mesmo nível.</li>
+          <li>Solte para combinar os dois em um objeto de nível superior.</li>
+          <li>Cada merge aumenta a barra de Level Up.</li>
+          <li>
+            Objetos de níveis diferentes não combinam e geram um aviso vermelho.
+          </li>
+        </ul>
+      </section>
+
+      <section class="guideSection">
+        <h3>💠 Polígonos</h3>
+        <ul>
+          <li>Cada objeto gera polígonos automaticamente a cada segundo.</li>
+          <li>O popup acima do objeto mostra quanto ele gerou no tick.</li>
+          <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
+        </ul>
+      </section>
+
+      <section class="guideSection">
+        <h3>✦ Estilhaços</h3>
+        <ul>
+          <li>Você ganha estilhaços ao subir de level.</li>
+          <li>A recompensa é múltipla de 5 e aumenta conforme seu level.</li>
+          <li>Cada estilhaço aumenta em 0.01x o ganho de polígonos.</li>
+        </ul>
+      </section>
+
+      <section class="guideSection">
+        <h3>🌟 Objetos dourados</h3>
+        <ul>
+          <li>Objetos dourados geram 2x polígonos para sempre.</li>
+          <li>Ao combinar, o efeito dourado continua no novo objeto.</li>
+          <li>
+            O upgrade de objeto dourado aumenta a chance deles aparecerem.
+          </li>
+        </ul>
+      </section>
+
+      <section class="guideSection">
+        <h3>🗑️ Lixeira</h3>
+        <ul>
+          <li>Arraste um objeto para a lixeira para removê-lo da grade.</li>
+          <li>
+            Ao excluir, você recebe metade do valor que ele gerava por segundo
+            em polígonos.
+          </li>
+          <li>Use isso para liberar espaço quando a grade estiver travando.</li>
+        </ul>
+      </section>
+
+      <section class="guideSection">
+        <h3>🛒 Loja</h3>
+        <ul>
+          <li>Compre upgrades para acelerar o spawn.</li>
+          <li>Aumente o nível dos objetos gerados.</li>
+          <li>Aumente a chance de spawn duplo, tick 2x e objetos dourados.</li>
+          <li>
+            Quando o nível inicial sobe, objetos antigos abaixo desse nível são
+            atualizados automaticamente.
+          </li>
+        </ul>
+      </section>
+    </aside>
+
+    <aside class="devPanel" id="devPanel">
+      <div class="shopHeader">
+        <h2>Dev Tools</h2>
+        <button class="closeBtn" id="closeDevBtn">✕</button>
+      </div>
+
+      <section class="devSection" id="devLoginSection">
+        <h3>🔐 Acesso Dev</h3>
+
+        <input
+          type="password"
+          id="devPasswordInput"
+          placeholder="Digite a senha dev"
+          class="devInput"
+        />
+
+        <button id="devLoginBtn">Entrar</button>
+        <p class="devError" id="devErrorText"></p>
+      </section>
+
+      <div id="devContent" class="devContent locked">
+        <section class="devSection">
+          <h3>💠 Economia</h3>
+          <div class="devGrid">
+            <button id="devAddPolygons1K">+1K Polígonos</button>
+            <button id="devAddPolygons100K">+100K Polígonos</button>
+            <button id="devAddShards5">+5 Estilhaços</button>
+            <button id="devAddShards50">+50 Estilhaços</button>
+          </div>
+        </section>
+
+        <section class="devSection">
+          <h3>🔁 Spawn e Grade</h3>
+          <div class="devGrid">
+            <button id="devSpawnOne">Gerar 1</button>
+            <button id="devSpawnGolden">Gerar Dourado</button>
+            <button id="devFillGrid">Preencher Grid</button>
+            <button id="devClearGrid">Limpar Grid</button>
+          </div>
+        </section>
+
+        <section class="devSection">
+          <h3>⚙️ Upgrades</h3>
+          <div class="devGrid">
+            <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
+            <button id="devLevelUpForm">+1 Forma</button>
+            <button id="devResetUpgrades">Reset Upgrades</button>
+            <button id="devAllUpgrades5">Todos Nv. 5</button>
+          </div>
+        </section>
+
+        <section class="devSection">
+          <h3>⭐ Level</h3>
+          <div class="devGrid">
+            <button id="devAddMerge">+1 Merge</button>
+            <button id="devForceLevelUp">Forçar Level Up</button>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <script>
+      const grid = document.getElementById("grid");
+      const moneyEl = document.getElementById("money");
+      const incomeEl = document.getElementById("income");
+      const shardsEl = document.getElementById("shards");
+      const saveStatus = document.getElementById("saveStatus");
+      const trashZone = document.getElementById("trashZone");
+      const resetBtn = document.getElementById("resetBtn");
+      const openShopBtn = document.getElementById("openShopBtn");
+      const openGuideBtn = document.getElementById("openGuideBtn");
+      const closeShopBtn = document.getElementById("closeShopBtn");
+      const closeGuideBtn = document.getElementById("closeGuideBtn");
+      const shop = document.getElementById("shop");
+      const guide = document.getElementById("guide");
+      const shopOverlay = document.getElementById("shopOverlay");
+      const guideOverlay = document.getElementById("guideOverlay");
+      const shopMoney = document.getElementById("shopMoney");
+      const upgradesEl = document.getElementById("upgrades");
+      const spawnTimeStat = document.getElementById("spawnTimeStat");
+      const startLevelStat = document.getElementById("startLevelStat");
+      const doubleSpawnStat = document.getElementById("doubleSpawnStat");
+      const doubleMoneyStat = document.getElementById("doubleMoneyStat");
+      const goldenChanceStat = document.getElementById("goldenChanceStat");
+      const multiplierStat = document.getElementById("multiplierStat");
+      const itemsStat = document.getElementById("itemsStat");
+      const levelStat = document.getElementById("levelStat");
+      const spawnProgressText = document.getElementById("spawnProgressText");
+      const spawnProgressFill = document.getElementById("spawnProgressFill");
+      const playerLevelEl = document.getElementById("playerLevel");
+      const levelProgressText = document.getElementById("levelProgressText");
+      const levelProgressFill = document.getElementById("levelProgressFill");
+      const levelBonusText = document.getElementById("levelBonusText");
+      const levelUpPopup = document.getElementById("levelUpPopup");
+      const spawnPopup = document.getElementById("spawnPopup");
+
+      const openDevBtn = document.getElementById("openDevBtn");
+      const closeDevBtn = document.getElementById("closeDevBtn");
+      const devPanel = document.getElementById("devPanel");
+      const devOverlay = document.getElementById("devOverlay");
+
+      const devAddPolygons1K = document.getElementById("devAddPolygons1K");
+      const devAddPolygons100K = document.getElementById("devAddPolygons100K");
+      const devAddShards5 = document.getElementById("devAddShards5");
+      const devAddShards50 = document.getElementById("devAddShards50");
+      const devSpawnOne = document.getElementById("devSpawnOne");
+      const devSpawnGolden = document.getElementById("devSpawnGolden");
+      const devFillGrid = document.getElementById("devFillGrid");
+      const devClearGrid = document.getElementById("devClearGrid");
+      const devMaxSpawnSpeed = document.getElementById("devMaxSpawnSpeed");
+      const devLevelUpForm = document.getElementById("devLevelUpForm");
+      const devResetUpgrades = document.getElementById("devResetUpgrades");
+      const devAllUpgrades5 = document.getElementById("devAllUpgrades5");
+      const devAddMerge = document.getElementById("devAddMerge");
+      const devForceLevelUp = document.getElementById("devForceLevelUp");
+      const devPasswordInput = document.getElementById("devPasswordInput");
+      const devLoginBtn = document.getElementById("devLoginBtn");
+      const devErrorText = document.getElementById("devErrorText");
+      const devLoginSection = document.getElementById("devLoginSection");
+      const devContent = document.getElementById("devContent");
+
+      const GRID_SIZE = 16;
+      const BASE_SPAWN_TIME = 6000;
+      const SAVE_KEY = "merge-clicker-prototype-save-v4";
+      const SPAWN_TICK_RATE = 100;
+      const DEV_PASSWORD = "senha67";
+
+      const LEVEL_COLORS = [
+        { name: "Branco", bg: "#f8f9fa", text: "#1f2933" },
+        { name: "Ciano", bg: "#22d3ee", text: "#06323a" },
+        { name: "Azul claro", bg: "#60a5fa", text: "#0f2748" },
+        { name: "Azul escuro", bg: "#2563eb", text: "#ffffff" },
+        { name: "Roxo", bg: "#7c3aed", text: "#ffffff" },
+        { name: "Vermelho claro", bg: "#f87171", text: "#4a1010" },
+        { name: "Rosa", bg: "#ec4899", text: "#ffffff" },
+        { name: "Vinho", bg: "#881337", text: "#ffffff" },
+        { name: "Marrom", bg: "#92400e", text: "#ffffff" },
+        { name: "Laranja", bg: "#f97316", text: "#ffffff" },
+        { name: "Amarelo", bg: "#facc15", text: "#3f3300" },
+        { name: "Verde claro", bg: "#86efac", text: "#064e3b" },
+        { name: "Verde escuro", bg: "#15803d", text: "#ffffff" },
+        { name: "Cinza", bg: "#6b7280", text: "#ffffff" },
+        { name: "Preto", bg: "#111827", text: "#ffffff" },
+      ];
+
+      let money = 0;
+      let shards = 0;
+      let playerLevel = 1;
+      let mergeProgress = 0;
+      let mergesNeeded = 5;
+      let cells = [];
+      let items = [];
+      let draggedItem = null;
+      let originalCellIndex = null;
+      let offsetX = 0;
+      let offsetY = 0;
+      let spawnProgress = 0;
+      let saveTextTimer = null;
+
+      //* Variáveis de Melhoria *//
+      const upgrades = {
+        spawnSpeed: {
+          name: "Esteira mais rápida",
+          description:
+            "Diminui o tempo de espera para gerar novos objetos em 0.1s por nível. Mínimo: 2s.",
+          level: 0,
+          baseCost: 2000,
+          multiplier: 2,
+          tenMultiplier: 4,
+        },
+        startLevel: {
+          name: "Forma melhorada",
+          description:
+            "Faz com que os objetos comecem 1 nível acima. Objetos antigos abaixo do novo nível também são atualizados.",
+          level: 0,
+          baseCost: 5000,
+          multiplier: 5,
+          tenMultiplier: 10,
+        },
+        doubleSpawn: {
+          name: "Entrega dupla",
+          description:
+            "Aumenta em 2% por nível a chance de nascerem 2 objetos ao mesmo tempo. Máximo: 50%.",
+          level: 0,
+          baseCost: 1500,
+          multiplier: 2,
+          tenMultiplier: 4,
+        },
+        doubleMoney: {
+          name: "Momento valioso",
+          description:
+            "Aumenta em 2% por nível a chance de um objeto gerar 2x polígonos naquele momento. Máximo: 50%.",
+          level: 0,
+          baseCost: 2000,
+          multiplier: 2,
+          tenMultiplier: 4,
+        },
+        goldenChance: {
+          name: "Objeto dourado",
+          description:
+            "Aumenta em 2% por nível a chance de nascer um objeto dourado. Dourados geram 2x para sempre e mantêm o bônus ao combinar.",
+          level: 0,
+          baseCost: 10000,
+          multiplier: 4,
+          tenMultiplier: 8,
+          //noTenMultiplier: true,
+          golden: true,
+        },
+      };
+
+      function unlockDevTools() {
+        const typedPassword = devPasswordInput.value;
+
+        if (typedPassword !== DEV_PASSWORD) {
+          devErrorText.textContent = "Senha incorreta.";
+          devPasswordInput.value = "";
+          return;
+        }
+
+        devErrorText.textContent = "";
+        devLoginSection.style.display = "none";
+        devContent.classList.remove("locked");
+      }
+
+      function devRefresh() {
+        updateUI();
+        updateSpawnBarVisual?.();
+        saveGame(true);
+      }
+
+      function clearAllItems() {
+        items.forEach((item) => item.element.remove());
+        items = [];
+      }
+
+      function devSetSpawnToMinimum() {
+        const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 50);
+        upgrades.spawnSpeed.level = Math.max(
+          upgrades.spawnSpeed.level,
+          neededLevel,
+        );
+      }
+
+      function getLevelVisual(level) {
+        const colorIndex = (level - 1) % LEVEL_COLORS.length;
+        const cycle = Math.floor((level - 1) / LEVEL_COLORS.length);
+        const color = LEVEL_COLORS[colorIndex];
+
+        return {
+          bg: color.bg,
+          text: color.text,
+          cycle,
+        };
+      }
+
+      function formatMoney(value) {
+        if (value >= 1_000_000_000)
+          return `◆${(value / 1_000_000_000).toFixed(2)}B`;
+        if (value >= 1_000_000) return `◆${(value / 1_000_000).toFixed(2)}M`;
+        if (value >= 1_000) return `◆${(value / 1_000).toFixed(2)}K`;
+        return `◆${Math.floor(value)}`;
+      }
+
+      function getShardMultiplier() {
+        return 1 + shards * 0.01;
+      }
+
+      function getShardsReward() {
+        return (playerLevel - 1) * 5;
+      }
+
+      function getNextMergeRequirement() {
+        return Math.ceil(mergesNeeded * 1.5);
+      }
+
+      function createGrid() {
+        grid.innerHTML = "";
+        cells = [];
+
+        for (let i = 0; i < GRID_SIZE; i++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.dataset.index = i;
+          grid.appendChild(cell);
+          cells.push(cell);
+        }
+      }
+
+      function getUpgradeCost(key) {
+        const upgrade = upgrades[key];
+        let cost = upgrade.baseCost;
+
+        const baseMultiplier = upgrade.multiplier ?? 2;
+        const tenMultiplier = upgrade.tenMultiplier ?? 4;
+
+        for (let i = 1; i <= upgrade.level; i++) {
+          if (!upgrade.noTenMultiplier && i % 10 === 0) {
+            cost *= tenMultiplier;
+          } else {
+            cost *= baseMultiplier;
+          }
+        }
+
+        return Math.floor(cost);
+      }
+
+      function getSpawnTime() {
+        const reduction = upgrades.spawnSpeed.level * 100;
+        return Math.max(2000, BASE_SPAWN_TIME - reduction);
+      }
+
+      function getStartLevel() {
+        return 1 + upgrades.startLevel.level;
+      }
+
+      function upgradeOldItemsToStartLevel() {
+        const startLevel = getStartLevel();
+        let changed = false;
+
+        items.forEach((item) => {
+          if (item.level < startLevel) {
+            item.level = startLevel;
+            updateItemElement(item);
+            changed = true;
+          }
+        });
+
+        if (changed) {
+          updateUI();
+          saveGame(true);
+        }
+      }
+
+      function getDoubleSpawnChance() {
+        return Math.min(0.5, upgrades.doubleSpawn.level * 0.02);
+      }
+
+      function getDoubleMoneyChance() {
+        return Math.min(0.5, upgrades.doubleMoney.level * 0.02);
+      }
+
+      function getGoldenChance() {
+        return Math.min(0.5, upgrades.goldenChance.level * 0.02);
+      }
+
+      function getBaseItemValue(level) {
+        return Math.pow(3, level - 1);
+      }
+
+      function getItemPotentialValue(item) {
+        return (
+          getBaseItemValue(item.level) *
+          (item.isGolden ? 2 : 1) *
+          getShardMultiplier()
+        );
+      }
+
+      function getTotalIncomePreview() {
+        return items.reduce(
+          (total, item) => total + getItemPotentialValue(item),
+          0,
+        );
+      }
+
+      function updateUI() {
+        moneyEl.textContent = formatMoney(money);
+        incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
+        shardsEl.textContent = `✦${shards}`;
+        shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ✦${shards}`;
+        spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
+        startLevelStat.textContent = `Lv ${getStartLevel()}`;
+        doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
+        doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
+        goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
+        multiplierStat.textContent = `${getShardMultiplier().toFixed(1)}x`;
+        itemsStat.textContent = `${items.length}/16`;
+        levelStat.textContent = playerLevel;
+        playerLevelEl.textContent = playerLevel;
+        levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} combinações`;
+        levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
+        levelBonusText.innerHTML = `Multiplicador por estilhaços: <strong>${getShardMultiplier().toFixed(1)}x</strong>`;
+        renderUpgrades();
+      }
+
+      function getLevelShadow(cycle, isGolden) {
+        const baseShadow = `
                inset 0 -6px rgba(0, 0, 0, 0.12),
                0 6px 12px rgba(0, 0, 0, 0.16)
             `;
 
-            const cycleEffects = [
-               '',
-               '0 0 0 3px rgba(255, 255, 255, 0.8)',
-               '0 0 0 3px rgba(108, 92, 231, 0.9), 0 0 16px rgba(108, 92, 231, 0.45)',
-               '0 0 0 3px rgba(255, 216, 77, 0.95), 0 0 20px rgba(255, 216, 77, 0.55)',
-               '0 0 0 4px rgba(255, 255, 255, 0.9), 0 0 24px rgba(31, 143, 72, 0.6)',
-            ];
+        const cycleEffects = [
+          "",
+          "0 0 0 3px rgba(255, 255, 255, 0.8)",
+          "0 0 0 3px rgba(108, 92, 231, 0.9), 0 0 16px rgba(108, 92, 231, 0.45)",
+          "0 0 0 3px rgba(255, 216, 77, 0.95), 0 0 20px rgba(255, 216, 77, 0.55)",
+          "0 0 0 4px rgba(255, 255, 255, 0.9), 0 0 24px rgba(31, 143, 72, 0.6)",
+        ];
 
-            const cycleShadow =
-               cycleEffects[Math.min(cycle, cycleEffects.length - 1)];
+        const cycleShadow =
+          cycleEffects[Math.min(cycle, cycleEffects.length - 1)];
 
-            const goldenShadow = isGolden
-               ? '0 0 0 3px #ffd84d, 0 0 18px #ffd84d'
-               : '';
+        const goldenShadow = isGolden
+          ? "0 0 0 3px #ffd84d, 0 0 18px #ffd84d"
+          : "";
 
-            return [goldenShadow, cycleShadow, baseShadow]
-               .filter(Boolean)
-               .join(',');
-         }
+        return [goldenShadow, cycleShadow, baseShadow]
+          .filter(Boolean)
+          .join(",");
+      }
 
-         function updateSpawnProgressBar() {
-            const total = getSpawnTime();
+      function updateSpawnProgressBar() {
+        const total = getSpawnTime();
 
-            spawnProgress += SPAWN_TICK_RATE;
+        spawnProgress += SPAWN_TICK_RATE;
 
-            if (spawnProgress >= total) {
-               spawnProgress = total;
+        if (spawnProgress >= total) {
+          spawnProgress = total;
 
-               if (!isGridFull()) {
-                  spawnObjects();
-                  spawnProgress = 0;
-               }
-            }
+          if (!isGridFull()) {
+            spawnObjects();
+            spawnProgress = 0;
+          }
+        }
 
-            updateSpawnBarVisual();
-         }
+        updateSpawnBarVisual();
+      }
 
-         function updateSpawnBarVisual() {
-            const total = getSpawnTime();
-            const remaining = Math.max(0, total - spawnProgress);
-            const progress = Math.min(100, (spawnProgress / total) * 100);
+      function updateSpawnBarVisual() {
+        const total = getSpawnTime();
+        const remaining = Math.max(0, total - spawnProgress);
+        const progress = Math.min(100, (spawnProgress / total) * 100);
 
-            spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
-            spawnProgressFill.style.width = `${progress}%`;
-         }
+        spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
+        spawnProgressFill.style.width = `${progress}%`;
+      }
 
-         function showSpawnPopup(message, type = '') {
-            spawnPopup.innerHTML = message;
-            spawnPopup.className = `spawnPopup ${type}`;
+      function showSpawnPopup(message, type = "") {
+        spawnPopup.innerHTML = message;
+        spawnPopup.className = `spawnPopup ${type}`;
 
-            spawnPopup.classList.remove('show');
-            void spawnPopup.offsetWidth;
-            spawnPopup.classList.add('show');
-         }
+        spawnPopup.classList.remove("show");
+        void spawnPopup.offsetWidth;
+        spawnPopup.classList.add("show");
+      }
 
-         function showLevelUpPopup(oldLevel, newLevel, reward) {
-            levelUpPopup.innerHTML = `
+      function showLevelUpPopup(oldLevel, newLevel, reward) {
+        levelUpPopup.innerHTML = `
          Nível ${oldLevel} → Nível ${newLevel}
          <small>+${reward} estilhaços!</small>
       `;
 
-            levelUpPopup.classList.remove('show');
-            void levelUpPopup.offsetWidth;
-            levelUpPopup.classList.add('show');
-         }
+        levelUpPopup.classList.remove("show");
+        void levelUpPopup.offsetWidth;
+        levelUpPopup.classList.add("show");
+      }
 
-         function addMergeProgress() {
-            mergeProgress++;
+      function addMergeProgress() {
+        mergeProgress++;
 
-            if (mergeProgress >= mergesNeeded) {
-               mergeProgress -= mergesNeeded;
+        if (mergeProgress >= mergesNeeded) {
+          mergeProgress -= mergesNeeded;
 
-               const oldLevel = playerLevel;
-               playerLevel++;
+          const oldLevel = playerLevel;
+          playerLevel++;
 
-               const reward = getShardsReward();
-               shards += reward;
+          const reward = getShardsReward();
+          shards += reward;
 
-               showLevelUpPopup(oldLevel, playerLevel, reward);
+          showLevelUpPopup(oldLevel, playerLevel, reward);
 
-               mergesNeeded = getNextMergeRequirement();
+          mergesNeeded = getNextMergeRequirement();
 
-               clearTimeout(saveTextTimer);
-               saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
+          clearTimeout(saveTextTimer);
+          saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
 
-               saveTextTimer = setTimeout(() => {
-                  saveStatus.innerHTML =
-                     'Salvamento automático <strong>ativo</strong>';
-               }, 1600);
-            }
+          saveTextTimer = setTimeout(() => {
+            saveStatus.innerHTML =
+              "Salvamento automático <strong>ativo</strong>";
+          }, 1600);
+        }
 
-            updateUI();
-            saveGame(true);
-         }
+        updateUI();
+        saveGame(true);
+      }
 
-         function getFreeCells() {
-            const occupied = items.map((item) => item.cellIndex);
-            return cells.filter((_, index) => !occupied.includes(index));
-         }
+      function getFreeCells() {
+        const occupied = items.map((item) => item.cellIndex);
+        return cells.filter((_, index) => !occupied.includes(index));
+      }
 
-         function isGridFull() {
-            return items.length >= GRID_SIZE;
-         }
+      function isGridFull() {
+        return items.length >= GRID_SIZE;
+      }
 
-         function updateItemElement(item) {
-            const visual = getLevelVisual(item.level);
+      function getCycleRoman(cycle) {
+        const roman = [
+          "",
+          "II",
+          "III",
+          "IV",
+          "V",
+          "VI",
+          "VII",
+          "VIII",
+          "IX",
+          "X",
+        ];
+        return roman[cycle] ?? `${cycle + 1}`;
+      }
 
-            item.element.className = `item pop ${item.isGolden ? 'golden' : ''}`;
-            item.element.dataset.level = item.level;
+      function updateItemElement(item) {
+        const visual = getLevelVisual(item.level);
+        const cycleBadge =
+          visual.cycle > 0
+            ? `<span class="cycleBadge">${getCycleRoman(visual.cycle)}</span>`
+            : "";
 
-            item.element.style.background = `
+        item.element.className = `item pop ${item.isGolden ? "golden" : ""}`;
+        item.element.dataset.level = item.level;
+
+        item.element.style.background = `
                linear-gradient(
                   145deg,
                   ${visual.bg},
@@ -1490,622 +1519,615 @@
                )
             `;
 
-            item.element.style.color = visual.text;
+        item.element.style.color = visual.text;
 
-            item.element.style.boxShadow = getLevelShadow(
-               visual.cycle,
-               item.isGolden,
-            );
+        item.element.style.boxShadow = getLevelShadow(
+          visual.cycle,
+          item.isGolden,
+        );
 
-            item.element.innerHTML = `
-               Lv ${item.level}
-               ${visual.cycle > 0 ? `<small>✦ Ciclo ${visual.cycle + 1}</small>` : ''}
-               ${item.isGolden ? '<small>★ 2x</small>' : ''}
-            `;
-         }
+        item.element.innerHTML = `
+            ${cycleBadge}
+            <span class="itemLevelText">Lv ${item.level}</span>
+            ${item.isGolden ? "<small>★ 2x</small>" : ""}
+         `;
+      }
 
-         function createItem(
-            level = getStartLevel(),
-            cellIndex = null,
-            forcedGolden = null,
-         ) {
-            const freeCells = getFreeCells();
-            if (freeCells.length === 0 && cellIndex === null) return false;
+      function createItem(
+        level = getStartLevel(),
+        cellIndex = null,
+        forcedGolden = null,
+      ) {
+        const freeCells = getFreeCells();
+        if (freeCells.length === 0 && cellIndex === null) return false;
 
-            const chosenCell =
-               cellIndex !== null
-                  ? cells[cellIndex]
-                  : freeCells[Math.floor(Math.random() * freeCells.length)];
+        const chosenCell =
+          cellIndex !== null
+            ? cells[cellIndex]
+            : freeCells[Math.floor(Math.random() * freeCells.length)];
 
-            const chosenIndex = Number(chosenCell.dataset.index);
-            const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
+        const chosenIndex = Number(chosenCell.dataset.index);
+        const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
 
-            if (isGolden && cellIndex === null) {
-               showSpawnPopup('🌟 Objeto dourado apareceu!', 'golden');
-            }
+        if (isGolden && cellIndex === null) {
+          showSpawnPopup("🌟 Objeto dourado apareceu!", "golden");
+        }
 
-            const element = document.createElement('div');
-            const item = {
-               id: crypto.randomUUID(),
-               level,
-               cellIndex: chosenIndex,
-               isGolden,
-               element,
-            };
+        const element = document.createElement("div");
+        const item = {
+          id: crypto.randomUUID(),
+          level,
+          cellIndex: chosenIndex,
+          isGolden,
+          element,
+        };
 
-            updateItemElement(item);
-            chosenCell.appendChild(element);
-            items.push(item);
-            addDragEvents(item);
-            updateUI();
-            saveGame();
-            return true;
-         }
+        updateItemElement(item);
+        chosenCell.appendChild(element);
+        items.push(item);
+        addDragEvents(item);
+        updateUI();
+        saveGame();
+        return true;
+      }
 
-         function spawnObjects() {
-            if (isGridFull()) return false;
+      function spawnObjects() {
+        if (isGridFull()) return false;
 
-            const firstSpawned = createItem();
+        const firstSpawned = createItem();
 
-            const canDoubleSpawn =
-               !isGridFull() && Math.random() < getDoubleSpawnChance();
+        const canDoubleSpawn =
+          !isGridFull() && Math.random() < getDoubleSpawnChance();
 
-            if (canDoubleSpawn) {
-               createItem();
-               showSpawnPopup('📦 Entrega dupla!', 'double');
-            }
+        if (canDoubleSpawn) {
+          createItem();
+          showSpawnPopup("📦 Entrega dupla!", "double");
+        }
 
-            lastSpawnTime = Date.now();
-            return firstSpawned;
-         }
+        lastSpawnTime = Date.now();
+        return firstSpawned;
+      }
 
-         function applySpawnSpeedUpgrade() {
-            const oldTotal = Date.now() - lastSpawnTime;
-            const newTotal = getSpawnTime();
+      function applySpawnSpeedUpgrade() {
+        const oldTotal = Date.now() - lastSpawnTime;
+        const newTotal = getSpawnTime();
 
-            if (oldTotal >= newTotal) {
-               spawnObjects();
-            }
+        if (oldTotal >= newTotal) {
+          spawnObjects();
+        }
 
-            updateSpawnProgressBar();
-         }
+        updateSpawnProgressBar();
+      }
 
-         function restartSpawnTimer() {
-            spawnProgress = 0;
-            updateSpawnBarVisual();
-         }
+      function restartSpawnTimer() {
+        spawnProgress = 0;
+        updateSpawnBarVisual();
+      }
 
-         function addDragEvents(item) {
-            item.element.addEventListener('pointerdown', (event) => {
-               draggedItem = item;
-               originalCellIndex = item.cellIndex;
+      function addDragEvents(item) {
+        item.element.addEventListener("pointerdown", (event) => {
+          draggedItem = item;
+          originalCellIndex = item.cellIndex;
 
-               const rect = item.element.getBoundingClientRect();
-               offsetX = event.clientX - rect.left;
-               offsetY = event.clientY - rect.top;
+          const rect = item.element.getBoundingClientRect();
+          offsetX = event.clientX - rect.left;
+          offsetY = event.clientY - rect.top;
 
-               item.element.classList.add('dragging');
-               item.element.style.width = `${rect.width}px`;
-               item.element.style.height = `${rect.height}px`;
-               document.body.appendChild(item.element);
+          item.element.classList.add("dragging");
+          item.element.style.width = `${rect.width}px`;
+          item.element.style.height = `${rect.height}px`;
+          document.body.appendChild(item.element);
 
-               moveDraggedItem(event.clientX, event.clientY);
-            });
-         }
+          moveDraggedItem(event.clientX, event.clientY);
+        });
+      }
 
-         function moveDraggedItem(x, y) {
-            if (!draggedItem) return;
-            draggedItem.element.style.left = `${x - offsetX}px`;
-            draggedItem.element.style.top = `${y - offsetY}px`;
-         }
+      function moveDraggedItem(x, y) {
+        if (!draggedItem) return;
+        draggedItem.element.style.left = `${x - offsetX}px`;
+        draggedItem.element.style.top = `${y - offsetY}px`;
+      }
 
-         function getCellUnderPointer(x, y) {
-            return cells.find((cell) => {
-               const rect = cell.getBoundingClientRect();
-               return (
-                  x >= rect.left &&
-                  x <= rect.right &&
-                  y >= rect.top &&
-                  y <= rect.bottom
-               );
-            });
-         }
+      function getCellUnderPointer(x, y) {
+        return cells.find((cell) => {
+          const rect = cell.getBoundingClientRect();
+          return (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+          );
+        });
+      }
 
-         function getItemByCellIndex(cellIndex) {
-            return items.find(
-               (item) => item.cellIndex === cellIndex && item !== draggedItem,
-            );
-         }
+      function getItemByCellIndex(cellIndex) {
+        return items.find(
+          (item) => item.cellIndex === cellIndex && item !== draggedItem,
+        );
+      }
 
-         function getItemByExactCell(cellIndex) {
-            return items.find((item) => item.cellIndex === cellIndex);
-         }
+      function getItemByExactCell(cellIndex) {
+        return items.find((item) => item.cellIndex === cellIndex);
+      }
 
-         function clearHighlights() {
-            cells.forEach((cell) => cell.classList.remove('highlight'));
-         }
+      function clearHighlights() {
+        cells.forEach((cell) => cell.classList.remove("highlight"));
+      }
 
-         function returnToOriginalCell() {
-            const originalCell = cells[originalCellIndex];
-            originalCell.appendChild(draggedItem.element);
-            draggedItem.cellIndex = originalCellIndex;
-            resetDraggedStyles();
-         }
+      function returnToOriginalCell() {
+        const originalCell = cells[originalCellIndex];
+        originalCell.appendChild(draggedItem.element);
+        draggedItem.cellIndex = originalCellIndex;
+        resetDraggedStyles();
+      }
 
-         function resetDraggedStyles() {
-            draggedItem.element.classList.remove('dragging');
-            draggedItem.element.style.left = '';
-            draggedItem.element.style.top = '';
-            draggedItem.element.style.width = '';
-            draggedItem.element.style.height = '';
-         }
+      function resetDraggedStyles() {
+        draggedItem.element.classList.remove("dragging");
+        draggedItem.element.style.left = "";
+        draggedItem.element.style.top = "";
+        draggedItem.element.style.width = "";
+        draggedItem.element.style.height = "";
+      }
 
-         function getElementCenter(element) {
-            const rect = element.getBoundingClientRect();
-            return {
-               x: rect.left + rect.width / 2,
-               y: rect.top + rect.height / 2,
-            };
-         }
+      function getElementCenter(element) {
+        const rect = element.getBoundingClientRect();
+        return {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        };
+      }
 
-         function createRing(x, y, type = 'merge') {
-            const ring = document.createElement('div');
-            ring.className = `effectRing ${type === 'error' ? 'error' : ''}`;
-            ring.style.left = `${x}px`;
-            ring.style.top = `${y}px`;
-            document.body.appendChild(ring);
-            setTimeout(() => ring.remove(), 500);
-         }
+      function createRing(x, y, type = "merge") {
+        const ring = document.createElement("div");
+        ring.className = `effectRing ${type === "error" ? "error" : ""}`;
+        ring.style.left = `${x}px`;
+        ring.style.top = `${y}px`;
+        document.body.appendChild(ring);
+        setTimeout(() => ring.remove(), 500);
+      }
 
-         function isPointerOverTrash(x, y) {
-            const rect = trashZone.getBoundingClientRect();
-            return (
-               x >= rect.left &&
-               x <= rect.right &&
-               y >= rect.top &&
-               y <= rect.bottom
-            );
-         }
+      function isPointerOverTrash(x, y) {
+        const rect = trashZone.getBoundingClientRect();
+        return (
+          x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+        );
+      }
 
-         function deleteDraggedItem() {
-            const refund = getItemPotentialValue(draggedItem) / 2;
-            const center = getElementCenter(trashZone);
+      function deleteDraggedItem() {
+        const refund = getItemPotentialValue(draggedItem) / 2;
+        const center = getElementCenter(trashZone);
 
-            money += refund;
-            draggedItem.element.remove();
-            items = items.filter((item) => item !== draggedItem);
-            createRing(center.x, center.y, 'error');
+        money += refund;
+        draggedItem.element.remove();
+        items = items.filter((item) => item !== draggedItem);
+        createRing(center.x, center.y, "error");
 
-            draggedItem = null;
-            trashZone.classList.remove('active');
-            updateUI();
-            saveGame(true);
-         }
+        draggedItem = null;
+        trashZone.classList.remove("active");
+        updateUI();
+        saveGame(true);
+      }
 
-         function flashError(targetItem, targetCell) {
-            const center = getElementCenter(targetItem.element);
-            createRing(center.x, center.y, 'error');
-            targetCell.classList.add('errorFlash');
-            targetItem.element.classList.add('shakeError');
-            draggedItem.element.classList.add('shakeError');
+      function flashError(targetItem, targetCell) {
+        const center = getElementCenter(targetItem.element);
+        createRing(center.x, center.y, "error");
+        targetCell.classList.add("errorFlash");
+        targetItem.element.classList.add("shakeError");
+        draggedItem.element.classList.add("shakeError");
 
-            setTimeout(() => {
-               targetCell.classList.remove('errorFlash');
-               targetItem.element.classList.remove('shakeError');
-               if (draggedItem)
-                  draggedItem.element.classList.remove('shakeError');
-            }, 360);
-         }
+        setTimeout(() => {
+          targetCell.classList.remove("errorFlash");
+          targetItem.element.classList.remove("shakeError");
+          if (draggedItem) draggedItem.element.classList.remove("shakeError");
+        }, 360);
+      }
 
-         function mergeItems(targetItem) {
-            const newLevel = draggedItem.level + 1;
-            const targetCellIndex = targetItem.cellIndex;
-            const newIsGolden = draggedItem.isGolden || targetItem.isGolden;
-            const center = getElementCenter(targetItem.element);
+      function mergeItems(targetItem) {
+        const newLevel = draggedItem.level + 1;
+        const targetCellIndex = targetItem.cellIndex;
+        const newIsGolden = draggedItem.isGolden || targetItem.isGolden;
+        const center = getElementCenter(targetItem.element);
 
-            draggedItem.element.remove();
-            targetItem.element.remove();
-            items = items.filter(
-               (item) => item !== draggedItem && item !== targetItem,
-            );
+        draggedItem.element.remove();
+        targetItem.element.remove();
+        items = items.filter(
+          (item) => item !== draggedItem && item !== targetItem,
+        );
 
-            draggedItem = null;
-            createItem(newLevel, targetCellIndex, newIsGolden);
+        draggedItem = null;
+        createItem(newLevel, targetCellIndex, newIsGolden);
 
-            const newItem = getItemByExactCell(targetCellIndex);
-            if (newItem) newItem.element.classList.add('mergeBurst');
-            createRing(center.x, center.y, 'merge');
+        const newItem = getItemByExactCell(targetCellIndex);
+        if (newItem) newItem.element.classList.add("mergeBurst");
+        createRing(center.x, center.y, "merge");
 
-            money +=
-               getBaseItemValue(newLevel) *
-               (newIsGolden ? 2 : 1) *
-               5 *
-               getShardMultiplier();
-            addMergeProgress();
-            updateUI();
-            saveGame();
-         }
+        money +=
+          getBaseItemValue(newLevel) *
+          (newIsGolden ? 2 : 1) *
+          5 *
+          getShardMultiplier();
+        addMergeProgress();
+        updateUI();
+        saveGame();
+      }
 
-         function buyUpgrade(key) {
-            const cost = getUpgradeCost(key);
-            if (money < cost) return;
+      function buyUpgrade(key) {
+        const cost = getUpgradeCost(key);
+        if (money < cost) return;
 
-            money -= cost;
-            upgrades[key].level++;
+        money -= cost;
+        upgrades[key].level++;
 
-            if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
-            if (key === 'startLevel') {
-               const oldStartLevel = getStartLevel() - 1;
+        if (key === "spawnSpeed") applySpawnSpeedUpgrade();
+        if (key === "startLevel") {
+          const oldStartLevel = getStartLevel() - 1;
 
-               upgradeOldItemsToStartLevel();
+          upgradeOldItemsToStartLevel();
 
-               showSpawnPopup(
-                  `⬆️ Formas melhoradas! Lv ${oldStartLevel} → Lv ${getStartLevel()}`,
-                  'upgrade',
-                  1200,
-               );
-            }
-            updateUI();
-            saveGame(true);
-         }
+          showSpawnPopup(
+            `⬆️ Formas melhoradas! Lv ${oldStartLevel} → Lv ${getStartLevel()}`,
+            "upgrade",
+            1200,
+          );
+        }
+        updateUI();
+        saveGame(true);
+      }
 
-         function renderUpgrades() {
-            upgradesEl.innerHTML = '';
+      function renderUpgrades() {
+        upgradesEl.innerHTML = "";
 
-            Object.entries(upgrades).forEach(([key, upgrade]) => {
-               const cost = getUpgradeCost(key);
-               const card = document.createElement('div');
-               card.className = `upgrade ${upgrade.golden ? 'goldenUpgrade' : ''}`;
+        Object.entries(upgrades).forEach(([key, upgrade]) => {
+          const cost = getUpgradeCost(key);
+          const card = document.createElement("div");
+          card.className = `upgrade ${upgrade.golden ? "goldenUpgrade" : ""}`;
 
-               card.innerHTML = `
+          card.innerHTML = `
                 <div class="upgradeTop">
                   <h3>${upgrade.name}</h3>
                   <span class="upgradeLevel">Nv. ${upgrade.level}</span>
                 </div>
                 <p>${upgrade.description}</p>
-                <button ${money < cost ? 'disabled' : ''}>Comprar — ${formatMoney(cost)}</button>
+                <button ${money < cost ? "disabled" : ""}>Comprar — ${formatMoney(cost)}</button>
               `;
 
-               card
-                  .querySelector('button')
-                  .addEventListener('click', () => buyUpgrade(key));
-               upgradesEl.appendChild(card);
+          card
+            .querySelector("button")
+            .addEventListener("click", () => buyUpgrade(key));
+          upgradesEl.appendChild(card);
+        });
+      }
+
+      function createMoneyPopup(item, amount, isDoubleTick) {
+        const rect = item.element.getBoundingClientRect();
+        const popup = document.createElement("div");
+        popup.className = `moneyPopup ${isDoubleTick ? "double" : ""} ${item.isGolden ? "goldenText" : ""}`;
+        popup.textContent = `+${formatMoney(amount)}/s${isDoubleTick ? " 2x!" : ""}`;
+        popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
+        popup.style.top = `${rect.top - 4}px`;
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 900);
+      }
+
+      function incomeTick() {
+        items.forEach((item) => {
+          const base = getBaseItemValue(item.level);
+          const goldenMultiplier = item.isGolden ? 2 : 1;
+          const isDoubleTick = Math.random() < getDoubleMoneyChance();
+          const tickMultiplier = isDoubleTick ? 2 : 1;
+          const gained =
+            base * goldenMultiplier * tickMultiplier * getShardMultiplier();
+
+          money += gained;
+          createMoneyPopup(item, gained, isDoubleTick);
+        });
+
+        updateUI();
+        saveGame();
+      }
+
+      function saveGame(showText = false) {
+        const saveData = {
+          money,
+          shards,
+          playerLevel,
+          mergeProgress,
+          mergesNeeded,
+          items: items.map((item) => ({
+            level: item.level,
+            cellIndex: item.cellIndex,
+            isGolden: item.isGolden,
+          })),
+          upgrades: Object.fromEntries(
+            Object.entries(upgrades).map(([key, upgrade]) => [
+              key,
+              upgrade.level,
+            ]),
+          ),
+        };
+
+        localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+
+        if (showText) {
+          clearTimeout(saveTextTimer);
+          saveStatus.innerHTML = "Progresso <strong>salvo</strong> ✓";
+          saveTextTimer = setTimeout(() => {
+            saveStatus.innerHTML =
+              "Salvamento automático <strong>ativo</strong>";
+          }, 1200);
+        }
+      }
+
+      function loadGame() {
+        const rawSave = localStorage.getItem(SAVE_KEY);
+        if (!rawSave) return false;
+
+        try {
+          const saveData = JSON.parse(rawSave);
+          money = saveData.money ?? 0;
+          shards = saveData.shards ?? 0;
+          playerLevel = saveData.playerLevel ?? 1;
+          mergeProgress = saveData.mergeProgress ?? 0;
+          mergesNeeded = saveData.mergesNeeded ?? 5;
+
+          if (saveData.upgrades) {
+            Object.entries(saveData.upgrades).forEach(([key, level]) => {
+              if (upgrades[key]) upgrades[key].level = level;
             });
-         }
+          }
 
-         function createMoneyPopup(item, amount, isDoubleTick) {
-            const rect = item.element.getBoundingClientRect();
-            const popup = document.createElement('div');
-            popup.className = `moneyPopup ${isDoubleTick ? 'double' : ''} ${item.isGolden ? 'goldenText' : ''}`;
-            popup.textContent = `+${formatMoney(amount)}/s${isDoubleTick ? ' 2x!' : ''}`;
-            popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
-            popup.style.top = `${rect.top - 4}px`;
-            document.body.appendChild(popup);
-            setTimeout(() => popup.remove(), 900);
-         }
-
-         function incomeTick() {
-            items.forEach((item) => {
-               const base = getBaseItemValue(item.level);
-               const goldenMultiplier = item.isGolden ? 2 : 1;
-               const isDoubleTick = Math.random() < getDoubleMoneyChance();
-               const tickMultiplier = isDoubleTick ? 2 : 1;
-               const gained =
-                  base *
-                  goldenMultiplier *
-                  tickMultiplier *
-                  getShardMultiplier();
-
-               money += gained;
-               createMoneyPopup(item, gained, isDoubleTick);
+          if (Array.isArray(saveData.items)) {
+            saveData.items.forEach((savedItem) => {
+              createItem(
+                savedItem.level,
+                savedItem.cellIndex,
+                savedItem.isGolden,
+              );
             });
+          }
 
-            updateUI();
-            saveGame();
-         }
+          return true;
+        } catch (error) {
+          console.warn("Erro ao carregar save:", error);
+          return false;
+        }
+      }
 
-         function saveGame(showText = false) {
-            const saveData = {
-               money,
-               shards,
-               playerLevel,
-               mergeProgress,
-               mergesNeeded,
-               items: items.map((item) => ({
-                  level: item.level,
-                  cellIndex: item.cellIndex,
-                  isGolden: item.isGolden,
-               })),
-               upgrades: Object.fromEntries(
-                  Object.entries(upgrades).map(([key, upgrade]) => [
-                     key,
-                     upgrade.level,
-                  ]),
-               ),
-            };
+      document.addEventListener("pointermove", (event) => {
+        if (!draggedItem) return;
 
-            localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+        moveDraggedItem(event.clientX, event.clientY);
+        clearHighlights();
 
-            if (showText) {
-               clearTimeout(saveTextTimer);
-               saveStatus.innerHTML = 'Progresso <strong>salvo</strong> ✓';
-               saveTextTimer = setTimeout(() => {
-                  saveStatus.innerHTML =
-                     'Salvamento automático <strong>ativo</strong>';
-               }, 1200);
-            }
-         }
+        if (isPointerOverTrash(event.clientX, event.clientY)) {
+          trashZone.classList.add("active");
+          return;
+        }
 
-         function loadGame() {
-            const rawSave = localStorage.getItem(SAVE_KEY);
-            if (!rawSave) return false;
+        trashZone.classList.remove("active");
 
-            try {
-               const saveData = JSON.parse(rawSave);
-               money = saveData.money ?? 0;
-               shards = saveData.shards ?? 0;
-               playerLevel = saveData.playerLevel ?? 1;
-               mergeProgress = saveData.mergeProgress ?? 0;
-               mergesNeeded = saveData.mergesNeeded ?? 5;
+        const cell = getCellUnderPointer(event.clientX, event.clientY);
+        if (!cell) return;
 
-               if (saveData.upgrades) {
-                  Object.entries(saveData.upgrades).forEach(([key, level]) => {
-                     if (upgrades[key]) upgrades[key].level = level;
-                  });
-               }
+        const targetItem = getItemByCellIndex(Number(cell.dataset.index));
+        if (targetItem && targetItem.level === draggedItem.level) {
+          cell.classList.add("highlight");
+        }
+      });
 
-               if (Array.isArray(saveData.items)) {
-                  saveData.items.forEach((savedItem) => {
-                     createItem(
-                        savedItem.level,
-                        savedItem.cellIndex,
-                        savedItem.isGolden,
-                     );
-                  });
-               }
+      document.addEventListener("pointerup", (event) => {
+        if (!draggedItem) return;
 
-               return true;
-            } catch (error) {
-               console.warn('Erro ao carregar save:', error);
-               return false;
-            }
-         }
+        const cell = getCellUnderPointer(event.clientX, event.clientY);
+        clearHighlights();
 
-         document.addEventListener('pointermove', (event) => {
-            if (!draggedItem) return;
+        if (isPointerOverTrash(event.clientX, event.clientY)) {
+          deleteDraggedItem();
+          return;
+        }
 
-            moveDraggedItem(event.clientX, event.clientY);
-            clearHighlights();
+        trashZone.classList.remove("active");
 
-            if (isPointerOverTrash(event.clientX, event.clientY)) {
-               trashZone.classList.add('active');
-               return;
-            }
+        if (!cell) {
+          returnToOriginalCell();
+          draggedItem = null;
+          return;
+        }
 
-            trashZone.classList.remove('active');
+        const targetCellIndex = Number(cell.dataset.index);
+        const targetItem = getItemByCellIndex(targetCellIndex);
 
-            const cell = getCellUnderPointer(event.clientX, event.clientY);
-            if (!cell) return;
+        if (targetItem && targetItem.level === draggedItem.level) {
+          mergeItems(targetItem);
+          return;
+        }
 
-            const targetItem = getItemByCellIndex(Number(cell.dataset.index));
-            if (targetItem && targetItem.level === draggedItem.level) {
-               cell.classList.add('highlight');
-            }
-         });
+        if (targetItem && targetItem.level !== draggedItem.level) {
+          flashError(targetItem, cell);
+          returnToOriginalCell();
+          draggedItem = null;
+          return;
+        }
 
-         document.addEventListener('pointerup', (event) => {
-            if (!draggedItem) return;
+        if (!targetItem) {
+          cell.appendChild(draggedItem.element);
+          draggedItem.cellIndex = targetCellIndex;
+          resetDraggedStyles();
+          draggedItem = null;
+          updateUI();
+          saveGame();
+          return;
+        }
 
-            const cell = getCellUnderPointer(event.clientX, event.clientY);
-            clearHighlights();
+        returnToOriginalCell();
+        draggedItem = null;
+      });
 
-            if (isPointerOverTrash(event.clientX, event.clientY)) {
-               deleteDraggedItem();
-               return;
-            }
+      devAddPolygons1K.addEventListener("click", () => {
+        money += 1000;
+        devRefresh();
+      });
 
-            trashZone.classList.remove('active');
+      devAddPolygons100K.addEventListener("click", () => {
+        money += 100000;
+        devRefresh();
+      });
 
-            if (!cell) {
-               returnToOriginalCell();
-               draggedItem = null;
-               return;
-            }
+      devAddShards5.addEventListener("click", () => {
+        shards += 5;
+        devRefresh();
+      });
 
-            const targetCellIndex = Number(cell.dataset.index);
-            const targetItem = getItemByCellIndex(targetCellIndex);
+      devAddShards50.addEventListener("click", () => {
+        shards += 50;
+        devRefresh();
+      });
 
-            if (targetItem && targetItem.level === draggedItem.level) {
-               mergeItems(targetItem);
-               return;
-            }
+      devSpawnOne.addEventListener("click", () => {
+        createItem();
+        devRefresh();
+      });
 
-            if (targetItem && targetItem.level !== draggedItem.level) {
-               flashError(targetItem, cell);
-               returnToOriginalCell();
-               draggedItem = null;
-               return;
-            }
+      devSpawnGolden.addEventListener("click", () => {
+        createItem(getStartLevel(), null, true);
+        devRefresh();
+      });
 
-            if (!targetItem) {
-               cell.appendChild(draggedItem.element);
-               draggedItem.cellIndex = targetCellIndex;
-               resetDraggedStyles();
-               draggedItem = null;
-               updateUI();
-               saveGame();
-               return;
-            }
+      devFillGrid.addEventListener("click", () => {
+        while (!isGridFull()) {
+          createItem();
+        }
 
-            returnToOriginalCell();
-            draggedItem = null;
-         });
+        devRefresh();
+      });
 
-         devAddPolygons1K.addEventListener('click', () => {
-            money += 1000;
-            devRefresh();
-         });
+      devClearGrid.addEventListener("click", () => {
+        clearAllItems();
+        devRefresh();
+      });
 
-         devAddPolygons100K.addEventListener('click', () => {
-            money += 100000;
-            devRefresh();
-         });
+      devMaxSpawnSpeed.addEventListener("click", () => {
+        devSetSpawnToMinimum();
+        restartSpawnTimer();
+        devRefresh();
+      });
 
-         devAddShards5.addEventListener('click', () => {
-            shards += 5;
-            devRefresh();
-         });
+      devLevelUpForm.addEventListener("click", () => {
+        upgrades.startLevel.level++;
+        upgradeOldItemsToStartLevel();
+        devRefresh();
+      });
 
-         devAddShards50.addEventListener('click', () => {
-            shards += 50;
-            devRefresh();
-         });
+      devResetUpgrades.addEventListener("click", () => {
+        Object.values(upgrades).forEach((upgrade) => {
+          upgrade.level = 0;
+        });
 
-         devSpawnOne.addEventListener('click', () => {
-            createItem();
-            devRefresh();
-         });
+        restartSpawnTimer();
+        devRefresh();
+      });
 
-         devSpawnGolden.addEventListener('click', () => {
-            createItem(getStartLevel(), null, true);
-            devRefresh();
-         });
+      devAllUpgrades5.addEventListener("click", () => {
+        Object.values(upgrades).forEach((upgrade) => {
+          upgrade.level = 5;
+        });
 
-         devFillGrid.addEventListener('click', () => {
-            while (!isGridFull()) {
-               createItem();
-            }
+        upgradeOldItemsToStartLevel();
+        restartSpawnTimer();
+        devRefresh();
+      });
 
-            devRefresh();
-         });
+      devAddMerge.addEventListener("click", () => {
+        addMergeProgress();
+        devRefresh();
+      });
 
-         devClearGrid.addEventListener('click', () => {
-            clearAllItems();
-            devRefresh();
-         });
+      devForceLevelUp.addEventListener("click", () => {
+        mergeProgress = mergesNeeded - 1;
+        addMergeProgress();
+        devRefresh();
+      });
 
-         devMaxSpawnSpeed.addEventListener('click', () => {
-            devSetSpawnToMinimum();
-            restartSpawnTimer();
-            devRefresh();
-         });
+      devLoginBtn.addEventListener("click", unlockDevTools);
 
-         devLevelUpForm.addEventListener('click', () => {
-            upgrades.startLevel.level++;
-            upgradeOldItemsToStartLevel();
-            devRefresh();
-         });
+      devPasswordInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          unlockDevTools();
+        }
+      });
 
-         devResetUpgrades.addEventListener('click', () => {
-            Object.values(upgrades).forEach((upgrade) => {
-               upgrade.level = 0;
-            });
+      resetBtn.addEventListener("click", () => {
+        money = 0;
+        shards = 0;
+        playerLevel = 1;
+        mergeProgress = 0;
+        mergesNeeded = 5;
+        items.forEach((item) => item.element.remove());
+        items = [];
 
-            restartSpawnTimer();
-            devRefresh();
-         });
+        Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
+        localStorage.removeItem(SAVE_KEY);
 
-         devAllUpgrades5.addEventListener('click', () => {
-            Object.values(upgrades).forEach((upgrade) => {
-               upgrade.level = 5;
-            });
+        createItem(1, null, false);
+        createItem(1, null, false);
+        restartSpawnTimer();
+        updateUI();
+        saveGame(true);
+      });
 
-            upgradeOldItemsToStartLevel();
-            restartSpawnTimer();
-            devRefresh();
-         });
+      openShopBtn.addEventListener("click", () => {
+        shop.classList.add("active");
+        shopOverlay.classList.add("active");
+      });
 
-         devAddMerge.addEventListener('click', () => {
-            addMergeProgress();
-            devRefresh();
-         });
+      function closeShop() {
+        shop.classList.remove("active");
+        shopOverlay.classList.remove("active");
+      }
 
-         devForceLevelUp.addEventListener('click', () => {
-            mergeProgress = mergesNeeded - 1;
-            addMergeProgress();
-            devRefresh();
-         });
+      closeShopBtn.addEventListener("click", closeShop);
+      shopOverlay.addEventListener("click", closeShop);
 
-         devLoginBtn.addEventListener('click', unlockDevTools);
+      openGuideBtn.addEventListener("click", () => {
+        guide.classList.add("active");
+        guideOverlay.classList.add("active");
+      });
 
-         devPasswordInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-               unlockDevTools();
-            }
-         });
+      function closeGuide() {
+        guide.classList.remove("active");
+        guideOverlay.classList.remove("active");
+      }
 
-         resetBtn.addEventListener('click', () => {
-            money = 0;
-            shards = 0;
-            playerLevel = 1;
-            mergeProgress = 0;
-            mergesNeeded = 5;
-            items.forEach((item) => item.element.remove());
-            items = [];
+      closeGuideBtn.addEventListener("click", closeGuide);
+      guideOverlay.addEventListener("click", closeGuide);
 
-            Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
-            localStorage.removeItem(SAVE_KEY);
+      openDevBtn.addEventListener("click", () => {
+        devPanel.classList.add("active");
+        devOverlay.classList.add("active");
+      });
 
-            createItem(1, null, false);
-            createItem(1, null, false);
-            restartSpawnTimer();
-            updateUI();
-            saveGame(true);
-         });
+      function closeDevPanel() {
+        devPanel.classList.remove("active");
+        devOverlay.classList.remove("active");
+      }
 
-         openShopBtn.addEventListener('click', () => {
-            shop.classList.add('active');
-            shopOverlay.classList.add('active');
-         });
+      closeDevBtn.addEventListener("click", closeDevPanel);
+      devOverlay.addEventListener("click", closeDevPanel);
 
-         function closeShop() {
-            shop.classList.remove('active');
-            shopOverlay.classList.remove('active');
-         }
+      setInterval(incomeTick, 1000);
+      setInterval(updateSpawnProgressBar, 100);
 
-         closeShopBtn.addEventListener('click', closeShop);
-         shopOverlay.addEventListener('click', closeShop);
+      createGrid();
+      const loaded = loadGame();
 
-         openGuideBtn.addEventListener('click', () => {
-            guide.classList.add('active');
-            guideOverlay.classList.add('active');
-         });
+      if (!loaded || items.length === 0) {
+        createItem(1, null, false);
+        createItem(1, null, false);
+      }
 
-         function closeGuide() {
-            guide.classList.remove('active');
-            guideOverlay.classList.remove('active');
-         }
-
-         closeGuideBtn.addEventListener('click', closeGuide);
-         guideOverlay.addEventListener('click', closeGuide);
-
-         openDevBtn.addEventListener('click', () => {
-            devPanel.classList.add('active');
-            devOverlay.classList.add('active');
-         });
-
-         function closeDevPanel() {
-            devPanel.classList.remove('active');
-            devOverlay.classList.remove('active');
-         }
-
-         closeDevBtn.addEventListener('click', closeDevPanel);
-         devOverlay.addEventListener('click', closeDevPanel);
-
-         setInterval(incomeTick, 1000);
-         setInterval(updateSpawnProgressBar, 100);
-
-         createGrid();
-         const loaded = loadGame();
-
-         if (!loaded || items.length === 0) {
-            createItem(1, null, false);
-            createItem(1, null, false);
-         }
-
-         restartSpawnTimer();
-         updateUI();
-         updateSpawnProgressBar();
-      </script>
-   </body>
+      restartSpawnTimer();
+      updateUI();
+      updateSpawnProgressBar();
+    </script>
+  </body>
 </html>
