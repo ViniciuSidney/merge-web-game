@@ -1114,7 +1114,7 @@
 
       const GRID_SIZE = 16;
       const BASE_SPAWN_TIME = 6000;
-      const SAVE_KEY = "merge-clicker-prototype-save-v4";
+      const SAVE_KEY = "merge-clicker-prototype-save-v5";
       const SPAWN_TICK_RATE = 100;
       const DEV_PASSWORD = "senha67";
 
@@ -1134,6 +1134,20 @@
         { name: "Verde escuro", bg: "#15803d", text: "#ffffff" },
         { name: "Cinza", bg: "#6b7280", text: "#ffffff" },
         { name: "Preto", bg: "#111827", text: "#ffffff" },
+      ];
+      const NUMBER_SUFFIXES = [
+        "", // unidade
+        "K", // mil
+        "M", // milhão
+        "B", // bilhão
+        "T", // trilhão
+        "Qd", // quadrilhão
+        "Qi", // quintilhão
+        "Sx", // sextilhão
+        "Sp", // septilhão
+        "Oc", // octilhão
+        "No", // nonilhão
+        "Dc", // decilhão
       ];
 
       let money = 0;
@@ -1246,12 +1260,39 @@
         };
       }
 
+      function formatShortNumber(value) {
+        if (value >= 100) return value.toFixed(0);
+        if (value >= 10) return value.toFixed(1);
+        return value.toFixed(2);
+      }
+
+      function formatNumber(value, symbol = "") {
+        if (!Number.isFinite(value)) return `${symbol}∞`;
+
+        const sign = value < 0 ? "-" : "";
+        const absValue = Math.abs(value);
+
+        if (absValue < 1000) {
+          return `${sign}${symbol}${Math.floor(absValue)}`;
+        }
+
+        const suffixIndex = Math.min(
+          Math.floor(Math.log10(absValue) / 3),
+          NUMBER_SUFFIXES.length - 1,
+        );
+
+        const shortValue = absValue / Math.pow(1000, suffixIndex);
+        const suffix = NUMBER_SUFFIXES[suffixIndex];
+
+        return `${sign}${symbol}${formatShortNumber(shortValue)}${suffix}`;
+      }
+
       function formatMoney(value) {
-        if (value >= 1_000_000_000)
-          return `◆${(value / 1_000_000_000).toFixed(2)}B`;
-        if (value >= 1_000_000) return `◆${(value / 1_000_000).toFixed(2)}M`;
-        if (value >= 1_000) return `◆${(value / 1_000).toFixed(2)}K`;
-        return `◆${Math.floor(value)}`;
+        return formatNumber(value, "◆");
+      }
+
+      function formatShards(value) {
+        return formatNumber(value, "✦");
       }
 
       function getShardMultiplier() {
@@ -1358,8 +1399,8 @@
       function updateUI() {
         moneyEl.textContent = formatMoney(money);
         incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-        shardsEl.textContent = `✦${shards}`;
-        shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ✦${shards}`;
+        shardsEl.textContent = formatShards(shards);
+        shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ${formatShards(shards)}`
         spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
         startLevelStat.textContent = `Lv ${getStartLevel()}`;
         doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
