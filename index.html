@@ -53,7 +53,7 @@
         gap: 10px;
 
         position: relative;
-        overflow: hidden;
+        overflow: visible;
       }
 
       .top,
@@ -229,6 +229,15 @@
         color: #45634d;
         margin-top: 5px;
         text-align: center;
+      }
+
+      .spawnPopup,
+      .levelUpPopup {
+        z-index: 80;
+        max-width: min(360px, calc(100vw - 48px));
+        min-width: min(280px, calc(100vw - 48px));
+        white-space: normal;
+        line-height: 1.2;
       }
 
       .grid {
@@ -939,6 +948,19 @@
           line-height: 1.1;
         }
 
+        .spawnPopup,
+        .levelUpPopup {
+          max-width: min(240px, calc(100vw - 32px));
+          min-width: min(210px, calc(100vw - 32px));
+          padding: 7px 10px;
+          font-size: 9px;
+          border-radius: 11px;
+        }
+
+        .levelUpPopup small {
+          font-size: 9px;
+        }
+
         .grid {
           flex: 1;
           min-height: 0;
@@ -1107,6 +1129,18 @@
           margin-top: 4px;
           line-height: 1.1;
         }
+
+        .spawnPopup,
+        .levelUpPopup {
+          max-width: min(300px, calc(100vw - 40px));
+          padding: 7px 10px;
+          font-size: 11px;
+          border-radius: 11px;
+        }
+
+        .levelUpPopup small {
+          font-size: 10px;
+        }
       }
 
       @keyframes pop {
@@ -1208,47 +1242,47 @@
         }
       }
 
-      @keyframes levelUpPopupAnim {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, 10%) scale(0.8);
-        }
-
-        15% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1.08);
-        }
-
-        70% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1);
-        }
-
-        100% {
-          opacity: 0;
-          transform: translate(-50%, -90%) scale(0.95);
-        }
-      }
-
       @keyframes spawnPopupAnim {
         0% {
           opacity: 0;
-          transform: translate(-50%, 10%) scale(0.8);
+          transform: translate(-50%, -35%) scale(0.88);
         }
 
         15% {
           opacity: 1;
-          transform: translate(-50%, -50%) scale(1.08);
+          transform: translate(-50%, -50%) scale(1.04);
         }
 
-        70% {
+        75% {
           opacity: 1;
           transform: translate(-50%, -50%) scale(1);
         }
 
         100% {
           opacity: 0;
-          transform: translate(-50%, -90%) scale(0.95);
+          transform: translate(-50%, -65%) scale(0.96);
+        }
+      }
+
+      @keyframes levelUpPopupAnim {
+        0% {
+          opacity: 0;
+          transform: translate(-50%, -35%) scale(0.88);
+        }
+
+        15% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.05);
+        }
+
+        75% {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -65%) scale(0.96);
         }
       }
     </style>
@@ -1323,12 +1357,12 @@
       </div>
 
       <button class="shop-open" id="openShopBtn">
-        <span class="desktopLabel">Melhorias</span>
+        <span class="desktopLabel">Melhorias ⬆️</span>
         <span class="mobileLabel">⬆️</span>
       </button>
 
       <button class="guide-open" id="openGuideBtn">
-        <span class="desktopLabel">Guia</span>
+        <span class="desktopLabel">Guia 📘</span>
         <span class="mobileLabel">📘</span>
       </button>
 
@@ -1338,7 +1372,7 @@
       </button>
 
       <button class="dev-open" id="openDevBtn">
-        <span class="desktopLabel">Apenas Dev</span>
+        <span class="desktopLabel">"Hacking" 🛠️</span>
         <span class="mobileLabel">🛠️</span>
       </button>
     </section>
@@ -1465,12 +1499,12 @@
       </div>
 
       <section class="devSection" id="devLoginSection">
-        <h3>🔐 Acesso Dev</h3>
+        <h3>🔐 Restrito a Desenvolvedores 👀</h3>
 
         <input
           type="password"
           id="devPasswordInput"
-          placeholder="Digite a senha dev"
+          placeholder="Digite a senha de desenvolvedor"
           class="devInput"
         />
 
@@ -2058,7 +2092,7 @@
         const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
 
         if (isGolden && cellIndex === null) {
-          showSpawnPopup("🌟 Objeto dourado apareceu!", "golden");
+          showSpawnPopup("🌟 Objeto dourado!", "golden");
         }
 
         const element = document.createElement("div");
