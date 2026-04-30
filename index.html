@@ -340,7 +340,7 @@
          .footer {
             margin-top: 14px;
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr 0.85fr 0.85fr;
+            grid-template-columns: 1.1fr 0.75fr 0.75fr 0.75fr 0.75fr;
             gap: 10px;
             align-items: stretch;
          }
@@ -351,6 +351,7 @@
             border-radius: 12px;
             padding: 12px;
             font-weight: bold;
+            font-size: 70%;
             cursor: pointer;
             background: #1f8f48;
             color: white;
@@ -566,6 +567,79 @@
             animation: pop 0.25s ease;
          }
 
+         .dev-open {
+            background: #111827;
+         }
+
+         .devPanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: min(380px, 94vw);
+            background: #ffffff;
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+            padding: 18px;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            z-index: 1001;
+            overflow-y: auto;
+         }
+
+         .devPanel.active {
+            transform: translateX(0);
+         }
+
+         .devSection {
+            border: 2px solid #e1eee5;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #fbfffc;
+         }
+
+         .devSection h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+         }
+
+         .devGrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+         }
+
+         .devGrid button {
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 10px;
+            background: #111827;
+         }
+
+         .devInput {
+            width: 100%;
+            padding: 11px;
+            border: 2px solid #e1eee5;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            outline: none;
+         }
+
+         .devInput:focus {
+            border-color: #111827;
+         }
+
+         .devError {
+            font-size: 12px;
+            color: #c0392b;
+            margin-top: 8px;
+            min-height: 16px;
+         }
+
+         .devContent.locked {
+            display: none;
+         }
+
          @keyframes pop {
             0% {
                transform: scale(0.8);
@@ -768,11 +842,13 @@
             <button class="shop-open" id="openShopBtn">Melhorias</button>
             <button class="guide-open" id="openGuideBtn">Guia</button>
             <button class="danger" id="resetBtn">Resetar Tudo! ⚠️</button>
+            <button class="dev-open" id="openDevBtn">Apenas Dev</button>
          </section>
       </main>
 
       <div class="shopOverlay" id="shopOverlay"></div>
       <div class="shopOverlay" id="guideOverlay"></div>
+      <div class="shopOverlay" id="devOverlay"></div>
 
       <aside class="shop" id="shop">
          <div class="shopHeader">
@@ -904,6 +980,67 @@
          </section>
       </aside>
 
+      <aside class="devPanel" id="devPanel">
+         <div class="shopHeader">
+            <h2>Dev Tools</h2>
+            <button class="closeBtn" id="closeDevBtn">✕</button>
+         </div>
+
+         <section class="devSection" id="devLoginSection">
+            <h3>🔐 Acesso Dev</h3>
+
+            <input
+               type="password"
+               id="devPasswordInput"
+               placeholder="Digite a senha dev"
+               class="devInput"
+            />
+
+            <button id="devLoginBtn">Entrar</button>
+            <p class="devError" id="devErrorText"></p>
+         </section>
+
+         <div id="devContent" class="devContent locked">
+            <section class="devSection">
+               <h3>💠 Economia</h3>
+               <div class="devGrid">
+                  <button id="devAddPolygons1K">+1K Polígonos</button>
+                  <button id="devAddPolygons100K">+100K Polígonos</button>
+                  <button id="devAddShards5">+5 Estilhaços</button>
+                  <button id="devAddShards50">+50 Estilhaços</button>
+               </div>
+            </section>
+
+            <section class="devSection">
+               <h3>🔁 Spawn e Grade</h3>
+               <div class="devGrid">
+                  <button id="devSpawnOne">Gerar 1</button>
+                  <button id="devSpawnGolden">Gerar Dourado</button>
+                  <button id="devFillGrid">Preencher Grid</button>
+                  <button id="devClearGrid">Limpar Grid</button>
+               </div>
+            </section>
+
+            <section class="devSection">
+               <h3>⚙️ Upgrades</h3>
+               <div class="devGrid">
+                  <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
+                  <button id="devLevelUpForm">+1 Forma</button>
+                  <button id="devResetUpgrades">Reset Upgrades</button>
+                  <button id="devAllUpgrades5">Todos Nv. 5</button>
+               </div>
+            </section>
+
+            <section class="devSection">
+               <h3>⭐ Level</h3>
+               <div class="devGrid">
+                  <button id="devAddMerge">+1 Merge</button>
+                  <button id="devForceLevelUp">Forçar Level Up</button>
+               </div>
+            </section>
+         </div>
+      </aside>
+
       <script>
          const grid = document.getElementById('grid');
          const moneyEl = document.getElementById('money');
@@ -939,10 +1076,37 @@
          const levelUpPopup = document.getElementById('levelUpPopup');
          const spawnPopup = document.getElementById('spawnPopup');
 
+         const openDevBtn = document.getElementById('openDevBtn');
+         const closeDevBtn = document.getElementById('closeDevBtn');
+         const devPanel = document.getElementById('devPanel');
+         const devOverlay = document.getElementById('devOverlay');
+
+         const devAddPolygons1K = document.getElementById('devAddPolygons1K');
+         const devAddPolygons100K =
+            document.getElementById('devAddPolygons100K');
+         const devAddShards5 = document.getElementById('devAddShards5');
+         const devAddShards50 = document.getElementById('devAddShards50');
+         const devSpawnOne = document.getElementById('devSpawnOne');
+         const devSpawnGolden = document.getElementById('devSpawnGolden');
+         const devFillGrid = document.getElementById('devFillGrid');
+         const devClearGrid = document.getElementById('devClearGrid');
+         const devMaxSpawnSpeed = document.getElementById('devMaxSpawnSpeed');
+         const devLevelUpForm = document.getElementById('devLevelUpForm');
+         const devResetUpgrades = document.getElementById('devResetUpgrades');
+         const devAllUpgrades5 = document.getElementById('devAllUpgrades5');
+         const devAddMerge = document.getElementById('devAddMerge');
+         const devForceLevelUp = document.getElementById('devForceLevelUp');
+         const devPasswordInput = document.getElementById('devPasswordInput');
+         const devLoginBtn = document.getElementById('devLoginBtn');
+         const devErrorText = document.getElementById('devErrorText');
+         const devLoginSection = document.getElementById('devLoginSection');
+         const devContent = document.getElementById('devContent');
+
          const GRID_SIZE = 16;
          const BASE_SPAWN_TIME = 6000;
          const SAVE_KEY = 'merge-clicker-prototype-save-v4';
          const SPAWN_TICK_RATE = 100;
+         const DEV_PASSWORD = 'senha67';
 
          const LEVEL_COLORS = [
             { name: 'Branco', bg: '#f8f9fa', text: '#1f2933' },
@@ -1026,6 +1190,39 @@
                golden: true,
             },
          };
+
+         function unlockDevTools() {
+            const typedPassword = devPasswordInput.value;
+
+            if (typedPassword !== DEV_PASSWORD) {
+               devErrorText.textContent = 'Senha incorreta.';
+               devPasswordInput.value = '';
+               return;
+            }
+
+            devErrorText.textContent = '';
+            devLoginSection.style.display = 'none';
+            devContent.classList.remove('locked');
+         }
+
+         function devRefresh() {
+            updateUI();
+            updateSpawnBarVisual?.();
+            saveGame(true);
+         }
+
+         function clearAllItems() {
+            items.forEach((item) => item.element.remove());
+            items = [];
+         }
+
+         function devSetSpawnToMinimum() {
+            const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 50);
+            upgrades.spawnSpeed.level = Math.max(
+               upgrades.spawnSpeed.level,
+               neededLevel,
+            );
+         }
 
          function getLevelVisual(level) {
             const colorIndex = (level - 1) % LEVEL_COLORS.length;
@@ -1193,7 +1390,7 @@
             return [goldenShadow, cycleShadow, baseShadow]
                .filter(Boolean)
                .join(',');
-         }  
+         }
 
          function updateSpawnProgressBar() {
             const total = getSpawnTime();
@@ -1744,6 +1941,99 @@
             draggedItem = null;
          });
 
+         devAddPolygons1K.addEventListener('click', () => {
+            money += 1000;
+            devRefresh();
+         });
+
+         devAddPolygons100K.addEventListener('click', () => {
+            money += 100000;
+            devRefresh();
+         });
+
+         devAddShards5.addEventListener('click', () => {
+            shards += 5;
+            devRefresh();
+         });
+
+         devAddShards50.addEventListener('click', () => {
+            shards += 50;
+            devRefresh();
+         });
+
+         devSpawnOne.addEventListener('click', () => {
+            createItem();
+            devRefresh();
+         });
+
+         devSpawnGolden.addEventListener('click', () => {
+            createItem(getStartLevel(), null, true);
+            devRefresh();
+         });
+
+         devFillGrid.addEventListener('click', () => {
+            while (!isGridFull()) {
+               createItem();
+            }
+
+            devRefresh();
+         });
+
+         devClearGrid.addEventListener('click', () => {
+            clearAllItems();
+            devRefresh();
+         });
+
+         devMaxSpawnSpeed.addEventListener('click', () => {
+            devSetSpawnToMinimum();
+            restartSpawnTimer();
+            devRefresh();
+         });
+
+         devLevelUpForm.addEventListener('click', () => {
+            upgrades.startLevel.level++;
+            upgradeOldItemsToStartLevel();
+            devRefresh();
+         });
+
+         devResetUpgrades.addEventListener('click', () => {
+            Object.values(upgrades).forEach((upgrade) => {
+               upgrade.level = 0;
+            });
+
+            restartSpawnTimer();
+            devRefresh();
+         });
+
+         devAllUpgrades5.addEventListener('click', () => {
+            Object.values(upgrades).forEach((upgrade) => {
+               upgrade.level = 5;
+            });
+
+            upgradeOldItemsToStartLevel();
+            restartSpawnTimer();
+            devRefresh();
+         });
+
+         devAddMerge.addEventListener('click', () => {
+            addMergeProgress();
+            devRefresh();
+         });
+
+         devForceLevelUp.addEventListener('click', () => {
+            mergeProgress = mergesNeeded - 1;
+            addMergeProgress();
+            devRefresh();
+         });
+
+         devLoginBtn.addEventListener('click', unlockDevTools);
+
+         devPasswordInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+               unlockDevTools();
+            }
+         });
+
          resetBtn.addEventListener('click', () => {
             money = 0;
             shards = 0;
@@ -1788,6 +2078,19 @@
 
          closeGuideBtn.addEventListener('click', closeGuide);
          guideOverlay.addEventListener('click', closeGuide);
+
+         openDevBtn.addEventListener('click', () => {
+            devPanel.classList.add('active');
+            devOverlay.classList.add('active');
+         });
+
+         function closeDevPanel() {
+            devPanel.classList.remove('active');
+            devOverlay.classList.remove('active');
+         }
+
+         closeDevBtn.addEventListener('click', closeDevPanel);
+         devOverlay.addEventListener('click', closeDevPanel);
 
          setInterval(incomeTick, 1000);
          setInterval(updateSpawnProgressBar, 100);
