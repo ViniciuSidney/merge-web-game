@@ -409,10 +409,10 @@
             bottom: max(8px, env(safe-area-inset-bottom));
             transform: translateX(-50%);
 
-            width: min(600px, calc(100vw - 24px));
+            width: min(420px, calc(100vw - 24px));
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             align-items: stretch;
 
             background: rgba(255, 255, 255, 0.86);
@@ -426,12 +426,16 @@
 
          .footer button {
             min-width: 0;
-            min-height: 50px;
-            padding: 6px;
+            min-height: 54px;
+            padding: 8px;
             font-size: 13px;
             border-radius: 12px;
             line-height: 1.1;
             text-align: center;
+         }
+
+         .settings-open {
+            background: #5c5ee7;
          }
 
          button {
@@ -789,6 +793,86 @@
             display: none;
          }
 
+         .settingsOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            z-index: 1000;
+         }
+
+         .settingsOverlay.active {
+            opacity: 1;
+            pointer-events: auto;
+         }
+
+         .settingsPanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: min(380px, 94vw);
+            background: #ffffff;
+            opacity: 0.94;
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+            padding: 18px;
+            transform: translateX(100%);
+            transition: transform 0.25s ease;
+            z-index: 1001;
+            overflow-y: auto;
+         }
+
+         .settingsPanel.active {
+            transform: translateX(0);
+         }
+
+         .settingsTabs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+            position: sticky;
+            top: 58px;
+            background: #ffffff;
+            padding-bottom: 8px;
+            z-index: 4;
+         }
+
+         .settingsTab {
+            min-height: 36px;
+            padding: 7px 5px;
+            border-radius: 10px;
+            background: #eef5f0;
+            color: #16351f;
+            font-size: 11px;
+         }
+
+         .settingsTab.active {
+            background: #1f8f48;
+            color: #ffffff;
+         }
+
+         .settingsContent {
+            display: none;
+         }
+
+         .settingsContent.active {
+            display: block;
+         }
+
+         .dangerSection {
+            border-color: #f1b5ae;
+            background: #fff3f1;
+         }
+
+         .resetInsideBtn {
+            width: 100%;
+            margin-top: 10px;
+            min-height: 44px;
+         }
+
          /* Desktop */
          @media (min-width: 1025px) {
             body {
@@ -887,7 +971,7 @@
 
             .footer {
                width: min(600px, calc(100vw - 28px));
-               grid-template-columns: repeat(5, 1fr);
+               grid-template-columns: repeat(2, 1fr);
                gap: 8px;
                padding: 10px;
             }
@@ -987,19 +1071,15 @@
             }
 
             .footer {
-               width: min(390px, calc(100vw - 16px));
-               grid-template-columns: repeat(5, 1fr);
-               gap: 6px;
+               width: min(300px, calc(100vw - 16px));
+               grid-template-columns: repeat(2, 1fr);
+               gap: 8px;
                padding: 8px;
-               border-radius: 16px;
-               bottom: max(6px, env(safe-area-inset-bottom));
             }
 
             .footer button {
-               min-height: 52px;
-               padding: 6px 4px;
+               min-height: 50px;
                font-size: 18px;
-               border-radius: 12px;
             }
 
             .desktopLabel {
@@ -1097,7 +1177,7 @@
          @media (min-width: 370px) and (max-width: 520px) {
             .footer {
                width: min(390px, calc(100vw - 16px));
-               grid-template-columns: repeat(5, 1fr);
+               grid-template-columns: repeat(2, 1fr);
                gap: 6px;
                padding: 8px;
                border-radius: 16px;
@@ -1457,35 +1537,18 @@
 
       <section class="footer">
          <button class="shop-open" id="openShopBtn">
-            <span class="desktopLabel">Melhorias <br />⬆️</span>
+            <span class="desktopLabel">Melhorias ⬆️</span>
             <span class="mobileLabel">⬆️</span>
          </button>
 
-         <button class="stats-open" id="openStatsBtn">
-            <span class="desktopLabel">Estatísticas <br />📊</span>
-            <span class="mobileLabel">📊</span>
-         </button>
-
-         <button class="guide-open" id="openGuideBtn">
-            <span class="desktopLabel">Ajuda <br />📘</span>
-            <span class="mobileLabel">📘</span>
-         </button>
-
-         <button class="danger" id="resetBtn">
-            <span class="desktopLabel">Resetar Tudo! <br />⚠️</span>
-            <span class="mobileLabel">⚠️</span>
-         </button>
-
-         <button class="dev-open" id="openDevBtn">
-            <span class="desktopLabel">"Hacking" <br />🛠️</span>
-            <span class="mobileLabel">🛠️</span>
+         <button class="settings-open" id="openSettingsBtn">
+            <span class="desktopLabel">Configurações ⚙️</span>
+            <span class="mobileLabel">⚙️</span>
          </button>
       </section>
 
       <div class="shopOverlay" id="shopOverlay"></div>
-      <div class="statsOverlay" id="statsOverlay"></div>
-      <div class="guideOverlay" id="guideOverlay"></div>
-      <div class="devOverlay" id="devOverlay"></div>
+      <div class="settingsOverlay" id="settingsOverlay"></div>
 
       <aside class="shop" id="shop">
          <div class="shopHeader">
@@ -1500,191 +1563,168 @@
          <div class="upgradeList" id="upgrades"></div>
       </aside>
 
-      <aside class="statsPanel" id="statsPanel">
+      <aside class="settingsPanel" id="settingsPanel">
          <div class="shopHeader">
-            <h2>Estatísticas Gerais</h2>
-            <button class="closeBtn" id="closeStatsBtn">✕</button>
+            <h2>Configurações</h2>
+            <button class="closeBtn" id="closeSettingsBtn">✕</button>
          </div>
 
-         <div class="statsPageGrid">
-            <div class="statCard">
-               Spawn<strong id="spawnTimeStat">3.00s</strong>
-            </div>
-            <div class="statCard">
-               Nível inicial<strong id="startLevelStat">Lv 1</strong>
-            </div>
-            <div class="statCard">
-               Chance dupla<strong id="doubleSpawnStat">0%</strong>
-            </div>
-            <div class="statCard">
-               Bônus 2x<strong id="doubleMoneyStat">0%</strong>
-            </div>
-            <div class="statCard">
-               Dourado<strong id="goldenChanceStat">0%</strong>
-            </div>
-            <div class="statCard">
-               Multiplicador<strong id="multiplierStat">1.0x</strong>
-            </div>
-            <div class="statCard">
-               Objetos<strong id="itemsStat">0/16</strong>
-            </div>
-            <div class="statCard">Level<strong id="levelStat">1</strong></div>
-         </div>
-      </aside>
+         <nav class="settingsTabs">
+            <button class="settingsTab active" data-tab="stats">
+               📊 Stats
+            </button>
+            <button class="settingsTab" data-tab="guide">📘 Ajuda</button>
+            <button class="settingsTab" data-tab="reset">⚠️ Reset</button>
+            <button class="settingsTab" data-tab="dev">🛠️ Dev</button>
+         </nav>
 
-      <aside class="guide" id="guide">
-         <div class="shopHeader">
-            <h2>Informações Úteis</h2>
-            <button class="closeBtn" id="closeGuideBtn">✕</button>
-         </div>
-
-         <section class="guideSection">
-            <h3>🎯 Objetivo</h3>
-            <p>
-               Combine objetos iguais para criar objetos de nível maior, gerar
-               mais polígonos e subir de level.
-            </p>
-         </section>
-
-         <section class="guideSection">
-            <h3>🔁 Merge</h3>
-            <ul>
-               <li>Arraste um objeto sobre outro do mesmo nível.</li>
-               <li>
-                  Solte para combinar os dois em um objeto de nível superior.
-               </li>
-               <li>Cada merge aumenta a barra de Level Up.</li>
-               <li>
-                  Objetos de níveis diferentes não combinam e geram um aviso
-                  vermelho.
-               </li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>💠 Polígonos</h3>
-            <ul>
-               <li>
-                  Cada objeto gera polígonos automaticamente a cada segundo.
-               </li>
-               <li>O popup acima do objeto mostra quanto ele gerou no tick.</li>
-               <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>✦ Estilhaços</h3>
-            <ul>
-               <li>Você ganha estilhaços ao subir de level.</li>
-               <li>
-                  A recompensa é múltipla de 5 e aumenta conforme seu level.
-               </li>
-               <li>Cada estilhaço aumenta em 0.01x o ganho de polígonos.</li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>🌟 Objetos dourados</h3>
-            <ul>
-               <li>Objetos dourados geram 2x polígonos para sempre.</li>
-               <li>Ao combinar, o efeito dourado continua no novo objeto.</li>
-               <li>
-                  O upgrade de objeto dourado aumenta a chance deles aparecerem.
-               </li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>🗑️ Lixeira</h3>
-            <ul>
-               <li>
-                  Arraste um objeto para a lixeira para removê-lo da grade.
-               </li>
-               <li>
-                  Ao excluir, você recebe metade do valor que ele gerava por
-                  segundo em polígonos.
-               </li>
-               <li>
-                  Use isso para liberar espaço quando a grade estiver travando.
-               </li>
-            </ul>
-         </section>
-
-         <section class="guideSection">
-            <h3>🛒 Loja</h3>
-            <ul>
-               <li>Compre upgrades para acelerar o spawn.</li>
-               <li>Aumente o nível dos objetos gerados.</li>
-               <li>
-                  Aumente a chance de spawn duplo, tick 2x e objetos dourados.
-               </li>
-               <li>
-                  Quando o nível inicial sobe, objetos antigos abaixo desse
-                  nível são atualizados automaticamente.
-               </li>
-            </ul>
-         </section>
-      </aside>
-
-      <aside class="devPanel" id="devPanel">
-         <div class="shopHeader">
-            <h2>Ferramentas do Dev</h2>
-            <button class="closeBtn" id="closeDevBtn">✕</button>
-         </div>
-
-         <section class="devSection" id="devLoginSection">
-            <h3>🔐 Restrito a Desenvolvedores 👀</h3>
-
-            <input
-               type="password"
-               id="devPasswordInput"
-               placeholder="Digite a senha de desenvolvedor"
-               class="devInput"
-            />
-
-            <button id="devLoginBtn">Entrar</button>
-            <p class="devError" id="devErrorText"></p>
-         </section>
-
-         <div id="devContent" class="devContent locked">
-            <section class="devSection">
-               <h3>💠 Economia</h3>
-               <div class="devGrid">
-                  <button id="devAddPolygons1K">+1K Polígonos</button>
-                  <button id="devAddPolygons100K">+100K Polígonos</button>
-                  <button id="devAddShards5">+5 Estilhaços</button>
-                  <button id="devAddShards50">+50 Estilhaços</button>
+         <section class="settingsContent active" id="tab-stats">
+            <div class="statsPageGrid">
+               <div class="statCard">
+                  Spawn<strong id="spawnTimeStat">3.00s</strong>
                </div>
+               <div class="statCard">
+                  Nível inicial<strong id="startLevelStat">Lv 1</strong>
+               </div>
+               <div class="statCard">
+                  Chance dupla<strong id="doubleSpawnStat">0%</strong>
+               </div>
+               <div class="statCard">
+                  Bônus 2x<strong id="doubleMoneyStat">0%</strong>
+               </div>
+               <div class="statCard">
+                  Dourado<strong id="goldenChanceStat">0%</strong>
+               </div>
+               <div class="statCard">
+                  Multiplicador<strong id="multiplierStat">1.0x</strong>
+               </div>
+               <div class="statCard">
+                  Objetos<strong id="itemsStat">0/16</strong>
+               </div>
+               <div class="statCard">
+                  Level<strong id="levelStat">1</strong>
+               </div>
+            </div>
+         </section>
+
+         <section class="settingsContent" id="tab-guide">
+            <section class="guideSection">
+               <h3>🎯 Objetivo</h3>
+               <p>
+                  Combine objetos iguais para criar objetos de nível maior,
+                  gerar mais polígonos e subir de level.
+               </p>
             </section>
 
-            <section class="devSection">
-               <h3>🔁 Spawn e Grade</h3>
-               <div class="devGrid">
-                  <button id="devSpawnOne">Gerar 1</button>
-                  <button id="devSpawnGolden">Gerar Dourado</button>
-                  <button id="devFillGrid">Preencher Grid</button>
-                  <button id="devClearGrid">Limpar Grid</button>
-               </div>
+            <section class="guideSection">
+               <h3>🔁 Merge</h3>
+               <ul>
+                  <li>Arraste um objeto sobre outro do mesmo nível.</li>
+                  <li>
+                     Solte para combinar os dois em um objeto de nível superior.
+                  </li>
+                  <li>Cada merge aumenta a barra de Level Up.</li>
+                  <li>
+                     Objetos de níveis diferentes não combinam e geram um aviso
+                     vermelho.
+                  </li>
+               </ul>
             </section>
 
-            <section class="devSection">
-               <h3>⚙️ Upgrades</h3>
-               <div class="devGrid">
-                  <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
-                  <button id="devLevelUpForm">+1 Forma</button>
-                  <button id="devResetUpgrades">Reset Upgrades</button>
-                  <button id="devAllUpgrades5">Todos Nv. 5</button>
-               </div>
+            <section class="guideSection">
+               <h3>💠 Polígonos</h3>
+               <ul>
+                  <li>
+                     Cada objeto gera polígonos automaticamente a cada segundo.
+                  </li>
+                  <li>
+                     O popup acima do objeto mostra quanto ele gerou no tick.
+                  </li>
+                  <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
+               </ul>
             </section>
 
-            <section class="devSection">
-               <h3>⭐ Level</h3>
-               <div class="devGrid">
-                  <button id="devAddMerge">+1 Merge</button>
-                  <button id="devForceLevelUp">Forçar Level Up</button>
-               </div>
+            <section class="guideSection">
+               <h3>✦ Estilhaços</h3>
+               <ul>
+                  <li>Você ganha estilhaços ao subir de level.</li>
+                  <li>
+                     A recompensa é múltipla de 5 e aumenta conforme seu level.
+                  </li>
+                  <li>Cada estilhaço aumenta em 0.01x o ganho de polígonos.</li>
+               </ul>
             </section>
-         </div>
+         </section>
+
+         <section class="settingsContent" id="tab-reset">
+            <section class="guideSection dangerSection">
+               <h3>⚠️ Resetar progresso</h3>
+               <p>
+                  Essa ação apaga polígonos, estilhaços, objetos, level e
+                  melhorias compradas.
+               </p>
+
+               <button class="danger resetInsideBtn" id="resetInsideBtn">
+                  Resetar Tudo
+               </button>
+            </section>
+         </section>
+
+         <section class="settingsContent" id="tab-dev">
+            <section class="devSection" id="devLoginSection">
+               <h3>🔐 Restrito a Desenvolvedores 👀</h3>
+
+               <input
+                  type="password"
+                  id="devPasswordInput"
+                  placeholder="Digite a senha de desenvolvedor"
+                  class="devInput"
+               />
+
+               <button id="devLoginBtn">Entrar</button>
+               <p class="devError" id="devErrorText"></p>
+            </section>
+
+            <div id="devContent" class="devContent locked">
+               <section class="devSection">
+                  <h3>💠 Economia</h3>
+                  <div class="devGrid">
+                     <button id="devAddPolygons1K">+1K Polígonos</button>
+                     <button id="devAddPolygons100K">+100K Polígonos</button>
+                     <button id="devAddShards5">+5 Estilhaços</button>
+                     <button id="devAddShards50">+50 Estilhaços</button>
+                  </div>
+               </section>
+
+               <section class="devSection">
+                  <h3>🔁 Spawn e Grade</h3>
+                  <div class="devGrid">
+                     <button id="devSpawnOne">Gerar 1</button>
+                     <button id="devSpawnGolden">Gerar Dourado</button>
+                     <button id="devFillGrid">Preencher Grid</button>
+                     <button id="devClearGrid">Limpar Grid</button>
+                  </div>
+               </section>
+
+               <section class="devSection">
+                  <h3>⚙️ Upgrades</h3>
+                  <div class="devGrid">
+                     <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
+                     <button id="devLevelUpForm">+1 Forma</button>
+                     <button id="devResetUpgrades">Reset Upgrades</button>
+                     <button id="devAllUpgrades5">Todos Nv. 5</button>
+                  </div>
+               </section>
+
+               <section class="devSection">
+                  <h3>⭐ Level</h3>
+                  <div class="devGrid">
+                     <button id="devAddMerge">+1 Merge</button>
+                     <button id="devForceLevelUp">Forçar Level Up</button>
+                  </div>
+               </section>
+            </div>
+         </section>
       </aside>
 
       <script>
@@ -1693,15 +1733,10 @@
          const incomeEl = document.getElementById('income');
          const shardsEl = document.getElementById('shards');
          const saveStatus = document.getElementById('saveStatus');
-         const resetBtn = document.getElementById('resetBtn');
          const openShopBtn = document.getElementById('openShopBtn');
-         const openGuideBtn = document.getElementById('openGuideBtn');
          const closeShopBtn = document.getElementById('closeShopBtn');
-         const closeGuideBtn = document.getElementById('closeGuideBtn');
          const shop = document.getElementById('shop');
-         const guide = document.getElementById('guide');
          const shopOverlay = document.getElementById('shopOverlay');
-         const guideOverlay = document.getElementById('guideOverlay');
          const shopMoney = document.getElementById('shopMoney');
          const upgradesEl = document.getElementById('upgrades');
          const spawnTimeStat = document.getElementById('spawnTimeStat');
@@ -1720,15 +1755,14 @@
          const levelBonusText = document.getElementById('levelBonusText');
          const levelUpPopup = document.getElementById('levelUpPopup');
          const spawnPopup = document.getElementById('spawnPopup');
-         const openStatsBtn = document.getElementById('openStatsBtn');
-         const closeStatsBtn = document.getElementById('closeStatsBtn');
-         const statsPanel = document.getElementById('statsPanel');
-         const statsOverlay = document.getElementById('statsOverlay');
 
-         const openDevBtn = document.getElementById('openDevBtn');
-         const closeDevBtn = document.getElementById('closeDevBtn');
-         const devPanel = document.getElementById('devPanel');
-         const devOverlay = document.getElementById('devOverlay');
+         const openSettingsBtn = document.getElementById('openSettingsBtn');
+         const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+         const settingsPanel = document.getElementById('settingsPanel');
+         const settingsOverlay = document.getElementById('settingsOverlay');
+         const settingsTabs = document.querySelectorAll('.settingsTab');
+         const settingsContents = document.querySelectorAll('.settingsContent');
+         const resetInsideBtn = document.getElementById('resetInsideBtn');
 
          const devAddPolygons1K = document.getElementById('devAddPolygons1K');
          const devAddPolygons100K =
@@ -2605,6 +2639,22 @@
             }
          }
 
+         settingsTabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+               const selectedTab = tab.dataset.tab;
+
+               settingsTabs.forEach((item) => item.classList.remove('active'));
+               settingsContents.forEach((content) =>
+                  content.classList.remove('active'),
+               );
+
+               tab.classList.add('active');
+               document
+                  .getElementById(`tab-${selectedTab}`)
+                  .classList.add('active');
+            });
+         });
+
          document.addEventListener('pointermove', (event) => {
             if (!draggedItem) return;
 
@@ -2661,18 +2711,40 @@
             draggedItem = null;
          });
 
-         openStatsBtn.addEventListener('click', () => {
-            statsPanel.classList.add('active');
-            statsOverlay.classList.add('active');
-         });
+         function resetGame() {
+            money = 0;
+            shards = 0;
+            playerLevel = 1;
+            mergeProgress = 0;
+            mergesNeeded = 5;
 
-         function closeStatsPanel() {
-            statsPanel.classList.remove('active');
-            statsOverlay.classList.remove('active');
+            items.forEach((item) => item.element.remove());
+            items = [];
+
+            Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
+            localStorage.removeItem(SAVE_KEY);
+
+            createItem(1, null, false);
+            createItem(1, null, false);
+            restartSpawnTimer();
+            updateUI();
+            saveGame(true);
          }
 
-         closeStatsBtn.addEventListener('click', closeStatsPanel);
-         statsOverlay.addEventListener('click', closeStatsPanel);
+         resetInsideBtn.addEventListener('click', resetGame);
+
+         openSettingsBtn.addEventListener('click', () => {
+            settingsPanel.classList.add('active');
+            settingsOverlay.classList.add('active');
+         });
+
+         function closeSettingsPanel() {
+            settingsPanel.classList.remove('active');
+            settingsOverlay.classList.remove('active');
+         }
+
+         closeSettingsBtn.addEventListener('click', closeSettingsPanel);
+         settingsOverlay.addEventListener('click', closeSettingsPanel);
 
          devAddPolygons1K.addEventListener('click', () => {
             money += 1000;
@@ -2767,25 +2839,6 @@
             }
          });
 
-         resetBtn.addEventListener('click', () => {
-            money = 0;
-            shards = 0;
-            playerLevel = 1;
-            mergeProgress = 0;
-            mergesNeeded = 5;
-            items.forEach((item) => item.element.remove());
-            items = [];
-
-            Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
-            localStorage.removeItem(SAVE_KEY);
-
-            createItem(1, null, false);
-            createItem(1, null, false);
-            restartSpawnTimer();
-            updateUI();
-            saveGame(true);
-         });
-
          openShopBtn.addEventListener('click', () => {
             shop.classList.add('active');
             shopOverlay.classList.add('active');
@@ -2798,32 +2851,6 @@
 
          closeShopBtn.addEventListener('click', closeShop);
          shopOverlay.addEventListener('click', closeShop);
-
-         openGuideBtn.addEventListener('click', () => {
-            guide.classList.add('active');
-            guideOverlay.classList.add('active');
-         });
-
-         function closeGuide() {
-            guide.classList.remove('active');
-            guideOverlay.classList.remove('active');
-         }
-
-         closeGuideBtn.addEventListener('click', closeGuide);
-         guideOverlay.addEventListener('click', closeGuide);
-
-         openDevBtn.addEventListener('click', () => {
-            devPanel.classList.add('active');
-            devOverlay.classList.add('active');
-         });
-
-         function closeDevPanel() {
-            devPanel.classList.remove('active');
-            devOverlay.classList.remove('active');
-         }
-
-         closeDevBtn.addEventListener('click', closeDevPanel);
-         devOverlay.addEventListener('click', closeDevPanel);
 
          setInterval(incomeTick, 1000);
          setInterval(updateSpawnProgressBar, 100);
