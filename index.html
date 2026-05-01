@@ -211,7 +211,6 @@
             box-shadow: 0 8px 18px rgba(108, 92, 231, 0.25);
             opacity: 0;
             pointer-events: none;
-            z-index: 5;
          }
 
          .levelUpPopup.show {
@@ -473,33 +472,6 @@
          .guide-open {
             background: #5c5ee7;
          }
-
-         /* .trash {
-            border: 2px dashed #c0392b;
-            background: #fff1ef;
-            color: #9f2f24;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 48px;
-            font-size: 11px;
-            transition:
-               transform 0.15s ease,
-               background 0.15s ease,
-               border-color 0.15s ease;
-         } */
-
-         /* .trash strong {
-            font-size: 13px;
-         }
-
-         .trash.active {
-            background: #ffd8d2;
-            border-color: #e74c3c;
-            transform: scale(1.03);
-         } */
 
          .shopOverlay,
          .statsOverlay,
@@ -809,9 +781,7 @@
             display: none;
          }
 
-         .footer button span,
-         .trash span,
-         .trash strong {
+         .footer button span {
             overflow-wrap: anywhere;
          }
          .desktopLabel {
@@ -821,6 +791,7 @@
          .mobileLabel {
             display: none;
          }
+
          /* Desktop */
          @media (min-width: 1025px) {
             body {
@@ -881,6 +852,24 @@
                font-size: 10px;
                margin-top: 4px;
                line-height: 1.1;
+            }
+
+            .levelUpPopup {
+               min-width: unset;
+               width: min(85%, 260px);
+               max-width: 85%;
+               font-size: 10px;
+               padding: 7px 10px;
+            }
+
+            .spawnPopup {
+               min-width: unset;
+               width: min(85%, 260px);
+               max-width: 85%;
+               left: 50%;
+               top: 50%;
+               font-size: 10px;
+               padding: 7px 10px;
             }
 
             .grid {
@@ -1315,12 +1304,6 @@
       </main>
 
       <section class="footer">
-         <!-- <div class="trash" id="trashZone">
-            <strong class="desktopLabel">🗑️ Lixeira</strong>
-            <strong class="mobileLabel">🗑️</strong>
-            <span class="desktopLabel">Arraste aqui</span>
-         </div> -->
-
          <button class="shop-open" id="openShopBtn">
             <span class="desktopLabel">Melhorias <br />⬆️</span>
             <span class="mobileLabel">⬆️</span>
@@ -1558,7 +1541,6 @@
          const incomeEl = document.getElementById('income');
          const shardsEl = document.getElementById('shards');
          const saveStatus = document.getElementById('saveStatus');
-         const trashZone = document.getElementById('trashZone');
          const resetBtn = document.getElementById('resetBtn');
          const openShopBtn = document.getElementById('openShopBtn');
          const openGuideBtn = document.getElementById('openGuideBtn');
