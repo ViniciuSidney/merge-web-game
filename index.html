@@ -1016,7 +1016,6 @@
                border-radius: 12px;
             }
 
-
             .desktopLabel {
                display: none;
             }
@@ -2130,19 +2129,22 @@
                showSpawnPopup('📦 Entrega dupla!', 'double');
             }
 
-            lastSpawnTime = Date.now();
             return firstSpawned;
          }
 
          function applySpawnSpeedUpgrade() {
-            const oldTotal = Date.now() - lastSpawnTime;
-            const newTotal = getSpawnTime();
+            const total = getSpawnTime();
 
-            if (oldTotal >= newTotal) {
-               spawnObjects();
+            if (spawnProgress >= total) {
+               spawnProgress = total;
+
+               if (!isGridFull()) {
+                  spawnObjects();
+                  spawnProgress = 0;
+               }
             }
 
-            updateSpawnProgressBar();
+            updateSpawnBarVisual();
          }
 
          function restartSpawnTimer() {
@@ -2230,31 +2232,6 @@
             ring.style.top = `${y}px`;
             document.body.appendChild(ring);
             setTimeout(() => ring.remove(), 500);
-         }
-
-         function isPointerOverTrash(x, y) {
-            const rect = trashZone.getBoundingClientRect();
-            return (
-               x >= rect.left &&
-               x <= rect.right &&
-               y >= rect.top &&
-               y <= rect.bottom
-            );
-         }
-
-         function deleteDraggedItem() {
-            const refund = getItemPotentialValue(draggedItem) / 2;
-            const center = getElementCenter(trashZone);
-
-            money += refund;
-            draggedItem.element.remove();
-            items = items.filter((item) => item !== draggedItem);
-            createRing(center.x, center.y, 'error');
-
-            draggedItem = null;
-            trashZone.classList.remove('active');
-            updateUI();
-            saveGame(true);
          }
 
          function flashError(targetItem, targetCell) {
@@ -2484,13 +2461,6 @@
             moveDraggedItem(event.clientX, event.clientY);
             clearHighlights();
 
-            if (isPointerOverTrash(event.clientX, event.clientY)) {
-               trashZone.classList.add('active');
-               return;
-            }
-
-            trashZone.classList.remove('active');
-
             const cell = getCellUnderPointer(event.clientX, event.clientY);
             if (!cell) return;
 
@@ -2505,13 +2475,6 @@
 
             const cell = getCellUnderPointer(event.clientX, event.clientY);
             clearHighlights();
-
-            if (isPointerOverTrash(event.clientX, event.clientY)) {
-               deleteDraggedItem();
-               return;
-            }
-
-            trashZone.classList.remove('active');
 
             if (!cell) {
                returnToOriginalCell();
