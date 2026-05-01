@@ -1,3 +1,7 @@
+// ===============================
+// 1. ELEMENTOS DO DOM
+// ===============================
+
 const grid = document.getElementById('grid');
 const moneyEl = document.getElementById('money');
 const incomeEl = document.getElementById('income');
@@ -54,6 +58,10 @@ const devErrorText = document.getElementById('devErrorText');
 const devLoginSection = document.getElementById('devLoginSection');
 const devContent = document.getElementById('devContent');
 
+// ===============================
+// 2. CONSTANTES E CONFIGURAÇÕES BASE
+// ===============================
+
 const GRID_SIZE = 16;
 const BASE_SPAWN_TIME = 6000;
 const SAVE_KEY = 'merge-clicker-prototype-save-v5';
@@ -77,6 +85,7 @@ const LEVEL_COLORS = [
    { name: 'Cinza', bg: '#6b7280', text: '#ffffff' },
    { name: 'Preto', bg: '#111827', text: '#ffffff' },
 ];
+
 const NUMBER_SUFFIXES = [
    '', // unidade
    'K', // mil
@@ -92,6 +101,10 @@ const NUMBER_SUFFIXES = [
    'Dc', // decilhão
 ];
 
+// ===============================
+// 3. ESTADO DO JOGO
+// ===============================
+
 let money = 0;
 let shards = 0;
 let playerLevel = 1;
@@ -106,7 +119,10 @@ let offsetY = 0;
 let spawnProgress = 0;
 let saveTextTimer = null;
 
-//* Variáveis de Melhoria *//
+// ===============================
+// 4. CONFIGURAÇÕES DE UPGRADES
+// ===============================
+
 const upgrades = {
    spawnSpeed: {
       name: 'Esteira mais rápida',
@@ -156,47 +172,9 @@ const upgrades = {
    },
 };
 
-function unlockDevTools() {
-   const typedPassword = devPasswordInput.value;
-
-   if (typedPassword !== DEV_PASSWORD) {
-      devErrorText.textContent = 'Senha incorreta.';
-      devPasswordInput.value = '';
-      return;
-   }
-
-   devErrorText.textContent = '';
-   devLoginSection.style.display = 'none';
-   devContent.classList.remove('locked');
-}
-
-function devRefresh() {
-   updateUI();
-   updateSpawnBarVisual?.();
-   saveGame(true);
-}
-
-function clearAllItems() {
-   items.forEach((item) => item.element.remove());
-   items = [];
-}
-
-function devSetSpawnToMinimum() {
-   const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 50);
-   upgrades.spawnSpeed.level = Math.max(upgrades.spawnSpeed.level, neededLevel);
-}
-
-function getLevelVisual(level) {
-   const colorIndex = (level - 1) % LEVEL_COLORS.length;
-   const cycle = Math.floor((level - 1) / LEVEL_COLORS.length);
-   const color = LEVEL_COLORS[colorIndex];
-
-   return {
-      bg: color.bg,
-      text: color.text,
-      cycle,
-   };
-}
+// ===============================
+// 5. FUNÇÕES UTILITÁRIAS
+// ===============================
 
 function formatShortNumber(value) {
    if (value >= 100) return value.toFixed(0);
@@ -233,6 +211,15 @@ function formatShards(value) {
    return formatNumber(value, '✦ ');
 }
 
+function getCycleRoman(cycle) {
+   const roman = ['', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+   return roman[cycle] ?? `${cycle + 1}`;
+}
+
+// ===============================
+// 6. FUNÇÕES DE CÁLCULO
+// ===============================
+
 function getShardMultiplier() {
    return 1 + shards * 0.01;
 }
@@ -243,19 +230,6 @@ function getShardsReward() {
 
 function getNextMergeRequirement() {
    return Math.ceil(mergesNeeded * 1.5);
-}
-
-function createGrid() {
-   grid.innerHTML = '';
-   cells = [];
-
-   for (let i = 0; i < GRID_SIZE; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.index = i;
-      grid.appendChild(cell);
-      cells.push(cell);
-   }
 }
 
 function getUpgradeCost(key) {
@@ -283,24 +257,6 @@ function getSpawnTime() {
 
 function getStartLevel() {
    return 1 + upgrades.startLevel.level;
-}
-
-function upgradeOldItemsToStartLevel() {
-   const startLevel = getStartLevel();
-   let changed = false;
-
-   items.forEach((item) => {
-      if (item.level < startLevel) {
-         item.level = startLevel;
-         updateItemElement(item);
-         changed = true;
-      }
-   });
-
-   if (changed) {
-      updateUI();
-      saveGame(true);
-   }
 }
 
 function getDoubleSpawnChance() {
@@ -331,24 +287,42 @@ function getTotalIncomePreview() {
    return items.reduce((total, item) => total + getItemPotentialValue(item), 0);
 }
 
-function updateUI() {
-   moneyEl.textContent = formatMoney(money);
-   incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-   shardsEl.textContent = formatShards(shards);
-   shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ${formatShards(shards)}`;
-   spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
-   startLevelStat.textContent = `Lv ${getStartLevel()}`;
-   doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
-   doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
-   goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
-   multiplierStat.textContent = `${getShardMultiplier().toFixed(1)}x`;
-   itemsStat.textContent = `${items.length}/16`;
-   levelStat.textContent = playerLevel;
-   playerLevelEl.textContent = playerLevel;
-   levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} combinações`;
-   levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
-   levelBonusText.innerHTML = `Multiplicador por estilhaços: <strong>${getShardMultiplier().toFixed(1)}x</strong>`;
-   renderUpgrades();
+// ===============================
+// 7. GRID E ITENS
+// ===============================
+
+function createGrid() {
+   grid.innerHTML = '';
+   cells = [];
+
+   for (let i = 0; i < GRID_SIZE; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = i;
+      grid.appendChild(cell);
+      cells.push(cell);
+   }
+}
+
+function getFreeCells() {
+   const occupied = items.map((item) => item.cellIndex);
+   return cells.filter((_, index) => !occupied.includes(index));
+}
+
+function isGridFull() {
+   return items.length >= GRID_SIZE;
+}
+
+function getLevelVisual(level) {
+   const colorIndex = (level - 1) % LEVEL_COLORS.length;
+   const cycle = Math.floor((level - 1) / LEVEL_COLORS.length);
+   const color = LEVEL_COLORS[colorIndex];
+
+   return {
+      bg: color.bg,
+      text: color.text,
+      cycle,
+   };
 }
 
 function getLevelShadow(cycle, isGolden) {
@@ -370,94 +344,6 @@ function getLevelShadow(cycle, isGolden) {
    const goldenShadow = isGolden ? '0 0 0 3px #ffd84d, 0 0 18px #ffd84d' : '';
 
    return [goldenShadow, cycleShadow, baseShadow].filter(Boolean).join(',');
-}
-
-function updateSpawnProgressBar() {
-   const total = getSpawnTime();
-
-   spawnProgress += SPAWN_TICK_RATE;
-
-   if (spawnProgress >= total) {
-      spawnProgress = total;
-
-      if (!isGridFull()) {
-         spawnObjects();
-         spawnProgress = 0;
-      }
-   }
-
-   updateSpawnBarVisual();
-}
-
-function updateSpawnBarVisual() {
-   const total = getSpawnTime();
-   const remaining = Math.max(0, total - spawnProgress);
-   const progress = Math.min(100, (spawnProgress / total) * 100);
-
-   spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
-   spawnProgressFill.style.width = `${progress}%`;
-}
-
-function showSpawnPopup(message, type = '') {
-   spawnPopup.innerHTML = message;
-   spawnPopup.className = `spawnPopup ${type}`;
-
-   spawnPopup.classList.remove('show');
-   void spawnPopup.offsetWidth;
-   spawnPopup.classList.add('show');
-}
-
-function showLevelUpPopup(oldLevel, newLevel, reward) {
-   levelUpPopup.innerHTML = `
-         Nível ${oldLevel} → Nível ${newLevel}
-         <small>+${reward} estilhaços!</small>
-      `;
-
-   levelUpPopup.classList.remove('show');
-   void levelUpPopup.offsetWidth;
-   levelUpPopup.classList.add('show');
-}
-
-function addMergeProgress() {
-   mergeProgress++;
-
-   if (mergeProgress >= mergesNeeded) {
-      mergeProgress -= mergesNeeded;
-
-      const oldLevel = playerLevel;
-      playerLevel++;
-
-      const reward = getShardsReward();
-      shards += reward;
-
-      showLevelUpPopup(oldLevel, playerLevel, reward);
-
-      mergesNeeded = getNextMergeRequirement();
-
-      clearTimeout(saveTextTimer);
-      saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
-
-      saveTextTimer = setTimeout(() => {
-         saveStatus.innerHTML = 'Salvamento automático <strong>ativo</strong>';
-      }, 1600);
-   }
-
-   updateUI();
-   saveGame(true);
-}
-
-function getFreeCells() {
-   const occupied = items.map((item) => item.cellIndex);
-   return cells.filter((_, index) => !occupied.includes(index));
-}
-
-function isGridFull() {
-   return items.length >= GRID_SIZE;
-}
-
-function getCycleRoman(cycle) {
-   const roman = ['', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-   return roman[cycle] ?? `${cycle + 1}`;
 }
 
 function updateItemElement(item) {
@@ -527,6 +413,68 @@ function createItem(
    return true;
 }
 
+function clearAllItems() {
+   items.forEach((item) => item.element.remove());
+   items = [];
+}
+
+function upgradeOldItemsToStartLevel() {
+   const startLevel = getStartLevel();
+   let changed = false;
+
+   items.forEach((item) => {
+      if (item.level < startLevel) {
+         item.level = startLevel;
+         updateItemElement(item);
+         changed = true;
+      }
+   });
+
+   if (changed) {
+      updateUI();
+      saveGame(true);
+   }
+}
+
+// ===============================
+// 8. SPAWN
+// ===============================
+
+function updateSpawnProgressBar() {
+   const total = getSpawnTime();
+
+   spawnProgress += SPAWN_TICK_RATE;
+
+   if (spawnProgress >= total) {
+      spawnProgress = total;
+
+      if (!isGridFull()) {
+         spawnObjects();
+         spawnProgress = 0;
+      }
+   }
+
+   updateSpawnBarVisual();
+}
+
+function updateSpawnBarVisual() {
+   const total = getSpawnTime();
+   const remaining = Math.max(0, total - spawnProgress);
+   const progress = Math.min(100, (spawnProgress / total) * 100);
+
+   spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
+   spawnProgressFill.style.width = `${progress}%`;
+}
+
+function showSpawnPopup(message, type = '') {
+   spawnPopup.innerHTML = message;
+   spawnPopup.className = `spawnPopup ${type}`;
+
+   spawnPopup.classList.remove('show');
+   void spawnPopup.offsetWidth;
+   spawnPopup.classList.add('show');
+}
+
 function spawnObjects() {
    if (isGridFull()) return false;
 
@@ -562,6 +510,10 @@ function restartSpawnTimer() {
    spawnProgress = 0;
    updateSpawnBarVisual();
 }
+
+// ===============================
+// 9. DRAG AND DROP
+// ===============================
 
 function addDragEvents(item) {
    item.element.addEventListener('pointerdown', (event) => {
@@ -625,6 +577,10 @@ function resetDraggedStyles() {
    draggedItem.element.style.height = '';
 }
 
+// ===============================
+// 10. EFEITOS VISUAIS
+// ===============================
+
 function getElementCenter(element) {
    const rect = element.getBoundingClientRect();
    return {
@@ -656,6 +612,44 @@ function flashError(targetItem, targetCell) {
    }, 360);
 }
 
+function showLevelUpPopup(oldLevel, newLevel, reward) {
+   levelUpPopup.innerHTML = `
+         Nível ${oldLevel} → Nível ${newLevel}
+         <small>+${reward} estilhaços!</small>
+      `;
+
+   levelUpPopup.classList.remove('show');
+   void levelUpPopup.offsetWidth;
+   levelUpPopup.classList.add('show');
+}
+
+function shouldShowMoneyPopup(isDoubleTick, item) {
+   const compactMode = window.innerHeight <= 760 || window.innerWidth <= 520;
+
+   if (!compactMode) return true;
+
+   // Eventos especiais continuam tendo destaque.
+   if (isDoubleTick || item.isGolden) return true;
+
+   // Em modo compacto, mostra só parte dos popups comuns.
+   return Math.random() < 0.35;
+}
+
+function createMoneyPopup(item, amount, isDoubleTick) {
+   const rect = item.element.getBoundingClientRect();
+   const popup = document.createElement('div');
+   popup.className = `moneyPopup ${isDoubleTick ? 'double' : ''} ${item.isGolden ? 'goldenText' : ''}`;
+   popup.textContent = `+${formatMoney(amount)}/s${isDoubleTick ? ' 2x!' : ''}`;
+   popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
+   popup.style.top = `${rect.top - 4}px`;
+   document.body.appendChild(popup);
+   setTimeout(() => popup.remove(), 900);
+}
+
+// ===============================
+// 11. MERGE, LEVEL E ECONOMIA
+// ===============================
+
 function mergeItems(targetItem) {
    const newLevel = draggedItem.level + 1;
    const targetCellIndex = targetItem.cellIndex;
@@ -683,27 +677,76 @@ function mergeItems(targetItem) {
    saveGame();
 }
 
-function buyUpgrade(key) {
-   const cost = getUpgradeCost(key);
-   if (money < cost) return;
+function addMergeProgress() {
+   mergeProgress++;
 
-   money -= cost;
-   upgrades[key].level++;
+   if (mergeProgress >= mergesNeeded) {
+      mergeProgress -= mergesNeeded;
 
-   if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
-   if (key === 'startLevel') {
-      const oldStartLevel = getStartLevel() - 1;
+      const oldLevel = playerLevel;
+      playerLevel++;
 
-      upgradeOldItemsToStartLevel();
+      const reward = getShardsReward();
+      shards += reward;
 
-      showSpawnPopup(
-         `⬆️ Formas melhoradas! Lv ${oldStartLevel} → Lv ${getStartLevel()}`,
-         'upgrade',
-         1200,
-      );
+      showLevelUpPopup(oldLevel, playerLevel, reward);
+
+      mergesNeeded = getNextMergeRequirement();
+
+      clearTimeout(saveTextTimer);
+      saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
+
+      saveTextTimer = setTimeout(() => {
+         saveStatus.innerHTML = 'Salvamento automático <strong>ativo</strong>';
+      }, 1600);
    }
+
    updateUI();
    saveGame(true);
+}
+
+function incomeTick() {
+   items.forEach((item) => {
+      const base = getBaseItemValue(item.level);
+      const goldenMultiplier = item.isGolden ? 2 : 1;
+      const isDoubleTick = Math.random() < getDoubleMoneyChance();
+      const tickMultiplier = isDoubleTick ? 2 : 1;
+      const gained =
+         base * goldenMultiplier * tickMultiplier * getShardMultiplier();
+
+      money += gained;
+
+      if (shouldShowMoneyPopup(isDoubleTick, item)) {
+         createMoneyPopup(item, gained, isDoubleTick);
+      }
+   });
+
+   updateUI();
+   saveGame();
+}
+
+// ===============================
+// 12. INTERFACE E RENDERIZAÇÃO
+// ===============================
+
+function updateUI() {
+   moneyEl.textContent = formatMoney(money);
+   incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
+   shardsEl.textContent = formatShards(shards);
+   shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ${formatShards(shards)}`;
+   spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
+   startLevelStat.textContent = `Lv ${getStartLevel()}`;
+   doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
+   doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
+   goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
+   multiplierStat.textContent = `${getShardMultiplier().toFixed(1)}x`;
+   itemsStat.textContent = `${items.length}/16`;
+   levelStat.textContent = playerLevel;
+   playerLevelEl.textContent = playerLevel;
+   levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} combinações`;
+   levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
+   levelBonusText.innerHTML = `Multiplicador por estilhaços: <strong>${getShardMultiplier().toFixed(1)}x</strong>`;
+   renderUpgrades();
 }
 
 function getUpgradeEffectText(key) {
@@ -762,48 +805,32 @@ function renderUpgrades() {
    });
 }
 
-function shouldShowMoneyPopup(isDoubleTick, item) {
-   const compactMode = window.innerHeight <= 760 || window.innerWidth <= 520;
+function buyUpgrade(key) {
+   const cost = getUpgradeCost(key);
+   if (money < cost) return;
 
-   if (!compactMode) return true;
+   money -= cost;
+   upgrades[key].level++;
 
-   // Eventos especiais continuam tendo destaque.
-   if (isDoubleTick || item.isGolden) return true;
+   if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
+   if (key === 'startLevel') {
+      const oldStartLevel = getStartLevel() - 1;
 
-   // Em modo compacto, mostra só parte dos popups comuns.
-   return Math.random() < 0.35;
-}
+      upgradeOldItemsToStartLevel();
 
-function createMoneyPopup(item, amount, isDoubleTick) {
-   const rect = item.element.getBoundingClientRect();
-   const popup = document.createElement('div');
-   popup.className = `moneyPopup ${isDoubleTick ? 'double' : ''} ${item.isGolden ? 'goldenText' : ''}`;
-   popup.textContent = `+${formatMoney(amount)}/s${isDoubleTick ? ' 2x!' : ''}`;
-   popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
-   popup.style.top = `${rect.top - 4}px`;
-   document.body.appendChild(popup);
-   setTimeout(() => popup.remove(), 900);
-}
-
-function incomeTick() {
-   items.forEach((item) => {
-      const base = getBaseItemValue(item.level);
-      const goldenMultiplier = item.isGolden ? 2 : 1;
-      const isDoubleTick = Math.random() < getDoubleMoneyChance();
-      const tickMultiplier = isDoubleTick ? 2 : 1;
-      const gained =
-         base * goldenMultiplier * tickMultiplier * getShardMultiplier();
-
-      money += gained;
-
-      if (shouldShowMoneyPopup(isDoubleTick, item)) {
-         createMoneyPopup(item, gained, isDoubleTick);
-      }
-   });
-
+      showSpawnPopup(
+         `⬆️ Formas melhoradas! Lv ${oldStartLevel} → Lv ${getStartLevel()}`,
+         'upgrade',
+         1200,
+      );
+   }
    updateUI();
-   saveGame();
+   saveGame(true);
 }
+
+// ===============================
+// 13. SALVAMENTO
+// ===============================
 
 function saveGame(showText = false) {
    const saveData = {
@@ -868,74 +895,6 @@ function loadGame() {
    }
 }
 
-settingsTabs.forEach((tab) => {
-   tab.addEventListener('click', () => {
-      const selectedTab = tab.dataset.tab;
-
-      settingsTabs.forEach((item) => item.classList.remove('active'));
-      settingsContents.forEach((content) => content.classList.remove('active'));
-
-      tab.classList.add('active');
-      document.getElementById(`tab-${selectedTab}`).classList.add('active');
-   });
-});
-
-document.addEventListener('pointermove', (event) => {
-   if (!draggedItem) return;
-
-   moveDraggedItem(event.clientX, event.clientY);
-   clearHighlights();
-
-   const cell = getCellUnderPointer(event.clientX, event.clientY);
-   if (!cell) return;
-
-   const targetItem = getItemByCellIndex(Number(cell.dataset.index));
-   if (targetItem && targetItem.level === draggedItem.level) {
-      cell.classList.add('highlight');
-   }
-});
-
-document.addEventListener('pointerup', (event) => {
-   if (!draggedItem) return;
-
-   const cell = getCellUnderPointer(event.clientX, event.clientY);
-   clearHighlights();
-
-   if (!cell) {
-      returnToOriginalCell();
-      draggedItem = null;
-      return;
-   }
-
-   const targetCellIndex = Number(cell.dataset.index);
-   const targetItem = getItemByCellIndex(targetCellIndex);
-
-   if (targetItem && targetItem.level === draggedItem.level) {
-      mergeItems(targetItem);
-      return;
-   }
-
-   if (targetItem && targetItem.level !== draggedItem.level) {
-      flashError(targetItem, cell);
-      returnToOriginalCell();
-      draggedItem = null;
-      return;
-   }
-
-   if (!targetItem) {
-      cell.appendChild(draggedItem.element);
-      draggedItem.cellIndex = targetCellIndex;
-      resetDraggedStyles();
-      draggedItem = null;
-      updateUI();
-      saveGame();
-      return;
-   }
-
-   returnToOriginalCell();
-   draggedItem = null;
-});
-
 function resetGame() {
    money = 0;
    shards = 0;
@@ -956,20 +915,38 @@ function resetGame() {
    saveGame(true);
 }
 
-resetInsideBtn.addEventListener('click', resetGame);
+// ===============================
+// 14. DEV TOOLS
+// ===============================
 
-openSettingsBtn.addEventListener('click', () => {
-   settingsPanel.classList.add('active');
-   settingsOverlay.classList.add('active');
-});
+function unlockDevTools() {
+   const typedPassword = devPasswordInput.value;
 
-function closeSettingsPanel() {
-   settingsPanel.classList.remove('active');
-   settingsOverlay.classList.remove('active');
+   if (typedPassword !== DEV_PASSWORD) {
+      devErrorText.textContent = 'Senha incorreta.';
+      devPasswordInput.value = '';
+      return;
+   }
+
+   devErrorText.textContent = '';
+   devLoginSection.style.display = 'none';
+   devContent.classList.remove('locked');
 }
 
-closeSettingsBtn.addEventListener('click', closeSettingsPanel);
-settingsOverlay.addEventListener('click', closeSettingsPanel);
+function devRefresh() {
+   updateUI();
+   updateSpawnBarVisual?.();
+   saveGame(true);
+}
+
+function devSetSpawnToMinimum() {
+   const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 50);
+   upgrades.spawnSpeed.level = Math.max(upgrades.spawnSpeed.level, neededLevel);
+}
+
+// ===============================
+// 15. EVENTOS DEV TOOLS
+// ===============================
 
 devAddPolygons1K.addEventListener('click', () => {
    money += 1000;
@@ -1064,6 +1041,93 @@ devPasswordInput.addEventListener('keydown', (event) => {
    }
 });
 
+// ===============================
+// 16. EVENTOS DE INTERFACE
+// ===============================
+
+settingsTabs.forEach((tab) => {
+   tab.addEventListener('click', () => {
+      const selectedTab = tab.dataset.tab;
+
+      settingsTabs.forEach((item) => item.classList.remove('active'));
+      settingsContents.forEach((content) => content.classList.remove('active'));
+
+      tab.classList.add('active');
+      document.getElementById(`tab-${selectedTab}`).classList.add('active');
+   });
+});
+
+document.addEventListener('pointermove', (event) => {
+   if (!draggedItem) return;
+
+   moveDraggedItem(event.clientX, event.clientY);
+   clearHighlights();
+
+   const cell = getCellUnderPointer(event.clientX, event.clientY);
+   if (!cell) return;
+
+   const targetItem = getItemByCellIndex(Number(cell.dataset.index));
+   if (targetItem && targetItem.level === draggedItem.level) {
+      cell.classList.add('highlight');
+   }
+});
+
+document.addEventListener('pointerup', (event) => {
+   if (!draggedItem) return;
+
+   const cell = getCellUnderPointer(event.clientX, event.clientY);
+   clearHighlights();
+
+   if (!cell) {
+      returnToOriginalCell();
+      draggedItem = null;
+      return;
+   }
+
+   const targetCellIndex = Number(cell.dataset.index);
+   const targetItem = getItemByCellIndex(targetCellIndex);
+
+   if (targetItem && targetItem.level === draggedItem.level) {
+      mergeItems(targetItem);
+      return;
+   }
+
+   if (targetItem && targetItem.level !== draggedItem.level) {
+      flashError(targetItem, cell);
+      returnToOriginalCell();
+      draggedItem = null;
+      return;
+   }
+
+   if (!targetItem) {
+      cell.appendChild(draggedItem.element);
+      draggedItem.cellIndex = targetCellIndex;
+      resetDraggedStyles();
+      draggedItem = null;
+      updateUI();
+      saveGame();
+      return;
+   }
+
+   returnToOriginalCell();
+   draggedItem = null;
+});
+
+resetInsideBtn.addEventListener('click', resetGame);
+
+openSettingsBtn.addEventListener('click', () => {
+   settingsPanel.classList.add('active');
+   settingsOverlay.classList.add('active');
+});
+
+function closeSettings() {
+   settingsPanel.classList.remove('active');
+   settingsOverlay.classList.remove('active');
+}
+
+closeSettingsBtn.addEventListener('click', closeSettings);
+settingsOverlay.addEventListener('click', closeSettings);
+
 openShopBtn.addEventListener('click', () => {
    shop.classList.add('active');
    shopOverlay.classList.add('active');
@@ -1076,6 +1140,10 @@ function closeShop() {
 
 closeShopBtn.addEventListener('click', closeShop);
 shopOverlay.addEventListener('click', closeShop);
+
+// ===============================
+// 17. INICIALIZAÇÃO DO JOGO
+// ===============================
 
 setInterval(incomeTick, 1000);
 setInterval(updateSpawnProgressBar, 100);
