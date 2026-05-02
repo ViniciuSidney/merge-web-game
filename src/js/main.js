@@ -5,8 +5,6 @@ import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
 
 import { state } from './state.js';
 
-import { resetUpgrades } from './upgrades.js';
-
 import { createGrid, createItem } from './grid.js';
 
 import { updateSpawnProgressBar, updateSpawnBarVisual, restartSpawnTimer } from './spawn.js';
@@ -92,37 +90,19 @@ function handleBuyUpgrade(key) {
    buyUpgrade(key, getShopActionsContext());
 }
 
-import { saveGame, loadGame, clearSave } from './save.js';
-function resetGame() {
-   state.money = 0;
-   state.shards = 0;
-   state.playerLevel = 1;
-   state.mergeProgress = 0;
-   state.mergesNeeded = 5;
+import { saveGame, loadGame } from './save.js';
 
-   state.items.forEach((item) => item.element.remove());
-   state.items = [];
-
-   resetUpgrades();
-   clearSave();
-
-   createItem({
-      level: 1,
-      forcedGolden: false,
-      onCreated: addDragEvents,
-   });
-   createItem({
-      level: 1,
-      forcedGolden: false,
-      onCreated: addDragEvents,
-   });
-   restartSpawnTimer(getSpawnContext());
-   updateUI(getUIContext());
-
-   saveGame({
-      showText: true,
+import { resetGame } from './gameActions.js';
+function getGameActionsContext() {
+   return {
+      onItemCreated: addDragEvents,
+      onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
+      onUpdateUI: () => updateUI(getUIContext()),
       saveStatus: DOM.game.saveStatus,
-   });
+   };
+}
+function handleResetGame() {
+   resetGame(getGameActionsContext());
 }
 
 import { setupDevTools } from './devTools.js';
@@ -196,7 +176,7 @@ function getBoardInputContext() {
    };
 }
 
-DOM.settings.resetBtn.addEventListener('click', resetGame);
+DOM.settings.resetBtn.addEventListener('click', handleResetGame);
 
 // ===============================
 // INICIALIZAÇÃO DO JOGO
