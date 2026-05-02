@@ -163,86 +163,22 @@ import {
 // 8. SPAWN
 // ===============================
 
-function updateSpawnProgressBar() {
-   const total = getSpawnTime();
+import {
+   updateSpawnProgressBar,
+   updateSpawnBarVisual,
+   showSpawnPopup,
+   applySpawnSpeedUpgrade,
+   restartSpawnTimer,
+} from './spawn.js';
 
-   state.spawnProgress += SPAWN_TICK_RATE;
-
-   if (state.spawnProgress >= total) {
-      state.spawnProgress = total;
-
-      if (!isGridFull()) {
-         spawnObjects();
-         state.spawnProgress = 0;
-      }
-   }
-
-   updateSpawnBarVisual();
-}
-
-function updateSpawnBarVisual() {
-   const total = getSpawnTime();
-   const remaining = Math.max(0, total - state.spawnProgress);
-   const progress = Math.min(100, (state.spawnProgress / total) * 100);
-
-   spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
-   spawnProgressFill.style.width = `${progress}%`;
-}
-
-function showSpawnPopup(message, type = '') {
-   spawnPopup.innerHTML = message;
-   spawnPopup.className = `spawnPopup ${type}`;
-
-   spawnPopup.classList.remove('show');
-   void spawnPopup.offsetWidth;
-   spawnPopup.classList.add('show');
-}
-
-function spawnObjects() {
-   if (isGridFull()) return false;
-
-   const firstSpawned = createItem({
-      onCreated: addDragEvents,
-      onGoldenSpawn: () => showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
-   });
-
-   const canDoubleSpawn =
-      !isGridFull() && Math.random() < getDoubleSpawnChance();
-
-   if (canDoubleSpawn) {
-      createItem({
-         onCreated: addDragEvents,
-         onGoldenSpawn: () =>
-            showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
-      });
-
-      showSpawnPopup(TEXTS.spawn.doubleDelivery, 'double');
-   }
-
-   updateUI();
-   saveGame();
-
-   return Boolean(firstSpawned);
-}
-
-function applySpawnSpeedUpgrade() {
-   const total = getSpawnTime();
-
-   if (state.spawnProgress >= total) {
-      state.spawnProgress = total;
-
-      if (!isGridFull()) {
-         spawnObjects();
-         state.spawnProgress = 0;
-      }
-   }
-
-   updateSpawnBarVisual();
-}
-
-function restartSpawnTimer() {
-   state.spawnProgress = 0;
-   updateSpawnBarVisual();
+function getSpawnContext() {
+   return {
+      spawnProgressText,
+      spawnProgressFill,
+      spawnPopupElement: spawnPopup,
+      onItemCreated: addDragEvents,
+      onUpdateUI: updateUI,
+   };
 }
 
 // ===============================
@@ -511,7 +447,7 @@ function buyUpgrade(key) {
    state.money -= cost;
    increaseUpgradeLevel(key);
 
-   if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
+   if (key === 'spawnSpeed') applySpawnSpeedUpgrade(getSpawnContext());
 
    if (key === 'startLevel') {
       const oldStartLevel = getStartLevel() - 1;
@@ -527,6 +463,7 @@ function buyUpgrade(key) {
       });
 
       showSpawnPopup(
+         spawnPopup,
          TEXTS.spawn.upgradedForms(oldStartLevel, getStartLevel()),
          'upgrade',
       );
@@ -569,9 +506,9 @@ function resetGame() {
       forcedGolden: false,
       onCreated: addDragEvents,
    });
-   restartSpawnTimer();
+   restartSpawnTimer(getSpawnContext());
    updateUI();
-   
+
    saveGame({
       showText: true,
       saveStatus,
@@ -598,7 +535,7 @@ function unlockDevTools() {
 
 function devRefresh() {
    updateUI();
-   updateSpawnBarVisual();
+   updateSpawnBarVisual(getSpawnContext());
    saveGame({
       showText: true,
       saveStatus,
@@ -667,7 +604,7 @@ devClearGrid.addEventListener('click', () => {
 
 devMaxSpawnSpeed.addEventListener('click', () => {
    setSpawnSpeedToMinimum();
-   restartSpawnTimer();
+   restartSpawnTimer(getSpawnContext());
    devRefresh();
 });
 
@@ -681,7 +618,7 @@ devLevelUpForm.addEventListener('click', () => {
 
 devResetUpgrades.addEventListener('click', () => {
    resetUpgrades();
-   restartSpawnTimer();
+   restartSpawnTimer(getSpawnContext());
    devRefresh();
 });
 
@@ -691,7 +628,7 @@ devAllUpgrades5.addEventListener('click', () => {
    upgradeOldItemsToStartLevel({
       onChanged: devRefresh,
    });
-   restartSpawnTimer();
+   restartSpawnTimer(getSpawnContext());
    devRefresh();
 });
 
@@ -819,7 +756,9 @@ shopOverlay.addEventListener('click', closeShop);
 // ===============================
 
 setInterval(incomeTick, MONEY_TICK_INTERVAL);
-setInterval(updateSpawnProgressBar, SPAWN_TICK_RATE);
+setInterval(() => {
+   updateSpawnProgressBar(getSpawnContext());
+}, SPAWN_TICK_RATE);
 
 createGrid(grid);
 const loaded = loadGame({
@@ -839,6 +778,7 @@ if (!loaded || state.items.length === 0) {
    });
 }
 
-restartSpawnTimer();
+restartSpawnTimer(getSpawnContext());
 updateUI();
-updateSpawnProgressBar();
+
+updateSpawnProgressBar(getSpawnContext());
