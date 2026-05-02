@@ -107,24 +107,19 @@ import { state } from './state.js';
 
 import { UPGRADE_CONFIGS } from './upgradeConfig.js';
 
-function createInitialUpgrades() {
-   return Object.fromEntries(
-      Object.entries(UPGRADE_CONFIGS).map(([key, config]) => [
-         key,
-         {
-            ...config,
-            level: 0,
-         },
-      ]),
-   );
-}
-
-const upgrades = createInitialUpgrades();
-
-function increaseUpgradeLevel(key, amount = 1) {
-   if (!upgrades[key]) return;
-   upgrades[key].level += amount;
-}
+import {
+   upgrades,
+   resetUpgrades,
+   increaseUpgradeLevel,
+   setAllUpgradesLevel,
+   getUpgradeCost,
+   getSpawnTime,
+   getStartLevel,
+   getDoubleSpawnChance,
+   getDoubleMoneyChance,
+   getGoldenChance,
+   setSpawnSpeedToMinimum,
+} from './upgrades.js';
 
 // ===============================
 // 5. FUNÇÕES UTILITÁRIAS
@@ -151,54 +146,6 @@ function getShardsReward() {
 
 function getNextMergeRequirement() {
    return Math.ceil(state.mergesNeeded * MERGE_REQUIREMENT_MULTIPLIER);
-}
-
-function getUpgradeCost(key) {
-   const upgrade = upgrades[key];
-   let cost = upgrade.baseCost;
-
-   const baseMultiplier = upgrade.multiplier ?? 2;
-   const tenMultiplier = upgrade.tenMultiplier ?? 4;
-
-   for (let i = 1; i <= upgrade.level; i++) {
-      if (!upgrade.noTenMultiplier && i % 10 === 0) {
-         cost *= tenMultiplier;
-      } else {
-         cost *= baseMultiplier;
-      }
-   }
-
-   return Math.floor(cost);
-}
-
-function getSpawnTime() {
-   const reduction = upgrades.spawnSpeed.level * 100;
-   return Math.max(2000, BASE_SPAWN_TIME - reduction);
-}
-
-function getStartLevel() {
-   return 1 + upgrades.startLevel.level;
-}
-
-function getDoubleSpawnChance() {
-   return Math.min(
-      MAX_CHANCE,
-      upgrades.doubleSpawn.level * UPGRADE_CHANCE_STEP,
-   );
-}
-
-function getDoubleMoneyChance() {
-   return Math.min(
-      MAX_CHANCE,
-      upgrades.doubleMoney.level * UPGRADE_CHANCE_STEP,
-   );
-}
-
-function getGoldenChance() {
-   return Math.min(
-      MAX_CHANCE,
-      upgrades.goldenChance.level * UPGRADE_CHANCE_STEP,
-   );
 }
 
 function getBaseItemValue(level) {
@@ -708,6 +655,7 @@ function buyUpgrade(key) {
    increaseUpgradeLevel(key);
 
    if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
+
    if (key === 'startLevel') {
       const oldStartLevel = getStartLevel() - 1;
 
@@ -718,6 +666,7 @@ function buyUpgrade(key) {
          'upgrade',
       );
    }
+
    updateUI();
    saveGame(true);
 }
@@ -814,12 +763,6 @@ function resetGame() {
 // 14. DEV TOOLS
 // ===============================
 
-function resetUpgrades() {
-   Object.values(upgrades).forEach((upgrade) => {
-      upgrade.level = 0;
-   });
-}
-
 function unlockDevTools() {
    const typedPassword = devPasswordInput.value;
 
@@ -838,11 +781,6 @@ function devRefresh() {
    updateUI();
    updateSpawnBarVisual();
    saveGame(true);
-}
-
-function devSetSpawnToMinimum() {
-   const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 100);
-   upgrades.spawnSpeed.level = Math.max(upgrades.spawnSpeed.level, neededLevel);
 }
 
 // ===============================
@@ -893,7 +831,7 @@ devClearGrid.addEventListener('click', () => {
 });
 
 devMaxSpawnSpeed.addEventListener('click', () => {
-   devSetSpawnToMinimum();
+   setSpawnSpeedToMinimum();
    restartSpawnTimer();
    devRefresh();
 });
@@ -911,9 +849,7 @@ devResetUpgrades.addEventListener('click', () => {
 });
 
 devAllUpgrades5.addEventListener('click', () => {
-   Object.values(upgrades).forEach((upgrade) => {
-      upgrade.level = 5;
-   });
+   setAllUpgradesLevel(5);
 
    upgradeOldItemsToStartLevel();
    restartSpawnTimer();
