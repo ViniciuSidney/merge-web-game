@@ -153,37 +153,6 @@ function getSpawnContext() {
    };
 }
 
-function getDevToolsContext() {
-   return {
-      devAddPolygonsSmall,
-      devAddPolygonsBig,
-      devAddShardsSmall,
-      devAddShardsBig,
-      devSpawnOne,
-      devSpawnGolden,
-      devFillGrid,
-      devClearGrid,
-      devMaxSpawnSpeed,
-      devLevelUpForm,
-      devResetUpgrades,
-      devAllUpgrades5,
-      devAddMerge,
-      devForceLevelUp,
-      devLoginBtn,
-      devPasswordInput,
-      devErrorText,
-      devLoginSection,
-      devContent,
-
-      spawnPopup,
-
-      onItemCreated: addDragEvents,
-      onRefresh: devRefresh,
-      onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
-      onAddMergeProgress: addMergeProgress,
-   };
-}
-
 // ===============================
 // 9. DRAG AND DROP
 // ===============================
@@ -426,21 +395,59 @@ function devRefresh() {
    });
 }
 
+function getDevToolsContext() {
+   return {
+      devAddPolygonsSmall,
+      devAddPolygonsBig,
+      devAddShardsSmall,
+      devAddShardsBig,
+      devSpawnOne,
+      devSpawnGolden,
+      devFillGrid,
+      devClearGrid,
+      devMaxSpawnSpeed,
+      devLevelUpForm,
+      devResetUpgrades,
+      devAllUpgrades5,
+      devAddMerge,
+      devForceLevelUp,
+      devLoginBtn,
+      devPasswordInput,
+      devErrorText,
+      devLoginSection,
+      devContent,
+
+      spawnPopup,
+
+      onItemCreated: addDragEvents,
+      onRefresh: devRefresh,
+      onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
+      onAddMergeProgress: addMergeProgress,
+   };
+}
+
 // ===============================
 // 16. EVENTOS DE INTERFACE
 // ===============================
 
-settingsTabs.forEach((tab) => {
-   tab.addEventListener('click', () => {
-      const selectedTab = tab.dataset.tab;
+import { setupPanels } from './panels.js';
 
-      settingsTabs.forEach((item) => item.classList.remove('active'));
-      settingsContents.forEach((content) => content.classList.remove('active'));
+function getPanelsContext() {
+   return {
+      settingsTabs,
+      settingsContents,
 
-      tab.classList.add('active');
-      document.getElementById(`tab-${selectedTab}`).classList.add('active');
-   });
-});
+      openSettingsBtn,
+      closeSettingsBtn,
+      settingsPanel,
+      settingsOverlay,
+
+      openShopBtn,
+      closeShopBtn,
+      shop,
+      shopOverlay,
+   };
+}
 
 document.addEventListener('pointermove', (event) => {
    if (!state.draggedItem) return;
@@ -501,36 +508,11 @@ document.addEventListener('pointerup', (event) => {
 
 resetInsideBtn.addEventListener('click', resetGame);
 
-openSettingsBtn.addEventListener('click', () => {
-   settingsPanel.classList.add('active');
-   settingsOverlay.classList.add('active');
-});
-
-function closeSettings() {
-   settingsPanel.classList.remove('active');
-   settingsOverlay.classList.remove('active');
-}
-
-closeSettingsBtn.addEventListener('click', closeSettings);
-settingsOverlay.addEventListener('click', closeSettings);
-
-openShopBtn.addEventListener('click', () => {
-   shop.classList.add('active');
-   shopOverlay.classList.add('active');
-});
-
-function closeShop() {
-   shop.classList.remove('active');
-   shopOverlay.classList.remove('active');
-}
-
-closeShopBtn.addEventListener('click', closeShop);
-shopOverlay.addEventListener('click', closeShop);
-
 // ===============================
 // 17. INICIALIZAÇÃO DO JOGO
 // ===============================
 
+setupPanels(getPanelsContext());
 setupDevTools(getDevToolsContext());
 
 setInterval(incomeTick, MONEY_TICK_INTERVAL);
