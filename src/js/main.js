@@ -206,54 +206,71 @@ let saveTextTimer = null;
 // 4. CONFIGURAÇÕES DE UPGRADES
 // ===============================
 
-const upgrades = {
+const UPGRADE_CONFIGS = {
    spawnSpeed: {
       name: 'Esteira mais rápida',
       description:
          'Diminui o tempo de espera para gerar novos objetos em 0.1s por nível.',
-      level: 0,
       baseCost: 2000,
       multiplier: 2,
       tenMultiplier: 4,
    },
+
    startLevel: {
       name: 'Forma melhorada',
       description: 'Faz com que os objetos comecem 1 nível acima.',
-      level: 0,
       baseCost: 5000,
       multiplier: 5,
       tenMultiplier: 10,
    },
+
    doubleSpawn: {
       name: 'Entrega dupla',
       description:
          'Aumenta em 2% por nível a chance de nascerem 2 objetos ao mesmo tempo.',
-      level: 0,
       baseCost: 1500,
       multiplier: 2,
       tenMultiplier: 4,
    },
+
    doubleMoney: {
       name: 'Momento valioso',
       description:
          'Aumenta em 2% por nível a chance de um objeto gerar 2x polígonos naquele momento.',
-      level: 0,
       baseCost: 2000,
       multiplier: 2,
       tenMultiplier: 4,
    },
+
    goldenChance: {
       name: 'Objeto dourado',
       description:
          'Aumenta em 2% por nível a chance de nascer um objeto dourado.',
-      level: 0,
       baseCost: 10000,
       multiplier: 4,
       tenMultiplier: 8,
-      //noTenMultiplier: true,
       golden: true,
    },
 };
+
+function createInitialUpgrades() {
+   return Object.fromEntries(
+      Object.entries(UPGRADE_CONFIGS).map(([key, config]) => [
+         key,
+         {
+            ...config,
+            level: 0,
+         },
+      ]),
+   );
+}
+
+const upgrades = createInitialUpgrades();
+
+function increaseUpgradeLevel(key, amount = 1) {
+   if (!upgrades[key]) return;
+   upgrades[key].level += amount;
+}
 
 // ===============================
 // 5. FUNÇÕES UTILITÁRIAS
@@ -841,9 +858,11 @@ function updateUI() {
    );
    levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
    levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
-   devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(DEV_ADD_SMALL_MONEY);
+   devAddPolygonsSmall.textContent =
+      TEXTS.dev.addPolygonsSmall(DEV_ADD_SMALL_MONEY);
    devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(DEV_ADD_BIG_MONEY);
-   devAddShardsSmall.textContent = TEXTS.dev.addShardsSmall(DEV_ADD_SMALL_SHARDS);
+   devAddShardsSmall.textContent =
+      TEXTS.dev.addShardsSmall(DEV_ADD_SMALL_SHARDS);
    devAddShardsBig.textContent = TEXTS.dev.addShardsBig(DEV_ADD_BIG_SHARDS);
    renderUpgrades();
 }
@@ -909,7 +928,7 @@ function buyUpgrade(key) {
    if (money < cost) return;
 
    money -= cost;
-   upgrades[key].level++;
+   increaseUpgradeLevel(key);
 
    if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
    if (key === 'startLevel') {
@@ -1006,6 +1025,7 @@ function resetGame() {
    Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
    localStorage.removeItem(SAVE_KEY);
 
+   resetUpgrades();
    createItem(1, null, false);
    createItem(1, null, false);
    restartSpawnTimer();
@@ -1016,6 +1036,12 @@ function resetGame() {
 // ===============================
 // 14. DEV TOOLS
 // ===============================
+
+function resetUpgrades() {
+   Object.values(upgrades).forEach((upgrade) => {
+      upgrade.level = 0;
+   });
+}
 
 function unlockDevTools() {
    const typedPassword = devPasswordInput.value;
@@ -1096,16 +1122,13 @@ devMaxSpawnSpeed.addEventListener('click', () => {
 });
 
 devLevelUpForm.addEventListener('click', () => {
-   upgrades.startLevel.level++;
+   increaseUpgradeLevel('startLevel');
    upgradeOldItemsToStartLevel();
    devRefresh();
 });
 
 devResetUpgrades.addEventListener('click', () => {
-   Object.values(upgrades).forEach((upgrade) => {
-      upgrade.level = 0;
-   });
-
+   resetUpgrades();
    restartSpawnTimer();
    devRefresh();
 });
