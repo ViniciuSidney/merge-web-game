@@ -2,10 +2,10 @@
 // 7. GRID E ITENS
 // ===============================
 
-import { state } from './state.js';
-import { GRID_SIZE, LEVEL_COLORS } from './config.js';
-import { TEXTS } from './texts.js';
-import { getCycleRoman } from './format.js';
+import { state } from '../core/state.js';
+import { GRID_SIZE, LEVEL_COLORS } from '../core/config.js';
+import { TEXTS } from '../core/texts.js';
+import { getCycleRoman } from '../utils/format.js';
 import { getStartLevel, getGoldenChance } from './upgrades.js';
 import { getShardMultiplier } from './economy.js';
 

@@ -8,10 +8,10 @@ import {
    DEV_ADD_BIG_MONEY,
    DEV_ADD_SMALL_SHARDS,
    DEV_ADD_BIG_SHARDS,
-} from './config.js';
+} from '../core/config.js';
 
-import { TEXTS } from './texts.js';
-import { state } from './state.js';
+import { TEXTS } from '../core/texts.js';
+import { state } from '../core/state.js';
 
 import {
    resetUpgrades,
@@ -19,16 +19,16 @@ import {
    setAllUpgradesLevel,
    setSpawnSpeedToMinimum,
    getStartLevel,
-} from './upgrades.js';
+} from '../systems/upgrades.js';
 
 import {
    createItem,
    clearAllItems,
    upgradeOldItemsToStartLevel,
    isGridFull,
-} from './grid.js';
+} from '../systems/grid.js';
 
-import { showSpawnPopup } from './spawn.js';
+import { showSpawnPopup } from '../systems/spawn.js';
 
 export function unlockDevTools({
    devPasswordInput,
@@ -171,14 +171,14 @@ export function setupDevTools({
    });
 
    devAddMerge.addEventListener('click', () => {
-      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
-      onRefresh();
+      onAddMergeProgress: (() => addMergeProgress(getLevelContext()),
+         onRefresh());
    });
 
    devForceLevelUp.addEventListener('click', () => {
       state.mergeProgress = state.mergesNeeded - 1;
-      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
-      onRefresh();
+      onAddMergeProgress: (() => addMergeProgress(getLevelContext()),
+         onRefresh());
    });
 
    devLoginBtn.addEventListener('click', () => {

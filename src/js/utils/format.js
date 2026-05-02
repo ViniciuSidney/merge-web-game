@@ -2,7 +2,7 @@
 // 5. FUNÇÕES UTILITÁRIAS
 // ===============================
 
-import { NUMBER_SUFFIXES } from './config.js';
+import { NUMBER_SUFFIXES } from '../core/config.js';
 
 export function formatShortNumber(value) {
    if (value >= 100) return value.toFixed(0);

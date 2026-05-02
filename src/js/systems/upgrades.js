@@ -2,9 +2,13 @@
 // 12. INTERFACE E RENDERIZAÇÃO (UPGRADES)
 // ===============================
 
-import { UPGRADE_CONFIGS } from './upgradeConfig.js';
+import { UPGRADE_CONFIGS } from '../config/upgradeConfig.js';
 
-import { BASE_SPAWN_TIME, MAX_CHANCE, UPGRADE_CHANCE_STEP } from './config.js';
+import {
+   BASE_SPAWN_TIME,
+   MAX_CHANCE,
+   UPGRADE_CHANCE_STEP,
+} from '../core/config.js';
 
 export const upgrades = createInitialUpgrades();
 

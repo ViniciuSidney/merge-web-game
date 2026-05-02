@@ -2,16 +2,16 @@
 // 8. SPAWN
 // ===============================
 
-import { state } from './state.js';
+import { state } from '../core/state.js';
 
-import { SPAWN_TICK_RATE } from './config.js';
-import { TEXTS } from './texts.js';
+import { SPAWN_TICK_RATE } from '../core/config.js';
+import { TEXTS } from '../core/texts.js';
 
 import { getSpawnTime, getDoubleSpawnChance } from './upgrades.js';
 
 import { createItem, isGridFull } from './grid.js';
 
-import { saveGame } from './save.js';
+import { saveGame } from '../persistence/save.js';
 
 export function showSpawnPopup(spawnPopupElement, message, type = '') {
    spawnPopupElement.innerHTML = message;

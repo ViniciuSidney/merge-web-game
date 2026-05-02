@@ -2,13 +2,13 @@
 // 6. FUNÇÕES DE CÁLCULO (ECONOMIA)
 // ===============================
 
-import { state } from './state.js';
+import { state } from '../core/state.js';
 
 import {
    SHARD_MULTIPLIER_STEP,
    SHARD_REWARD_STEP,
    MERGE_REQUIREMENT_MULTIPLIER,
-} from './config.js';
+} from '../core/config.js';
 
 export function getShardMultiplier() {
    return 1 + state.shards * SHARD_MULTIPLIER_STEP;

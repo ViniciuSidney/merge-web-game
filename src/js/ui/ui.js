@@ -2,16 +2,16 @@
 // UI — INTERFACE E RENDERIZAÇÃO
 // ===============================
 
-import { GRID_SIZE } from './config.js';
+import { GRID_SIZE } from './core/config.js';
 import {
    DEV_ADD_SMALL_MONEY,
    DEV_ADD_BIG_MONEY,
    DEV_ADD_SMALL_SHARDS,
    DEV_ADD_BIG_SHARDS,
-} from './config.js';
+} from './core/config.js';
 
-import { TEXTS } from './texts.js';
-import { state } from './state.js';
+import { TEXTS } from './core/texts.js';
+import { state } from './core/state.js';
 
 import { formatNumber, formatMoney, formatShards } from './format.js';
 

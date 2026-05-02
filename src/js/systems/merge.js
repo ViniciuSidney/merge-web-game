@@ -2,16 +2,16 @@
 // MERGE — COMBINAÇÃO DE ITENS
 // ===============================
 
-import { MERGE_REWARD_MULTIPLIER } from './core/config.js';
-import { state } from './core/state.js';
+import { MERGE_REWARD_MULTIPLIER } from '../core/config.js';
+import { state } from '../core/state.js';
 
-import { createItem, getItemByExactCell } from './systems/grid.js';
+import { createItem, getItemByExactCell } from './grid.js';
 
-import { getBaseItemValue, getShardMultiplier } from './systems/economy.js';
+import { getBaseItemValue, getShardMultiplier } from './economy.js';
 
 import { getElementCenter, createRing } from './effects.js';
 
-import { saveGame } from './persistence/save.js';
+import { saveGame } from '../persistence/save.js';
 
 export function mergeItems(
    targetItem,

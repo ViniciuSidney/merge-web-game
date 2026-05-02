@@ -2,13 +2,13 @@
 // GAME ACTIONS — AÇÕES GERAIS DO JOGO
 // ===============================
 
-import { state } from './state.js';
+import { state } from '../core/state.js';
 
-import { resetUpgrades } from './upgrades.js';
+import { resetUpgrades } from '../systems/upgrades.js';
 
-import { createItem } from './grid.js';
+import { createItem } from '../systems/grid.js';
 
-import { clearSave, saveGame } from './save.js';
+import { clearSave, saveGame } from '../persistence/save.js';
 
 export function resetGame({
    onItemCreated,

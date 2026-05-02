@@ -1,4 +1,3 @@
-
 // ===============================
 // 10. EFEITOS VISUAIS
 // ===============================
@@ -7,9 +6,9 @@ import {
    RING_REMOVE_DELAY,
    ERROR_EFFECT_DURATION,
    MONEY_POPUP_DURATION,
-} from './config.js';
+} from './core/config.js';
 
-import { TEXTS } from './texts.js';
+import { TEXTS } from './core/texts.js';
 import { formatMoney } from './format.js';
 
 export function getElementCenter(element) {

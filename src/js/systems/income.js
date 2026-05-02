@@ -2,15 +2,15 @@
 // INCOME — GANHO PASSIVO
 // ===============================
 
-import { state } from './core/state.js';
+import { state } from '../core/state.js';
 
 import { getDoubleMoneyChance } from './upgrades.js';
 
-import { getBaseItemValue, getShardMultiplier } from './systems/economy.js';
+import { getBaseItemValue, getShardMultiplier } from './economy.js';
 
 import { shouldShowMoneyPopup, createMoneyPopup } from './effects.js';
 
-import { saveGame } from './persistence/save.js';
+import { saveGame } from '../persistence/save.js';
 
 export function incomeTick({ onUpdateUI } = {}) {
    state.items.forEach((item) => {

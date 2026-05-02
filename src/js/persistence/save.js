@@ -2,11 +2,11 @@
 // 13. SALVAMENTO
 // ===============================
 
-import { SAVE_KEY, SAVE_FEEDBACK_DURATION } from './config.js';
-import { TEXTS } from './texts.js';
-import { state } from './state.js';
-import { upgrades } from './upgrades.js';
-import { createItem } from './grid.js';
+import { SAVE_KEY, SAVE_FEEDBACK_DURATION } from '../core/config.js';
+import { TEXTS } from '../core/texts.js';
+import { state } from '../core/state.js';
+import { upgrades } from '../systems/upgrades.js';
+import { createItem } from '../systems/grid.js';
 
 export function saveGame({ showText = false, saveStatus = null } = {}) {
    const saveData = {

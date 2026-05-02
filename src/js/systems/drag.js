@@ -2,7 +2,7 @@
 // 9. DRAG AND DROP
 // ===============================
 
-import { state } from './state.js';
+import { state } from '../core/state.js';
 
 export function addDragEvents(item) {
    item.element.addEventListener('pointerdown', (event) => {

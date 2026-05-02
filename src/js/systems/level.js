@@ -2,14 +2,14 @@
 // LEVEL — PROGRESSÃO DO JOGADOR
 // ===============================
 
-import { LEVEL_UP_FEEDBACK_DURATION } from './core/config.js';
-import { TEXTS } from './core/texts.js';
-import { state } from './core/state.js';
+import { LEVEL_UP_FEEDBACK_DURATION } from '../core/config.js';
+import { TEXTS } from '../core/texts.js';
+import { state } from '../core/state.js';
 
-import { getShardsReward, getNextMergeRequirement } from './systems/economy.js';
+import { getShardsReward, getNextMergeRequirement } from './economy.js';
 
 import { showLevelUpPopup } from './effects.js';
-import { saveGame } from './persistence/save.js';
+import { saveGame } from '../persistence/save.js';
 
 export function addMergeProgress({ levelUpPopup, saveStatus, onUpdateUI }) {
    state.mergeProgress++;

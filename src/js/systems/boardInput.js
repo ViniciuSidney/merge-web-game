@@ -2,7 +2,7 @@
 // BOARD INPUT — INTERAÇÃO COM O TABULEIRO
 // ===============================
 
-import { state } from './state.js';
+import { state } from '../core/state.js';
 
 import {
    moveDraggedItem,

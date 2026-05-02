@@ -1,39 +1,39 @@
 // IMPORTS
-import { DOM } from './dom.js';
+import { DOM } from './core/dom.js';
 
-import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
+import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './core/config.js';
 
-import { state } from './state.js';
+import { state } from './core/state.js';
 
-import { createGrid, createItem } from './grid.js';
+import { createGrid, createItem } from './systems/grid.js';
 
 import {
    updateSpawnProgressBar,
    updateSpawnBarVisual,
    restartSpawnTimer,
-} from './spawn.js';
+} from './systems/spawn.js';
 
-import { addDragEvents } from './drag.js';
+import { addDragEvents } from './systems/drag.js';
 
-import { mergeItems } from './merge.js';
+import { mergeItems } from './systems/merge.js';
 
-import { addMergeProgress } from './level.js';
+import { addMergeProgress } from './systems/level.js';
 
-import { incomeTick } from './income.js';
+import { incomeTick } from './systems/income.js';
 
 import { updateUI } from './ui.js';
 
-import { buyUpgrade } from './shopActions.js';
+import { buyUpgrade } from './actions/shopActions.js';
 
-import { saveGame, loadGame } from './save.js';
+import { saveGame, loadGame } from './persistence/save.js';
 
-import { resetGame } from './gameActions.js';
+import { resetGame } from './actions/gameActions.js';
 
-import { setupDevTools } from './devTools.js';
+import { setupDevTools } from './dev/devTools.js';
 
 import { setupPanels } from './panels.js';
 
-import { setupBoardInput } from './boardInput.js';
+import { setupBoardInput } from './systems/boardInput.js';
 
 // CONTEXTOS
 function getUIContext() {

@@ -2,20 +2,20 @@
 // SHOP ACTIONS — AÇÕES DA LOJA
 // ===============================
 
-import { TEXTS } from './texts.js';
-import { state } from './state.js';
+import { TEXTS } from '../core/texts.js';
+import { state } from '../core/state.js';
 
 import {
    increaseUpgradeLevel,
    getUpgradeCost,
    getStartLevel,
-} from './upgrades.js';
+} from '../systems/upgrades.js';
 
-import { upgradeOldItemsToStartLevel } from './grid.js';
+import { upgradeOldItemsToStartLevel } from '../systems/grid.js';
 
-import { showSpawnPopup, applySpawnSpeedUpgrade } from './spawn.js';
+import { showSpawnPopup, applySpawnSpeedUpgrade } from '../systems/spawn.js';
 
-import { saveGame } from './save.js';
+import { saveGame } from '../persistence/save.js';
 
 export function buyUpgrade(
    key,
