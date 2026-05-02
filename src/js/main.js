@@ -177,7 +177,7 @@ function getSpawnContext() {
       spawnProgressFill,
       spawnPopupElement: spawnPopup,
       onItemCreated: addDragEvents,
-      onUpdateUI: updateUI,
+      onUpdateUI: () => updateUI(getUIContext()),
    };
 }
 
@@ -242,7 +242,7 @@ function mergeItems(targetItem) {
       MERGE_REWARD_MULTIPLIER *
       getShardMultiplier();
    addMergeProgress();
-   updateUI();
+   updateUI(getUIContext());
    saveGame();
 }
 
@@ -270,7 +270,7 @@ function addMergeProgress() {
       }, LEVEL_UP_FEEDBACK_DURATION);
    }
 
-   updateUI();
+   updateUI(getUIContext());
    saveGame({
       showText: true,
       saveStatus,
@@ -293,7 +293,7 @@ function incomeTick() {
       }
    });
 
-   updateUI();
+   updateUI(getUIContext());
    saveGame();
 }
 
@@ -301,101 +301,37 @@ function incomeTick() {
 // 12. INTERFACE E RENDERIZAÇÃO
 // ===============================
 
-function updateUI() {
-   moneyEl.textContent = formatMoney(state.money);
-   incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-   shardsEl.textContent = formatShards(state.shards);
-   shopMoney.innerHTML = TEXTS.shop.balance(
-      formatMoney(state.money),
-      formatShards(state.shards),
-   );
-   spawnTimeStat.textContent = TEXTS.stats.spawnTime(getSpawnTime() / 1000);
-   startLevelStat.textContent = TEXTS.stats.startLevel(getStartLevel());
-   doubleSpawnStat.textContent = TEXTS.stats.chance(getDoubleSpawnChance());
-   doubleMoneyStat.textContent = TEXTS.stats.chance(getDoubleMoneyChance());
-   goldenChanceStat.textContent = TEXTS.stats.chance(getGoldenChance());
-   multiplierStat.textContent = TEXTS.stats.multiplier(getShardMultiplier());
-   itemsStat.textContent = TEXTS.stats.items(state.items.length, GRID_SIZE);
-   levelStat.textContent = state.playerLevel;
-   playerLevelEl.textContent = state.playerLevel;
-   levelProgressText.textContent = TEXTS.level.progress(
-      state.mergeProgress,
-      state.mergesNeeded,
-   );
-   levelProgressFill.style.width = `${Math.min(100, (state.mergeProgress / state.mergesNeeded) * 100)}%`;
-   levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
-   devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(
-      formatNumber(DEV_ADD_SMALL_MONEY),
-   );
+import { updateUI } from './ui.js';
 
-   devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(
-      formatNumber(DEV_ADD_BIG_MONEY),
-   );
+function getUIContext() {
+   return {
+      moneyEl,
+      incomeEl,
+      shardsEl,
 
-   devAddShardsSmall.textContent = TEXTS.dev.addShardsSmall(
-      formatNumber(DEV_ADD_SMALL_SHARDS),
-   );
+      shopMoney,
+      upgradesEl,
+      onBuyUpgrade: buyUpgrade,
 
-   devAddShardsBig.textContent = TEXTS.dev.addShardsBig(
-      formatNumber(DEV_ADD_BIG_SHARDS),
-   );
-   renderUpgrades();
-}
+      spawnTimeStat,
+      startLevelStat,
+      doubleSpawnStat,
+      doubleMoneyStat,
+      goldenChanceStat,
+      multiplierStat,
+      itemsStat,
+      levelStat,
 
-function getUpgradeEffectText(key) {
-   if (key === 'spawnSpeed') {
-      return `${(getSpawnTime() / 1000).toFixed(1)}s/2.0s`;
-   }
+      playerLevelEl,
+      levelProgressText,
+      levelProgressFill,
+      levelBonusText,
 
-   if (key === 'startLevel') {
-      return `Lv ${getStartLevel()}`;
-   }
-
-   if (key === 'doubleSpawn') {
-      return `${Math.round(getDoubleSpawnChance() * 100)}%/50%`;
-   }
-
-   if (key === 'doubleMoney') {
-      return `${Math.round(getDoubleMoneyChance() * 100)}%/50%`;
-   }
-
-   if (key === 'goldenChance') {
-      return `${Math.round(getGoldenChance() * 100)}%/50%`;
-   }
-
-   return '';
-}
-
-function renderUpgrades() {
-   upgradesEl.innerHTML = '';
-
-   Object.entries(upgrades).forEach(([key, upgrade]) => {
-      const cost = getUpgradeCost(key);
-      const card = document.createElement('div');
-      card.className = `upgrade ${upgrade.golden ? 'goldenUpgrade' : ''}`;
-
-      card.innerHTML = `
-                  <div class="upgradeTop">
-                     <h3>${upgrade.name}</h3>
-
-                     <div class="upgradeInfo">
-                        <span class="upgradeEffectCompact">[${getUpgradeEffectText(key)}]</span>
-                        <span class="upgradeLevel">${TEXTS.shop.level(upgrade.level)}</span>
-                     </div>
-                  </div>
-
-                  <p>${upgrade.description}</p>
-
-                  <button ${state.money < cost ? 'disabled' : ''}>
-                     ${TEXTS.shop.buyButton(formatMoney(cost))}
-                  </button>
-               `;
-
-      card
-         .querySelector('button')
-         .addEventListener('click', () => buyUpgrade(key));
-      upgradesEl.appendChild(card);
-   });
+      devAddPolygonsSmall,
+      devAddPolygonsBig,
+      devAddShardsSmall,
+      devAddShardsBig,
+   };
 }
 
 function buyUpgrade(key) {
@@ -412,7 +348,7 @@ function buyUpgrade(key) {
 
       upgradeOldItemsToStartLevel({
          onChanged: () => {
-            updateUI();
+            updateUI(getUIContext());
             saveGame({
                showText: true,
                saveStatus,
@@ -427,7 +363,7 @@ function buyUpgrade(key) {
       );
    }
 
-   updateUI();
+   updateUI(getUIContext());
    saveGame({
       showText: true,
       saveStatus,
@@ -465,7 +401,7 @@ function resetGame() {
       onCreated: addDragEvents,
    });
    restartSpawnTimer(getSpawnContext());
-   updateUI();
+   updateUI(getUIContext());
 
    saveGame({
       showText: true,
@@ -492,7 +428,7 @@ function unlockDevTools() {
 }
 
 function devRefresh() {
-   updateUI();
+   updateUI(getUIContext());
    updateSpawnBarVisual(getSpawnContext());
    saveGame({
       showText: true,
@@ -503,6 +439,10 @@ function devRefresh() {
 // ===============================
 // 15. EVENTOS DEV TOOLS
 // ===============================
+
+function showGoldenSpawnPopup() {
+   showSpawnPopup(spawnPopup, TEXTS.spawn.goldenObject, 'golden');
+}
 
 devAddPolygonsSmall.addEventListener('click', () => {
    state.money += DEV_ADD_SMALL_MONEY;
@@ -527,7 +467,7 @@ devAddShardsBig.addEventListener('click', () => {
 devSpawnOne.addEventListener('click', () => {
    createItem({
       onCreated: addDragEvents,
-      onGoldenSpawn: () => showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+      onGoldenSpawn: showGoldenSpawnPopup,
    });
    devRefresh();
 });
@@ -537,7 +477,7 @@ devSpawnGolden.addEventListener('click', () => {
       level: getStartLevel(),
       forcedGolden: true,
       onCreated: addDragEvents,
-      onGoldenSpawn: () => showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+      onGoldenSpawn: showGoldenSpawnPopup,
    });
 
    devRefresh();
@@ -547,8 +487,7 @@ devFillGrid.addEventListener('click', () => {
    while (!isGridFull()) {
       createItem({
          onCreated: addDragEvents,
-         onGoldenSpawn: () =>
-            showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+         onGoldenSpawn: showGoldenSpawnPopup,
       });
    }
 
@@ -673,7 +612,7 @@ document.addEventListener('pointerup', (event) => {
 
    if (!targetItem) {
       moveItemToCell(targetCellIndex);
-      updateUI();
+      updateUI(getUIContext());
       saveGame();
       return;
    }
@@ -738,6 +677,6 @@ if (!loaded || state.items.length === 0) {
 }
 
 restartSpawnTimer(getSpawnContext());
-updateUI();
+updateUI(getUIContext());
 
 updateSpawnProgressBar(getSpawnContext());
