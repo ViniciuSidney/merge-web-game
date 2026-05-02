@@ -2,7 +2,7 @@
 // 1. ELEMENTOS DO DOM
 // ===============================
 
-const DOM = {
+export const DOM = {
    game: {
       grid: document.getElementById('grid'),
       saveStatus: document.getElementById('saveStatus'),

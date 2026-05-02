@@ -1,29 +1,29 @@
 // ===============================
-// 1. ELEMENTOS DO DOM
+// ELEMENTOS DO DOM
 // ===============================
 
 import { DOM } from './dom.js';
 
 // ===============================
-// 2. CONSTANTES E CONFIGURAÇÕES BASE
+// CONSTANTES E CONFIGURAÇÕES BASE
 // ===============================
 
 import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
 
 // ===============================
-// 2.1 TEXTOS DO JOGO
+// TEXTOS DO JOGO
 // ===============================
 
 import { TEXTS } from './texts.js';
 
 // ===============================
-// 3. ESTADO DO JOGO
+// ESTADO DO JOGO
 // ===============================
 
 import { state } from './state.js';
 
 // ===============================
-// 4. CONFIGURAÇÕES DE UPGRADES
+// CONFIGURAÇÕES DE UPGRADES
 // ===============================
 
 import {
@@ -34,30 +34,17 @@ import {
 } from './upgrades.js';
 
 // ===============================
-// 5. FUNÇÕES UTILITÁRIAS
-// ===============================
-
-// import { formatNumber } from './format.js';
-
-// ===============================
-// 6. FUNÇÕES DE CÁLCULO
-// ===============================
-
-// import {...} from './economy.js';
-
-// ===============================
-// 7. GRID E ITENS
+// GRID E ITENS
 // ===============================
 
 import {
    createGrid,
    createItem,
    upgradeOldItemsToStartLevel,
-   getItemByCellIndex,
 } from './grid.js';
 
 // ===============================
-// 8. SPAWN
+// SPAWN
 // ===============================
 
 import {
@@ -79,31 +66,23 @@ function getSpawnContext() {
 }
 
 // ===============================
-// 9. DRAG AND DROP
+// DRAG AND DROP
 // ===============================
 
 import {
    addDragEvents,
-   moveDraggedItem,
-   getCellUnderPointer,
-   clearHighlights,
-   returnToOriginalCell,
-   moveItemToCell,
-   clearDraggedItem,
 } from './drag.js';
 
 // ===============================
-// 10. EFEITOS VISUAIS
+// EFEITOS VISUAIS
 // ===============================
 
-import { flashError } from './effects.js';
-
 // ===============================
-// 11. MERGE, LEVEL E ECONOMIA
+// MERGE, LEVEL E ECONOMIA
 // ===============================
 
+// Merge
 import { mergeItems } from './merge.js';
-
 function getMergeContext() {
    return {
       onItemCreated: addDragEvents,
@@ -112,8 +91,8 @@ function getMergeContext() {
    };
 }
 
+// Level
 import { addMergeProgress } from './level.js';
-
 function getLevelContext() {
    return {
       levelUpPopup: DOM.level.popup,
@@ -122,10 +101,11 @@ function getLevelContext() {
    };
 }
 
+// Economia
 import { incomeTick } from './income.js';
 
 // ===============================
-// 12. INTERFACE E RENDERIZAÇÃO
+// INTERFACE E RENDERIZAÇÃO
 // ===============================
 
 import { updateUI } from './ui.js';
@@ -198,7 +178,7 @@ function buyUpgrade(key) {
 }
 
 // ===============================
-// 13. SALVAMENTO
+// SALVAMENTO
 // ===============================
 
 import { saveGame, loadGame, clearSave } from './save.js';
@@ -236,7 +216,7 @@ function resetGame() {
 }
 
 // ===============================
-// 14. DEV TOOLS
+// DEV TOOLS
 // ===============================
 
 import { setupDevTools } from './devTools.js';
@@ -282,7 +262,7 @@ function getDevToolsContext() {
 }
 
 // ===============================
-// 16. EVENTOS DE INTERFACE
+// EVENTOS DE INTERFACE
 // ===============================
 
 import { setupPanels } from './panels.js';
@@ -304,71 +284,25 @@ function getPanelsContext() {
    };
 }
 
-document.addEventListener('pointermove', (event) => {
-   if (!state.draggedItem) return;
+import { setupBoardInput } from './boardInput.js';
 
-   moveDraggedItem(event.clientX, event.clientY);
-   clearHighlights();
-
-   const cell = getCellUnderPointer(event.clientX, event.clientY);
-   if (!cell) return;
-
-   const targetItem = getItemByCellIndex(
-      Number(cell.dataset.index),
-      state.draggedItem,
-   );
-
-   if (targetItem && targetItem.level === state.draggedItem.level) {
-      cell.classList.add('highlight');
-   }
-});
-
-document.addEventListener('pointerup', (event) => {
-   if (!state.draggedItem) return;
-
-   const cell = getCellUnderPointer(event.clientX, event.clientY);
-   clearHighlights();
-
-   if (!cell) {
-      returnToOriginalCell();
-      clearDraggedItem();
-      return;
-   }
-
-   const targetCellIndex = Number(cell.dataset.index);
-   const targetItem = getItemByCellIndex(targetCellIndex, state.draggedItem);
-
-   if (targetItem && targetItem.level === state.draggedItem.level) {
-      mergeItems(targetItem, getMergeContext());
-      return;
-   }
-
-   if (targetItem && targetItem.level !== state.draggedItem.level) {
-      flashError(targetItem, cell, state.draggedItem);
-      returnToOriginalCell();
-      clearDraggedItem();
-      return;
-   }
-
-   if (!targetItem) {
-      moveItemToCell(targetCellIndex);
-      updateUI(getUIContext());
-      saveGame();
-      return;
-   }
-
-   returnToOriginalCell();
-   clearDraggedItem();
-});
+function getBoardInputContext() {
+   return {
+      onMerge: (targetItem) => mergeItems(targetItem, getMergeContext()),
+      onUpdateUI: () => updateUI(getUIContext()),
+      onSave: () => saveGame(),
+   };
+}
 
 DOM.settings.resetBtn.addEventListener('click', resetGame);
 
 // ===============================
-// 17. INICIALIZAÇÃO DO JOGO
+// INICIALIZAÇÃO DO JOGO
 // ===============================
 
 setupPanels(getPanelsContext());
 setupDevTools(getDevToolsContext());
+setupBoardInput(getBoardInputContext());
 
 setInterval(() => {
    incomeTick({
