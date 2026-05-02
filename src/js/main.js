@@ -93,61 +93,7 @@ import {
 // 2.1 TEXTOS DO JOGO
 // ===============================
 
-const TEXTS = {
-   save: {
-      autoActive: 'Salvamento automático <strong>ativo</strong>',
-      saved: 'Progresso <strong>salvo</strong> ✓',
-      loadError: 'Erro ao carregar save:',
-   },
-
-   spawn: {
-      goldenObject: '🌟 Objeto dourado!',
-      doubleDelivery: '📦 Entrega dupla!',
-      upgradedForms: (oldLevel, newLevel) =>
-         `⬆️ Formas melhoradas! Lv ${oldLevel} → Lv ${newLevel}`,
-   },
-
-   level: {
-      up: (oldLevel, newLevel, reward) => `
-         Nível ${oldLevel} → Nível ${newLevel}
-         <small>+${reward} estilhaços!</small>
-      `,
-      status: (reward) => `Subiu de Nível! +${reward} estilhaços ✦`,
-      progress: (current, needed) => `${current} / ${needed} combinações`,
-      shardMultiplier: (multiplier) =>
-         `Multiplicador por estilhaços: <strong>${multiplier.toFixed(1)}x</strong>`,
-   },
-
-   shop: {
-      balance: (moneyValue, shardsValue) =>
-         `Polígonos: ${moneyValue}<br/> Estilhaços: ${shardsValue}`,
-      buyButton: (cost) => `Comprar — ${cost}`,
-      level: (level) => `Nv. ${level}`,
-   },
-
-   stats: {
-      spawnTime: (seconds) => `${seconds.toFixed(2)}s`,
-      startLevel: (level) => `Lv ${level}`,
-      chance: (chance) => `${Math.round(chance * 100)}%`,
-      multiplier: (multiplier) => `${multiplier.toFixed(1)}x`,
-      items: (current, max) => `${current}/${max}`,
-   },
-
-   item: {
-      level: (level) => `Lv ${level}`,
-      goldenBonus: '<small>★ 2x</small>',
-      moneyPopup: (amount, isDoubleTick) =>
-         `+${amount}/s${isDoubleTick ? ' 2x!' : ''}`,
-   },
-
-   dev: {
-      wrongPassword: 'Senha incorreta.',
-      addPolygonsSmall: (amount) => `+${formatNumber(amount)} Polígonos`,
-      addPolygonsBig: (amount) => `+${formatNumber(amount)} Polígonos`,
-      addShardsSmall: (amount) => `+${formatNumber(amount)} Estilhaços`,
-      addShardsBig: (amount) => `+${formatNumber(amount)} Estilhaços`,
-   },
-};
+import { TEXTS } from './texts.js';
 
 // ===============================
 // 3. ESTADO DO JOGO
@@ -823,12 +769,21 @@ function updateUI() {
    );
    levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
    levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
-   devAddPolygonsSmall.textContent =
-      TEXTS.dev.addPolygonsSmall(DEV_ADD_SMALL_MONEY);
-   devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(DEV_ADD_BIG_MONEY);
-   devAddShardsSmall.textContent =
-      TEXTS.dev.addShardsSmall(DEV_ADD_SMALL_SHARDS);
-   devAddShardsBig.textContent = TEXTS.dev.addShardsBig(DEV_ADD_BIG_SHARDS);
+   devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(
+      formatNumber(DEV_ADD_SMALL_MONEY),
+   );
+
+   devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(
+      formatNumber(DEV_ADD_BIG_MONEY),
+   );
+
+   devAddShardsSmall.textContent = TEXTS.dev.addShardsSmall(
+      formatNumber(DEV_ADD_SMALL_SHARDS),
+   );
+
+   devAddShardsBig.textContent = TEXTS.dev.addShardsBig(
+      formatNumber(DEV_ADD_BIG_SHARDS),
+   );
    renderUpgrades();
 }
 
