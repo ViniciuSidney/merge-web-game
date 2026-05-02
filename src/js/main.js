@@ -65,14 +65,9 @@ const devContent = document.getElementById('devContent');
 import {
    GRID_SIZE,
    SPAWN_TICK_RATE,
-   DEV_PASSWORD,
    MERGE_REWARD_MULTIPLIER,
    MONEY_TICK_INTERVAL,
    LEVEL_UP_FEEDBACK_DURATION,
-   DEV_ADD_SMALL_MONEY,
-   DEV_ADD_BIG_MONEY,
-   DEV_ADD_SMALL_SHARDS,
-   DEV_ADD_BIG_SHARDS,
 } from './config.js';
 
 // ===============================
@@ -97,14 +92,12 @@ import {
    upgrades,
    resetUpgrades,
    increaseUpgradeLevel,
-   setAllUpgradesLevel,
    getUpgradeCost,
    getSpawnTime,
    getStartLevel,
    getDoubleSpawnChance,
    getDoubleMoneyChance,
    getGoldenChance,
-   setSpawnSpeedToMinimum,
 } from './upgrades.js';
 
 // ===============================
@@ -157,6 +150,37 @@ function getSpawnContext() {
       spawnPopupElement: spawnPopup,
       onItemCreated: addDragEvents,
       onUpdateUI: () => updateUI(getUIContext()),
+   };
+}
+
+function getDevToolsContext() {
+   return {
+      devAddPolygonsSmall,
+      devAddPolygonsBig,
+      devAddShardsSmall,
+      devAddShardsBig,
+      devSpawnOne,
+      devSpawnGolden,
+      devFillGrid,
+      devClearGrid,
+      devMaxSpawnSpeed,
+      devLevelUpForm,
+      devResetUpgrades,
+      devAllUpgrades5,
+      devAddMerge,
+      devForceLevelUp,
+      devLoginBtn,
+      devPasswordInput,
+      devErrorText,
+      devLoginSection,
+      devContent,
+
+      spawnPopup,
+
+      onItemCreated: addDragEvents,
+      onRefresh: devRefresh,
+      onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
+      onAddMergeProgress: addMergeProgress,
    };
 }
 
@@ -391,19 +415,7 @@ function resetGame() {
 // 14. DEV TOOLS
 // ===============================
 
-function unlockDevTools() {
-   const typedPassword = devPasswordInput.value;
-
-   if (typedPassword !== DEV_PASSWORD) {
-      devErrorText.textContent = TEXTS.dev.wrongPassword;
-      devPasswordInput.value = '';
-      return;
-   }
-
-   devErrorText.textContent = '';
-   devLoginSection.style.display = 'none';
-   devContent.classList.remove('locked');
-}
+import { setupDevTools } from './devTools.js';
 
 function devRefresh() {
    updateUI(getUIContext());
@@ -413,118 +425,6 @@ function devRefresh() {
       saveStatus,
    });
 }
-
-// ===============================
-// 15. EVENTOS DEV TOOLS
-// ===============================
-
-function showGoldenSpawnPopup() {
-   showSpawnPopup(spawnPopup, TEXTS.spawn.goldenObject, 'golden');
-}
-
-devAddPolygonsSmall.addEventListener('click', () => {
-   state.money += DEV_ADD_SMALL_MONEY;
-   devRefresh();
-});
-
-devAddPolygonsBig.addEventListener('click', () => {
-   state.money += DEV_ADD_BIG_MONEY;
-   devRefresh();
-});
-
-devAddShardsSmall.addEventListener('click', () => {
-   state.shards += DEV_ADD_SMALL_SHARDS;
-   devRefresh();
-});
-
-devAddShardsBig.addEventListener('click', () => {
-   state.shards += DEV_ADD_BIG_SHARDS;
-   devRefresh();
-});
-
-devSpawnOne.addEventListener('click', () => {
-   createItem({
-      onCreated: addDragEvents,
-      onGoldenSpawn: showGoldenSpawnPopup,
-   });
-   devRefresh();
-});
-
-devSpawnGolden.addEventListener('click', () => {
-   createItem({
-      level: getStartLevel(),
-      forcedGolden: true,
-      onCreated: addDragEvents,
-      onGoldenSpawn: showGoldenSpawnPopup,
-   });
-
-   devRefresh();
-});
-
-devFillGrid.addEventListener('click', () => {
-   while (!isGridFull()) {
-      createItem({
-         onCreated: addDragEvents,
-         onGoldenSpawn: showGoldenSpawnPopup,
-      });
-   }
-
-   devRefresh();
-});
-
-devClearGrid.addEventListener('click', () => {
-   clearAllItems();
-   devRefresh();
-});
-
-devMaxSpawnSpeed.addEventListener('click', () => {
-   setSpawnSpeedToMinimum();
-   restartSpawnTimer(getSpawnContext());
-   devRefresh();
-});
-
-devLevelUpForm.addEventListener('click', () => {
-   increaseUpgradeLevel('startLevel');
-   upgradeOldItemsToStartLevel({
-      onChanged: devRefresh,
-   });
-   devRefresh();
-});
-
-devResetUpgrades.addEventListener('click', () => {
-   resetUpgrades();
-   restartSpawnTimer(getSpawnContext());
-   devRefresh();
-});
-
-devAllUpgrades5.addEventListener('click', () => {
-   setAllUpgradesLevel(5);
-
-   upgradeOldItemsToStartLevel({
-      onChanged: devRefresh,
-   });
-   restartSpawnTimer(getSpawnContext());
-   devRefresh();
-});
-
-devAddMerge.addEventListener('click', () => {
-   addMergeProgress();
-   devRefresh();
-});
-
-devForceLevelUp.addEventListener('click', () => {
-   state.mergeProgress = state.mergesNeeded - 1;
-   addMergeProgress();
-   devRefresh();
-});
-
-devLoginBtn.addEventListener('click', unlockDevTools);
-
-devPasswordInput.addEventListener('keydown', (event) => {
-   if (event.key === 'Enter') {
-      unlockDevTools();
-   }
-});
 
 // ===============================
 // 16. EVENTOS DE INTERFACE
@@ -630,6 +530,8 @@ shopOverlay.addEventListener('click', closeShop);
 // ===============================
 // 17. INICIALIZAÇÃO DO JOGO
 // ===============================
+
+setupDevTools(getDevToolsContext());
 
 setInterval(incomeTick, MONEY_TICK_INTERVAL);
 setInterval(() => {
