@@ -125,6 +125,66 @@ const NUMBER_SUFFIXES = [
 ];
 
 // ===============================
+// 2.1 TEXTOS DO JOGO
+// ===============================
+
+const TEXTS = {
+   save: {
+      autoActive: 'Salvamento automático <strong>ativo</strong>',
+      saved: 'Progresso <strong>salvo</strong> ✓',
+      loadError: 'Erro ao carregar save:',
+   },
+
+   spawn: {
+      goldenObject: '🌟 Objeto dourado!',
+      doubleDelivery: '📦 Entrega dupla!',
+      upgradedForms: (oldLevel, newLevel) =>
+         `⬆️ Formas melhoradas! Lv ${oldLevel} → Lv ${newLevel}`,
+   },
+
+   level: {
+      up: (oldLevel, newLevel, reward) => `
+         Nível ${oldLevel} → Nível ${newLevel}
+         <small>+${reward} estilhaços!</small>
+      `,
+      status: (reward) => `Subiu de Nível! +${reward} estilhaços ✦`,
+      progress: (current, needed) => `${current} / ${needed} combinações`,
+      shardMultiplier: (multiplier) =>
+         `Multiplicador por estilhaços: <strong>${multiplier.toFixed(1)}x</strong>`,
+   },
+
+   shop: {
+      balance: (moneyValue, shardsValue) =>
+         `Polígonos: ${moneyValue}<br/> Estilhaços: ${shardsValue}`,
+      buyButton: (cost) => `Comprar — ${cost}`,
+      level: (level) => `Nv. ${level}`,
+   },
+
+   stats: {
+      spawnTime: (seconds) => `${seconds.toFixed(2)}s`,
+      startLevel: (level) => `Lv ${level}`,
+      chance: (chance) => `${Math.round(chance * 100)}%`,
+      multiplier: (multiplier) => `${multiplier.toFixed(1)}x`,
+      items: (current, max) => `${current}/${max}`,
+   },
+
+   item: {
+      level: (level) => `Lv ${level}`,
+      goldenBonus: '<small>★ 2x</small>',
+      moneyPopup: (amount, isDoubleTick) =>
+         `+${amount}/s${isDoubleTick ? ' 2x!' : ''}`,
+   },
+
+   dev: {
+      wrongPassword: 'Senha incorreta.',
+      addPolygonsSmall: (amount) => `+${formatNumber(amount)} Polígonos`,
+      addPolygonsBig: (amount) => `+${formatNumber(amount)} Polígonos`,
+      addShardsSmall: (amount) => `+${formatNumber(amount)} Estilhaços`,
+      addShardsBig: (amount) => `+${formatNumber(amount)} Estilhaços`,
+   },
+};
+
+// ===============================
 // 3. ESTADO DO JOGO
 // ===============================
 
@@ -401,10 +461,10 @@ function updateItemElement(item) {
    item.element.style.boxShadow = getLevelShadow(visual.cycle, item.isGolden);
 
    item.element.innerHTML = `
-            ${cycleBadge}
-            <span class="itemLevelText">Lv ${item.level}</span>
-            ${item.isGolden ? '<small>★ 2x</small>' : ''}
-         `;
+      ${cycleBadge}
+      <span class="itemLevelText">${TEXTS.item.level(item.level)}</span>
+      ${item.isGolden ? TEXTS.item.goldenBonus : ''}
+   `;
 }
 
 function createItem(
@@ -424,7 +484,7 @@ function createItem(
    const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
 
    if (isGolden && cellIndex === null) {
-      showSpawnPopup('🌟 Objeto dourado!', 'golden');
+      showSpawnPopup(TEXTS.spawn.goldenObject, 'golden');
    }
 
    const element = document.createElement('div');
@@ -517,7 +577,7 @@ function spawnObjects() {
 
    if (canDoubleSpawn) {
       createItem();
-      showSpawnPopup('📦 Entrega dupla!', 'double');
+      showSpawnPopup(TEXTS.spawn.doubleDelivery, 'double');
    }
 
    return firstSpawned;
@@ -645,10 +705,7 @@ function flashError(targetItem, targetCell) {
 }
 
 function showLevelUpPopup(oldLevel, newLevel, reward) {
-   levelUpPopup.innerHTML = `
-         Nível ${oldLevel} → Nível ${newLevel}
-         <small>+${reward} estilhaços!</small>
-      `;
+   levelUpPopup.innerHTML = TEXTS.level.up(oldLevel, newLevel, reward);
 
    levelUpPopup.classList.remove('show');
    void levelUpPopup.offsetWidth;
@@ -671,7 +728,7 @@ function createMoneyPopup(item, amount, isDoubleTick) {
    const rect = item.element.getBoundingClientRect();
    const popup = document.createElement('div');
    popup.className = `moneyPopup ${isDoubleTick ? 'double' : ''} ${item.isGolden ? 'goldenText' : ''}`;
-   popup.textContent = `+${formatMoney(amount)}/s${isDoubleTick ? ' 2x!' : ''}`;
+   popup.textContent = TEXTS.item.moneyPopup(formatMoney(amount), isDoubleTick);
    popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
    popup.style.top = `${rect.top - 4}px`;
    document.body.appendChild(popup);
@@ -726,7 +783,7 @@ function addMergeProgress() {
       mergesNeeded = getNextMergeRequirement();
 
       clearTimeout(saveTextTimer);
-      saveStatus.textContent = `Subiu de Nível! +${reward} estilhaços ✦`;
+      saveStatus.textContent = TEXTS.level.status(reward);
 
       saveTextTimer = setTimeout(() => {
          saveStatus.innerHTML = 'Salvamento automático <strong>ativo</strong>';
@@ -765,23 +822,29 @@ function updateUI() {
    moneyEl.textContent = formatMoney(money);
    incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
    shardsEl.textContent = formatShards(shards);
-   shopMoney.innerHTML = `Polígonos: ${formatMoney(money)}<br/> Estilhaços: ${formatShards(shards)}`;
-   spawnTimeStat.textContent = `${(getSpawnTime() / 1000).toFixed(2)}s`;
-   startLevelStat.textContent = `Lv ${getStartLevel()}`;
-   doubleSpawnStat.textContent = `${Math.round(getDoubleSpawnChance() * 100)}%`;
-   doubleMoneyStat.textContent = `${Math.round(getDoubleMoneyChance() * 100)}%`;
-   goldenChanceStat.textContent = `${Math.round(getGoldenChance() * 100)}%`;
-   multiplierStat.textContent = `${getShardMultiplier().toFixed(1)}x`;
-   itemsStat.textContent = `${items.length}/16`;
+   shopMoney.innerHTML = TEXTS.shop.balance(
+      formatMoney(money),
+      formatShards(shards),
+   );
+   spawnTimeStat.textContent = TEXTS.stats.spawnTime(getSpawnTime() / 1000);
+   startLevelStat.textContent = TEXTS.stats.startLevel(getStartLevel());
+   doubleSpawnStat.textContent = TEXTS.stats.chance(getDoubleSpawnChance());
+   doubleMoneyStat.textContent = TEXTS.stats.chance(getDoubleMoneyChance());
+   goldenChanceStat.textContent = TEXTS.stats.chance(getGoldenChance());
+   multiplierStat.textContent = TEXTS.stats.multiplier(getShardMultiplier());
+   itemsStat.textContent = TEXTS.stats.items(items.length, GRID_SIZE);
    levelStat.textContent = playerLevel;
    playerLevelEl.textContent = playerLevel;
-   levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} combinações`;
+   levelProgressText.textContent = TEXTS.level.progress(
+      mergeProgress,
+      mergesNeeded,
+   );
    levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
-   levelBonusText.innerHTML = `Multiplicador por estilhaços: <strong>${getShardMultiplier().toFixed(1)}x</strong>`;
-   devAddPolygonsSmall.textContent = `Adicionar ${formatMoney(DEV_ADD_SMALL_MONEY)}`;
-   devAddPolygonsBig.textContent = `Adicionar ${formatMoney(DEV_ADD_BIG_MONEY)}`;
-   devAddShardsSmall.textContent = `Adicionar ${formatShards(DEV_ADD_SMALL_SHARDS)}`;
-   devAddShardsBig.textContent = `Adicionar ${formatShards(DEV_ADD_BIG_SHARDS)}`;
+   levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
+   devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(DEV_ADD_SMALL_MONEY);
+   devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(DEV_ADD_BIG_MONEY);
+   devAddShardsSmall.textContent = TEXTS.dev.addShardsSmall(DEV_ADD_SMALL_SHARDS);
+   devAddShardsBig.textContent = TEXTS.dev.addShardsBig(DEV_ADD_BIG_SHARDS);
    renderUpgrades();
 }
 
@@ -823,14 +886,14 @@ function renderUpgrades() {
 
                      <div class="upgradeInfo">
                         <span class="upgradeEffectCompact">[${getUpgradeEffectText(key)}]</span>
-                        <span class="upgradeLevel">Nv. ${upgrade.level}</span>
+                        <span class="upgradeLevel">${TEXTS.shop.level(upgrade.level)}</span>
                      </div>
                   </div>
 
                   <p>${upgrade.description}</p>
 
                   <button ${money < cost ? 'disabled' : ''}>
-                     Comprar — ${formatMoney(cost)}
+                     ${TEXTS.shop.buyButton(formatMoney(cost))}
                   </button>
                `;
 
@@ -855,7 +918,7 @@ function buyUpgrade(key) {
       upgradeOldItemsToStartLevel();
 
       showSpawnPopup(
-         `⬆️ Formas melhoradas! Lv ${oldStartLevel} → Lv ${getStartLevel()}`,
+         TEXTS.spawn.upgradedForms(oldStartLevel, getStartLevel()),
          'upgrade',
       );
    }
@@ -888,9 +951,9 @@ function saveGame(showText = false) {
 
    if (showText) {
       clearTimeout(saveTextTimer);
-      saveStatus.innerHTML = 'Progresso <strong>salvo</strong> ✓';
+      saveStatus.innerHTML = TEXTS.save.saved;
       saveTextTimer = setTimeout(() => {
-         saveStatus.innerHTML = 'Salvamento automático <strong>ativo</strong>';
+         saveStatus.innerHTML = TEXTS.save.autoActive;
       }, 1200);
    }
 }
@@ -925,7 +988,7 @@ function loadGame() {
 
       return true;
    } catch (error) {
-      console.warn('Erro ao carregar save:', error);
+      console.warn(TEXTS.save.loadError, error);
       return false;
    }
 }
@@ -958,7 +1021,7 @@ function unlockDevTools() {
    const typedPassword = devPasswordInput.value;
 
    if (typedPassword !== DEV_PASSWORD) {
-      devErrorText.textContent = 'Senha incorreta.';
+      devErrorText.textContent = TEXTS.dev.wrongPassword;
       devPasswordInput.value = '';
       return;
    }
@@ -1181,7 +1244,7 @@ shopOverlay.addEventListener('click', closeShop);
 // ===============================
 
 setInterval(incomeTick, MONEY_TICK_INTERVAL);
-setInterval(updateSpawnProgressBar, 100);
+setInterval(updateSpawnProgressBar, SPAWN_TICK_RATE);
 
 createGrid();
 const loaded = loadGame();
