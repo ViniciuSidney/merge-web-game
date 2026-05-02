@@ -65,9 +65,7 @@ const devContent = document.getElementById('devContent');
 import {
    GRID_SIZE,
    SPAWN_TICK_RATE,
-   MERGE_REWARD_MULTIPLIER,
    MONEY_TICK_INTERVAL,
-   LEVEL_UP_FEEDBACK_DURATION,
 } from './config.js';
 
 // ===============================
@@ -110,12 +108,9 @@ import { formatNumber } from './format.js';
 // 6. FUNÇÕES DE CÁLCULO
 // ===============================
 
-import {
-   getShardMultiplier,
-   getShardsReward,
-   getNextMergeRequirement,
-   getBaseItemValue,
-} from './economy.js';
+// import {
+
+// } from './economy.js';
 
 // ===============================
 // 7. GRID E ITENS
@@ -172,102 +167,34 @@ import {
 // ===============================
 
 import {
-   getElementCenter,
-   createRing,
    flashError,
-   showLevelUpPopup,
-   shouldShowMoneyPopup,
-   createMoneyPopup,
 } from './effects.js';
 
 // ===============================
 // 11. MERGE, LEVEL E ECONOMIA
 // ===============================
 
-function mergeItems(targetItem) {
-   const newLevel = state.draggedItem.level + 1;
-   const targetCellIndex = targetItem.cellIndex;
-   const newIsGolden = state.draggedItem.isGolden || targetItem.isGolden;
-   const center = getElementCenter(targetItem.element);
+import { mergeItems } from './merge.js';
 
-   state.draggedItem.element.remove();
-   targetItem.element.remove();
-   state.items = state.items.filter(
-      (item) => item !== state.draggedItem && item !== targetItem,
-   );
-
-   state.draggedItem = null;
-   createItem({
-      level: newLevel,
-      cellIndex: targetCellIndex,
-      forcedGolden: newIsGolden,
-      onCreated: addDragEvents,
-   });
-
-   const newItem = getItemByExactCell(targetCellIndex);
-   if (newItem) newItem.element.classList.add('mergeBurst');
-   createRing(center.x, center.y, 'merge');
-
-   state.money +=
-      getBaseItemValue(newLevel) *
-      (newIsGolden ? 2 : 1) *
-      MERGE_REWARD_MULTIPLIER *
-      getShardMultiplier();
-   addMergeProgress();
-   updateUI(getUIContext());
-   saveGame();
+function getMergeContext() {
+   return {
+      onItemCreated: addDragEvents,
+      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
+      onUpdateUI: () => updateUI(getUIContext()),
+   };
 }
 
-function addMergeProgress() {
-   state.mergeProgress++;
+import { addMergeProgress } from './level.js';
 
-   if (state.mergeProgress >= state.mergesNeeded) {
-      state.mergeProgress -= state.mergesNeeded;
-
-      const oldLevel = state.playerLevel;
-      state.playerLevel++;
-
-      const reward = getShardsReward();
-      state.shards += reward;
-
-      showLevelUpPopup(levelUpPopup, oldLevel, state.playerLevel, reward);
-
-      state.mergesNeeded = getNextMergeRequirement();
-
-      clearTimeout(state.saveTextTimer);
-      saveStatus.textContent = TEXTS.level.status(reward);
-
-      state.saveTextTimer = setTimeout(() => {
-         saveStatus.innerHTML = TEXTS.save.autoActive;
-      }, LEVEL_UP_FEEDBACK_DURATION);
-   }
-
-   updateUI(getUIContext());
-   saveGame({
-      showText: true,
+function getLevelContext() {
+   return {
+      levelUpPopup,
       saveStatus,
-   });
+      onUpdateUI: () => updateUI(getUIContext()),
+   };
 }
 
-function incomeTick() {
-   state.items.forEach((item) => {
-      const base = getBaseItemValue(item.level);
-      const goldenMultiplier = item.isGolden ? 2 : 1;
-      const isDoubleTick = Math.random() < getDoubleMoneyChance();
-      const tickMultiplier = isDoubleTick ? 2 : 1;
-      const gained =
-         base * goldenMultiplier * tickMultiplier * getShardMultiplier();
-
-      state.money += gained;
-
-      if (shouldShowMoneyPopup(isDoubleTick, item)) {
-         createMoneyPopup(item, gained, isDoubleTick);
-      }
-   });
-
-   updateUI(getUIContext());
-   saveGame();
-}
+import { incomeTick } from './income.js';
 
 // ===============================
 // 12. INTERFACE E RENDERIZAÇÃO
@@ -484,7 +411,7 @@ document.addEventListener('pointerup', (event) => {
    const targetItem = getItemByCellIndex(targetCellIndex, state.draggedItem);
 
    if (targetItem && targetItem.level === state.draggedItem.level) {
-      mergeItems(targetItem);
+      mergeItems(targetItem, getMergeContext());
       return;
    }
 
@@ -515,7 +442,12 @@ resetInsideBtn.addEventListener('click', resetGame);
 setupPanels(getPanelsContext());
 setupDevTools(getDevToolsContext());
 
-setInterval(incomeTick, MONEY_TICK_INTERVAL);
+setInterval(() => {
+   incomeTick({
+      onUpdateUI: () => updateUI(getUIContext()),
+   });
+}, MONEY_TICK_INTERVAL);
+
 setInterval(() => {
    updateSpawnProgressBar(getSpawnContext());
 }, SPAWN_TICK_RATE);

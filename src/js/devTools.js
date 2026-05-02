@@ -171,13 +171,13 @@ export function setupDevTools({
    });
 
    devAddMerge.addEventListener('click', () => {
-      onAddMergeProgress();
+      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
       onRefresh();
    });
 
    devForceLevelUp.addEventListener('click', () => {
       state.mergeProgress = state.mergesNeeded - 1;
-      onAddMergeProgress();
+      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
       onRefresh();
    });
 
