@@ -1,4 +1,4 @@
-
+// IMPORTS
 import { DOM } from './dom.js';
 
 import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
@@ -7,45 +7,35 @@ import { state } from './state.js';
 
 import { createGrid, createItem } from './grid.js';
 
-import { updateSpawnProgressBar, updateSpawnBarVisual, restartSpawnTimer } from './spawn.js';
-
-function getSpawnContext() {
-   return {
-      spawnProgressText: DOM.spawn.progressText,
-      spawnProgressFill: DOM.spawn.progressFill,
-      spawnPopupElement: DOM.spawn.popup,
-      onItemCreated: addDragEvents,
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
-}
+import {
+   updateSpawnProgressBar,
+   updateSpawnBarVisual,
+   restartSpawnTimer,
+} from './spawn.js';
 
 import { addDragEvents } from './drag.js';
 
-// Merge
 import { mergeItems } from './merge.js';
-function getMergeContext() {
-   return {
-      onItemCreated: addDragEvents,
-      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
-}
 
-// Level
 import { addMergeProgress } from './level.js';
-function getLevelContext() {
-   return {
-      levelUpPopup: DOM.level.popup,
-      saveStatus: DOM.game.saveStatus,
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
-}
 
-// Economia
 import { incomeTick } from './income.js';
 
-
 import { updateUI } from './ui.js';
+
+import { buyUpgrade } from './shopActions.js';
+
+import { saveGame, loadGame } from './save.js';
+
+import { resetGame } from './gameActions.js';
+
+import { setupDevTools } from './devTools.js';
+
+import { setupPanels } from './panels.js';
+
+import { setupBoardInput } from './boardInput.js';
+
+// CONTEXTOS
 function getUIContext() {
    return {
       moneyEl: DOM.top.money,
@@ -77,7 +67,32 @@ function getUIContext() {
    };
 }
 
-import { buyUpgrade } from './shopActions.js';
+function getSpawnContext() {
+   return {
+      spawnProgressText: DOM.spawn.progressText,
+      spawnProgressFill: DOM.spawn.progressFill,
+      spawnPopupElement: DOM.spawn.popup,
+      onItemCreated: addDragEvents,
+      onUpdateUI: () => updateUI(getUIContext()),
+   };
+}
+
+function getLevelContext() {
+   return {
+      levelUpPopup: DOM.level.popup,
+      saveStatus: DOM.game.saveStatus,
+      onUpdateUI: () => updateUI(getUIContext()),
+   };
+}
+
+function getMergeContext() {
+   return {
+      onItemCreated: addDragEvents,
+      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
+      onUpdateUI: () => updateUI(getUIContext()),
+   };
+}
+
 function getShopActionsContext() {
    return {
       spawnPopup: DOM.spawn.popup,
@@ -86,13 +101,7 @@ function getShopActionsContext() {
       onUpdateUI: () => updateUI(getUIContext()),
    };
 }
-function handleBuyUpgrade(key) {
-   buyUpgrade(key, getShopActionsContext());
-}
 
-import { saveGame, loadGame } from './save.js';
-
-import { resetGame } from './gameActions.js';
 function getGameActionsContext() {
    return {
       onItemCreated: addDragEvents,
@@ -101,19 +110,7 @@ function getGameActionsContext() {
       saveStatus: DOM.game.saveStatus,
    };
 }
-function handleResetGame() {
-   resetGame(getGameActionsContext());
-}
 
-import { setupDevTools } from './devTools.js';
-function devRefresh() {
-   updateUI(getUIContext());
-   updateSpawnBarVisual(getSpawnContext());
-   saveGame({
-      showText: true,
-      saveStatus: DOM.game.saveStatus,
-   });
-}
 function getDevToolsContext() {
    return {
       devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
@@ -145,11 +142,6 @@ function getDevToolsContext() {
    };
 }
 
-// ===============================
-// EVENTOS DE INTERFACE
-// ===============================
-
-import { setupPanels } from './panels.js';
 function getPanelsContext() {
    return {
       settingsTabs: DOM.settings.tabs,
@@ -167,7 +159,6 @@ function getPanelsContext() {
    };
 }
 
-import { setupBoardInput } from './boardInput.js';
 function getBoardInputContext() {
    return {
       onMerge: (targetItem) => mergeItems(targetItem, getMergeContext()),
@@ -176,32 +167,50 @@ function getBoardInputContext() {
    };
 }
 
-DOM.settings.resetBtn.addEventListener('click', handleResetGame);
+// HANDLERS
+function handleBuyUpgrade(key) {
+   buyUpgrade(key, getShopActionsContext());
+}
 
-// ===============================
-// INICIALIZAÇÃO DO JOGO
-// ===============================
+function handleResetGame() {
+   resetGame(getGameActionsContext());
+}
 
-setupPanels(getPanelsContext());
-setupDevTools(getDevToolsContext());
-setupBoardInput(getBoardInputContext());
-
-setInterval(() => {
-   incomeTick({
-      onUpdateUI: () => updateUI(getUIContext()),
+function devRefresh() {
+   updateUI(getUIContext());
+   updateSpawnBarVisual(getSpawnContext());
+   saveGame({
+      showText: true,
+      saveStatus: DOM.game.saveStatus,
    });
-}, MONEY_TICK_INTERVAL);
+}
 
-setInterval(() => {
-   updateSpawnProgressBar(getSpawnContext());
-}, SPAWN_TICK_RATE);
+// SETUP DE EVENTOS
+function setupEvents() {
+   setupPanels(getPanelsContext());
+   setupDevTools(getDevToolsContext());
+   setupBoardInput(getBoardInputContext());
 
-createGrid(DOM.game.grid);
-const loaded = loadGame({
-   onItemCreated: addDragEvents,
-});
+   DOM.settings.resetBtn.addEventListener('click', handleResetGame);
+}
 
-if (!loaded || state.items.length === 0) {
+// LOOPS DO JOGO
+function setupGameLoops() {
+   setInterval(() => {
+      incomeTick({
+         onUpdateUI: () => updateUI(getUIContext()),
+      });
+   }, MONEY_TICK_INTERVAL);
+
+   setInterval(() => {
+      updateSpawnProgressBar(getSpawnContext());
+   }, SPAWN_TICK_RATE);
+}
+
+// INICIALIZAÇÃO
+function createInitialItemsIfNeeded(loaded) {
+   if (loaded && state.items.length > 0) return;
+
    createItem({
       level: 1,
       forcedGolden: false,
@@ -214,7 +223,21 @@ if (!loaded || state.items.length === 0) {
    });
 }
 
-restartSpawnTimer(getSpawnContext());
-updateUI(getUIContext());
+function startGame() {
+   setupEvents();
+   setupGameLoops();
 
-updateSpawnProgressBar(getSpawnContext());
+   createGrid(DOM.game.grid);
+
+   const loaded = loadGame({
+      onItemCreated: addDragEvents,
+   });
+
+   createInitialItemsIfNeeded(loaded);
+
+   restartSpawnTimer(getSpawnContext());
+   updateUI(getUIContext());
+   updateSpawnProgressBar(getSpawnContext());
+}
+
+startGame();
