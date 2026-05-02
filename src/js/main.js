@@ -11,12 +11,6 @@ import { DOM } from './dom.js';
 import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
 
 // ===============================
-// TEXTOS DO JOGO
-// ===============================
-
-import { TEXTS } from './texts.js';
-
-// ===============================
 // ESTADO DO JOGO
 // ===============================
 
@@ -28,9 +22,6 @@ import { state } from './state.js';
 
 import {
    resetUpgrades,
-   increaseUpgradeLevel,
-   getUpgradeCost,
-   getStartLevel,
 } from './upgrades.js';
 
 // ===============================
@@ -40,7 +31,6 @@ import {
 import {
    createGrid,
    createItem,
-   upgradeOldItemsToStartLevel,
 } from './grid.js';
 
 // ===============================
@@ -50,8 +40,6 @@ import {
 import {
    updateSpawnProgressBar,
    updateSpawnBarVisual,
-   showSpawnPopup,
-   applySpawnSpeedUpgrade,
    restartSpawnTimer,
 } from './spawn.js';
 
@@ -118,7 +106,7 @@ function getUIContext() {
 
       shopMoney: DOM.shop.money,
       upgradesEl: DOM.shop.upgrades,
-      onBuyUpgrade: buyUpgrade,
+      onBuyUpgrade: handleBuyUpgrade,
 
       spawnTimeStat: DOM.stats.spawnTime,
       startLevelStat: DOM.stats.startLevel,
@@ -141,40 +129,23 @@ function getUIContext() {
    };
 }
 
-function buyUpgrade(key) {
-   const cost = getUpgradeCost(key);
-   if (state.money < cost) return;
+// ===============================
+// 12.1 AÇÕES DA LOJA
+// ===============================
 
-   state.money -= cost;
-   increaseUpgradeLevel(key);
+import { buyUpgrade } from './shopActions.js';
 
-   if (key === 'spawnSpeed') applySpawnSpeedUpgrade(getSpawnContext());
-
-   if (key === 'startLevel') {
-      const oldStartLevel = getStartLevel() - 1;
-
-      upgradeOldItemsToStartLevel({
-         onChanged: () => {
-            updateUI(getUIContext());
-            saveGame({
-               showText: true,
-               saveStatus: DOM.game.saveStatus,
-            });
-         },
-      });
-
-      showSpawnPopup(
-         DOM.spawn.popup,
-         TEXTS.spawn.upgradedForms(oldStartLevel, getStartLevel()),
-         'upgrade',
-      );
-   }
-
-   updateUI(getUIContext());
-   saveGame({
-      showText: true,
+function getShopActionsContext() {
+   return {
+      spawnPopup: DOM.spawn.popup,
       saveStatus: DOM.game.saveStatus,
-   });
+      spawnContext: getSpawnContext(),
+      onUpdateUI: () => updateUI(getUIContext()),
+   };
+}
+
+function handleBuyUpgrade(key) {
+   buyUpgrade(key, getShopActionsContext());
 }
 
 // ===============================
