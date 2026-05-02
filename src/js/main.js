@@ -136,33 +136,14 @@ import {
 // 6. FUNÇÕES DE CÁLCULO
 // ===============================
 
-function getShardMultiplier() {
-   return 1 + state.shards * SHARD_MULTIPLIER_STEP;
-}
-
-function getShardsReward() {
-   return (state.playerLevel - 1) * SHARD_REWARD_STEP;
-}
-
-function getNextMergeRequirement() {
-   return Math.ceil(state.mergesNeeded * MERGE_REQUIREMENT_MULTIPLIER);
-}
-
-function getBaseItemValue(level) {
-   return Math.pow(3, level - 1);
-}
-
-function getItemPotentialValue(item) {
-   return (
-      getBaseItemValue(item.level) *
-      (item.isGolden ? 2 : 1) *
-      getShardMultiplier()
-   );
-}
-
-function getTotalIncomePreview() {
-   return state.items.reduce((total, item) => total + getItemPotentialValue(item), 0);
-}
+import {
+   getShardMultiplier,
+   getShardsReward,
+   getNextMergeRequirement,
+   getBaseItemValue,
+   getItemPotentialValue,
+   getTotalIncomePreview,
+} from './economy.js';
 
 // ===============================
 // 7. GRID E ITENS
