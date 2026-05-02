@@ -2,18 +2,18 @@
 // UI — INTERFACE E RENDERIZAÇÃO
 // ===============================
 
-import { GRID_SIZE } from './core/config.js';
+import { GRID_SIZE } from '../core/config.js';
 import {
    DEV_ADD_SMALL_MONEY,
    DEV_ADD_BIG_MONEY,
    DEV_ADD_SMALL_SHARDS,
    DEV_ADD_BIG_SHARDS,
-} from './core/config.js';
+} from '../core/config.js';
 
-import { TEXTS } from './core/texts.js';
-import { state } from './core/state.js';
+import { TEXTS } from '../core/texts.js';
+import { state } from '../core/state.js';
 
-import { formatNumber, formatMoney, formatShards } from './format.js';
+import { formatNumber, formatMoney, formatShards } from '../utils/format.js';
 
 import {
    upgrades,
@@ -23,9 +23,9 @@ import {
    getDoubleSpawnChance,
    getDoubleMoneyChance,
    getGoldenChance,
-} from './upgrades.js';
+} from '../systems/upgrades.js';
 
-import { getShardMultiplier, getTotalIncomePreview } from './economy.js';
+import { getShardMultiplier, getTotalIncomePreview } from '../systems/economy.js';
 
 // ===============================
 // 1. PAINEL PRINCIPAL

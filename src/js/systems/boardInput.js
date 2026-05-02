@@ -15,7 +15,7 @@ import {
 
 import { getItemByCellIndex } from './grid.js';
 
-import { flashError } from './effects.js';
+import { flashError } from '../ui/effects.js';
 
 export function setupBoardInput({ onMerge, onUpdateUI, onSave }) {
    document.addEventListener('pointermove', (event) => {

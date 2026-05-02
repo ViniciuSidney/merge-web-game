@@ -9,7 +9,7 @@ import { createItem, getItemByExactCell } from './grid.js';
 
 import { getBaseItemValue, getShardMultiplier } from './economy.js';
 
-import { getElementCenter, createRing } from './effects.js';
+import { getElementCenter, createRing } from '../ui/effects.js';
 
 import { saveGame } from '../persistence/save.js';
 

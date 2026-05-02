@@ -8,7 +8,7 @@ import { state } from '../core/state.js';
 
 import { getShardsReward, getNextMergeRequirement } from './economy.js';
 
-import { showLevelUpPopup } from './effects.js';
+import { showLevelUpPopup } from '../ui/effects.js';
 import { saveGame } from '../persistence/save.js';
 
 export function addMergeProgress({ levelUpPopup, saveStatus, onUpdateUI }) {

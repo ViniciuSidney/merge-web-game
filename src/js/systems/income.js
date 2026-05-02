@@ -8,7 +8,7 @@ import { getDoubleMoneyChance } from './upgrades.js';
 
 import { getBaseItemValue, getShardMultiplier } from './economy.js';
 
-import { shouldShowMoneyPopup, createMoneyPopup } from './effects.js';
+import { shouldShowMoneyPopup, createMoneyPopup } from '../ui/effects.js';
 
 import { saveGame } from '../persistence/save.js';
 

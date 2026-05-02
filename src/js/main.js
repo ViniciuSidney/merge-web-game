@@ -21,7 +21,7 @@ import { addMergeProgress } from './systems/level.js';
 
 import { incomeTick } from './systems/income.js';
 
-import { updateUI } from './ui.js';
+import { updateUI } from './ui/ui.js';
 
 import { buyUpgrade } from './actions/shopActions.js';
 
@@ -31,7 +31,7 @@ import { resetGame } from './actions/gameActions.js';
 
 import { setupDevTools } from './dev/devTools.js';
 
-import { setupPanels } from './panels.js';
+import { setupPanels } from './ui/panels.js';
 
 import { setupBoardInput } from './systems/boardInput.js';
 

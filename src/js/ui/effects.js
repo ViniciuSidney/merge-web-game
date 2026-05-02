@@ -6,10 +6,10 @@ import {
    RING_REMOVE_DELAY,
    ERROR_EFFECT_DURATION,
    MONEY_POPUP_DURATION,
-} from './core/config.js';
+} from '../core/config.js';
 
-import { TEXTS } from './core/texts.js';
-import { formatMoney } from './format.js';
+import { TEXTS } from '../core/texts.js';
+import { formatMoney } from '../utils/format.js';
 
 export function getElementCenter(element) {
    const rect = element.getBoundingClientRect();
