@@ -2,71 +2,90 @@
 // 1. ELEMENTOS DO DOM
 // ===============================
 
-const grid = document.getElementById('grid');
-const moneyEl = document.getElementById('money');
-const incomeEl = document.getElementById('income');
-const shardsEl = document.getElementById('shards');
-const saveStatus = document.getElementById('saveStatus');
-const openShopBtn = document.getElementById('openShopBtn');
-const closeShopBtn = document.getElementById('closeShopBtn');
-const shop = document.getElementById('shop');
-const shopOverlay = document.getElementById('shopOverlay');
-const shopMoney = document.getElementById('shopMoney');
-const upgradesEl = document.getElementById('upgrades');
-const spawnTimeStat = document.getElementById('spawnTimeStat');
-const startLevelStat = document.getElementById('startLevelStat');
-const doubleSpawnStat = document.getElementById('doubleSpawnStat');
-const doubleMoneyStat = document.getElementById('doubleMoneyStat');
-const goldenChanceStat = document.getElementById('goldenChanceStat');
-const multiplierStat = document.getElementById('multiplierStat');
-const itemsStat = document.getElementById('itemsStat');
-const levelStat = document.getElementById('levelStat');
-const spawnProgressText = document.getElementById('spawnProgressText');
-const spawnProgressFill = document.getElementById('spawnProgressFill');
-const playerLevelEl = document.getElementById('playerLevel');
-const levelProgressText = document.getElementById('levelProgressText');
-const levelProgressFill = document.getElementById('levelProgressFill');
-const levelBonusText = document.getElementById('levelBonusText');
-const levelUpPopup = document.getElementById('levelUpPopup');
-const spawnPopup = document.getElementById('spawnPopup');
+const DOM = {
+   game: {
+      grid: document.getElementById('grid'),
+      saveStatus: document.getElementById('saveStatus'),
+   },
 
-const openSettingsBtn = document.getElementById('openSettingsBtn');
-const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-const settingsPanel = document.getElementById('settingsPanel');
-const settingsOverlay = document.getElementById('settingsOverlay');
-const settingsTabs = document.querySelectorAll('.settingsTab');
-const settingsContents = document.querySelectorAll('.settingsContent');
-const resetInsideBtn = document.getElementById('resetInsideBtn');
+   top: {
+      money: document.getElementById('money'),
+      income: document.getElementById('income'),
+      shards: document.getElementById('shards'),
+   },
 
-const devAddPolygonsSmall = document.getElementById('devAddPolygonsSmall');
-const devAddPolygonsBig = document.getElementById('devAddPolygonsBig');
-const devAddShardsSmall = document.getElementById('devAddShardsSmall');
-const devAddShardsBig = document.getElementById('devAddShardsBig');
-const devSpawnOne = document.getElementById('devSpawnOne');
-const devSpawnGolden = document.getElementById('devSpawnGolden');
-const devFillGrid = document.getElementById('devFillGrid');
-const devClearGrid = document.getElementById('devClearGrid');
-const devMaxSpawnSpeed = document.getElementById('devMaxSpawnSpeed');
-const devLevelUpForm = document.getElementById('devLevelUpForm');
-const devResetUpgrades = document.getElementById('devResetUpgrades');
-const devAllUpgrades5 = document.getElementById('devAllUpgrades5');
-const devAddMerge = document.getElementById('devAddMerge');
-const devForceLevelUp = document.getElementById('devForceLevelUp');
-const devPasswordInput = document.getElementById('devPasswordInput');
-const devLoginBtn = document.getElementById('devLoginBtn');
-const devErrorText = document.getElementById('devErrorText');
-const devLoginSection = document.getElementById('devLoginSection');
-const devContent = document.getElementById('devContent');
+   shop: {
+      openBtn: document.getElementById('openShopBtn'),
+      closeBtn: document.getElementById('closeShopBtn'),
+      panel: document.getElementById('shop'),
+      overlay: document.getElementById('shopOverlay'),
+      money: document.getElementById('shopMoney'),
+      upgrades: document.getElementById('upgrades'),
+   },
+
+   spawn: {
+      progressText: document.getElementById('spawnProgressText'),
+      progressFill: document.getElementById('spawnProgressFill'),
+      popup: document.getElementById('spawnPopup'),
+   },
+
+   level: {
+      playerLevel: document.getElementById('playerLevel'),
+      progressText: document.getElementById('levelProgressText'),
+      progressFill: document.getElementById('levelProgressFill'),
+      bonusText: document.getElementById('levelBonusText'),
+      popup: document.getElementById('levelUpPopup'),
+   },
+
+   settings: {
+      openBtn: document.getElementById('openSettingsBtn'),
+      closeBtn: document.getElementById('closeSettingsBtn'),
+      panel: document.getElementById('settingsPanel'),
+      overlay: document.getElementById('settingsOverlay'),
+      tabs: document.querySelectorAll('.settingsTab'),
+      contents: document.querySelectorAll('.settingsContent'),
+      resetBtn: document.getElementById('resetInsideBtn'),
+   },
+
+   stats: {
+      spawnTime: document.getElementById('spawnTimeStat'),
+      startLevel: document.getElementById('startLevelStat'),
+      doubleSpawn: document.getElementById('doubleSpawnStat'),
+      doubleMoney: document.getElementById('doubleMoneyStat'),
+      goldenChance: document.getElementById('goldenChanceStat'),
+      multiplier: document.getElementById('multiplierStat'),
+      items: document.getElementById('itemsStat'),
+      level: document.getElementById('levelStat'),
+   },
+
+   dev: {
+      addPolygonsSmall: document.getElementById('devAddPolygonsSmall'),
+      addPolygonsBig: document.getElementById('devAddPolygonsBig'),
+      addShardsSmall: document.getElementById('devAddShardsSmall'),
+      addShardsBig: document.getElementById('devAddShardsBig'),
+      spawnOne: document.getElementById('devSpawnOne'),
+      spawnGolden: document.getElementById('devSpawnGolden'),
+      fillGrid: document.getElementById('devFillGrid'),
+      clearGrid: document.getElementById('devClearGrid'),
+      maxSpawnSpeed: document.getElementById('devMaxSpawnSpeed'),
+      levelUpForm: document.getElementById('devLevelUpForm'),
+      resetUpgrades: document.getElementById('devResetUpgrades'),
+      allUpgrades5: document.getElementById('devAllUpgrades5'),
+      addMerge: document.getElementById('devAddMerge'),
+      forceLevelUp: document.getElementById('devForceLevelUp'),
+      passwordInput: document.getElementById('devPasswordInput'),
+      loginBtn: document.getElementById('devLoginBtn'),
+      errorText: document.getElementById('devErrorText'),
+      loginSection: document.getElementById('devLoginSection'),
+      content: document.getElementById('devContent'),
+   },
+};
 
 // ===============================
 // 2. CONSTANTES E CONFIGURAÇÕES BASE
 // ===============================
 
-import {
-   GRID_SIZE,
-   SPAWN_TICK_RATE,
-   MONEY_TICK_INTERVAL,
-} from './config.js';
+import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
 
 // ===============================
 // 2.1 TEXTOS DO JOGO
@@ -84,33 +103,24 @@ import { state } from './state.js';
 // 4. CONFIGURAÇÕES DE UPGRADES
 // ===============================
 
-import { UPGRADE_CONFIGS } from './upgradeConfig.js';
-
 import {
-   upgrades,
    resetUpgrades,
    increaseUpgradeLevel,
    getUpgradeCost,
-   getSpawnTime,
    getStartLevel,
-   getDoubleSpawnChance,
-   getDoubleMoneyChance,
-   getGoldenChance,
 } from './upgrades.js';
 
 // ===============================
 // 5. FUNÇÕES UTILITÁRIAS
 // ===============================
 
-import { formatNumber } from './format.js';
+// import { formatNumber } from './format.js';
 
 // ===============================
 // 6. FUNÇÕES DE CÁLCULO
 // ===============================
 
-// import {
-
-// } from './economy.js';
+// import {...} from './economy.js';
 
 // ===============================
 // 7. GRID E ITENS
@@ -119,11 +129,8 @@ import { formatNumber } from './format.js';
 import {
    createGrid,
    createItem,
-   clearAllItems,
    upgradeOldItemsToStartLevel,
-   isGridFull,
    getItemByCellIndex,
-   getItemByExactCell,
 } from './grid.js';
 
 // ===============================
@@ -140,9 +147,9 @@ import {
 
 function getSpawnContext() {
    return {
-      spawnProgressText,
-      spawnProgressFill,
-      spawnPopupElement: spawnPopup,
+      spawnProgressText: DOM.spawn.progressText,
+      spawnProgressFill: DOM.spawn.progressFill,
+      spawnPopupElement: DOM.spawn.popup,
       onItemCreated: addDragEvents,
       onUpdateUI: () => updateUI(getUIContext()),
    };
@@ -166,9 +173,7 @@ import {
 // 10. EFEITOS VISUAIS
 // ===============================
 
-import {
-   flashError,
-} from './effects.js';
+import { flashError } from './effects.js';
 
 // ===============================
 // 11. MERGE, LEVEL E ECONOMIA
@@ -204,32 +209,32 @@ import { updateUI } from './ui.js';
 
 function getUIContext() {
    return {
-      moneyEl,
-      incomeEl,
-      shardsEl,
+      moneyEl: DOM.top.money,
+      incomeEl: DOM.top.income,
+      shardsEl: DOM.top.shards,
 
-      shopMoney,
-      upgradesEl,
+      shopMoney: DOM.shop.money,
+      upgradesEl: DOM.shop.upgrades,
       onBuyUpgrade: buyUpgrade,
 
-      spawnTimeStat,
-      startLevelStat,
-      doubleSpawnStat,
-      doubleMoneyStat,
-      goldenChanceStat,
-      multiplierStat,
-      itemsStat,
-      levelStat,
+      spawnTimeStat: DOM.stats.spawnTime,
+      startLevelStat: DOM.stats.startLevel,
+      doubleSpawnStat: DOM.stats.doubleSpawn,
+      doubleMoneyStat: DOM.stats.doubleMoney,
+      goldenChanceStat: DOM.stats.goldenChance,
+      multiplierStat: DOM.stats.multiplier,
+      itemsStat: DOM.stats.items,
+      levelStat: DOM.stats.level,
 
-      playerLevelEl,
-      levelProgressText,
-      levelProgressFill,
-      levelBonusText,
+      playerLevelEl: DOM.level.playerLevel,
+      levelProgressText: DOM.level.progressText,
+      levelProgressFill: DOM.level.progressFill,
+      levelBonusText: DOM.level.bonusText,
 
-      devAddPolygonsSmall,
-      devAddPolygonsBig,
-      devAddShardsSmall,
-      devAddShardsBig,
+      devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
+      devAddPolygonsBig: DOM.dev.addPolygonsBig,
+      devAddShardsSmall: DOM.dev.addShardsSmall,
+      devAddShardsBig: DOM.dev.addShardsBig,
    };
 }
 
@@ -324,32 +329,32 @@ function devRefresh() {
 
 function getDevToolsContext() {
    return {
-      devAddPolygonsSmall,
-      devAddPolygonsBig,
-      devAddShardsSmall,
-      devAddShardsBig,
-      devSpawnOne,
-      devSpawnGolden,
-      devFillGrid,
-      devClearGrid,
-      devMaxSpawnSpeed,
-      devLevelUpForm,
-      devResetUpgrades,
-      devAllUpgrades5,
-      devAddMerge,
-      devForceLevelUp,
-      devLoginBtn,
-      devPasswordInput,
-      devErrorText,
-      devLoginSection,
-      devContent,
+      devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
+      devAddPolygonsBig: DOM.dev.addPolygonsBig,
+      devAddShardsSmall: DOM.dev.addShardsSmall,
+      devAddShardsBig: DOM.dev.addShardsBig,
+      devSpawnOne: DOM.dev.spawnOne,
+      devSpawnGolden: DOM.dev.spawnGolden,
+      devFillGrid: DOM.dev.fillGrid,
+      devClearGrid: DOM.dev.clearGrid,
+      devMaxSpawnSpeed: DOM.dev.maxSpawnSpeed,
+      devLevelUpForm: DOM.dev.levelUpForm,
+      devResetUpgrades: DOM.dev.resetUpgrades,
+      devAllUpgrades5: DOM.dev.allUpgrades5,
+      devAddMerge: DOM.dev.addMerge,
+      devForceLevelUp: DOM.dev.forceLevelUp,
+      devLoginBtn: DOM.dev.loginBtn,
+      devPasswordInput: DOM.dev.passwordInput,
+      devErrorText: DOM.dev.errorText,
+      devLoginSection: DOM.dev.loginSection,
+      devContent: DOM.dev.content,
 
       spawnPopup,
 
       onItemCreated: addDragEvents,
       onRefresh: devRefresh,
       onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
-      onAddMergeProgress: addMergeProgress,
+      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
    };
 }
 
