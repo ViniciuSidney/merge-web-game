@@ -38,10 +38,10 @@ const settingsTabs = document.querySelectorAll('.settingsTab');
 const settingsContents = document.querySelectorAll('.settingsContent');
 const resetInsideBtn = document.getElementById('resetInsideBtn');
 
-const devAddPolygons1K = document.getElementById('devAddPolygons1K');
-const devAddPolygons100K = document.getElementById('devAddPolygons100K');
-const devAddShards5 = document.getElementById('devAddShards5');
-const devAddShards50 = document.getElementById('devAddShards50');
+const devAddPolygonsSmall = document.getElementById('devAddPolygonsSmall');
+const devAddPolygonsBig = document.getElementById('devAddPolygonsBig');
+const devAddShardsSmall = document.getElementById('devAddShardsSmall');
+const devAddShardsBig = document.getElementById('devAddShardsBig');
 const devSpawnOne = document.getElementById('devSpawnOne');
 const devSpawnGolden = document.getElementById('devSpawnGolden');
 const devFillGrid = document.getElementById('devFillGrid');
@@ -67,6 +67,29 @@ const BASE_SPAWN_TIME = 6000;
 const SAVE_KEY = 'merge-clicker-prototype-save-v5';
 const SPAWN_TICK_RATE = 100;
 const DEV_PASSWORD = '67';
+
+const MAX_CHANCE = 0.5;
+const UPGRADE_CHANCE_STEP = 0.02;
+
+const SHARD_MULTIPLIER_STEP = 0.01;
+const SHARD_REWARD_STEP = 5;
+
+const MERGE_REWARD_MULTIPLIER = 5;
+const MERGE_REQUIREMENT_MULTIPLIER = 1.5;
+
+const MONEY_TICK_INTERVAL = 1000;
+
+const SAVE_FEEDBACK_DURATION = 1200;
+const LEVEL_UP_FEEDBACK_DURATION = 1600;
+
+const RING_REMOVE_DELAY = 500;
+const ERROR_EFFECT_DURATION = 360;
+const MONEY_POPUP_DURATION = 900;
+
+const DEV_ADD_SMALL_MONEY = 1000;
+const DEV_ADD_BIG_MONEY = 100000;
+const DEV_ADD_SMALL_SHARDS = 5;
+const DEV_ADD_BIG_SHARDS = 50;
 
 const LEVEL_COLORS = [
    { name: 'Branco', bg: '#f8f9fa', text: '#1f2933' },
@@ -221,15 +244,15 @@ function getCycleRoman(cycle) {
 // ===============================
 
 function getShardMultiplier() {
-   return 1 + shards * 0.01;
+   return 1 + shards * SHARD_MULTIPLIER_STEP;
 }
 
 function getShardsReward() {
-   return (playerLevel - 1) * 5;
+   return (playerLevel - 1) * SHARD_REWARD_STEP;
 }
 
 function getNextMergeRequirement() {
-   return Math.ceil(mergesNeeded * 1.5);
+   return Math.ceil(mergesNeeded * MERGE_REQUIREMENT_MULTIPLIER);
 }
 
 function getUpgradeCost(key) {
@@ -260,15 +283,24 @@ function getStartLevel() {
 }
 
 function getDoubleSpawnChance() {
-   return Math.min(0.5, upgrades.doubleSpawn.level * 0.02);
+   return Math.min(
+      MAX_CHANCE,
+      upgrades.doubleSpawn.level * UPGRADE_CHANCE_STEP,
+   );
 }
 
 function getDoubleMoneyChance() {
-   return Math.min(0.5, upgrades.doubleMoney.level * 0.02);
+   return Math.min(
+      MAX_CHANCE,
+      upgrades.doubleMoney.level * UPGRADE_CHANCE_STEP,
+   );
 }
 
 function getGoldenChance() {
-   return Math.min(0.5, upgrades.goldenChance.level * 0.02);
+   return Math.min(
+      MAX_CHANCE,
+      upgrades.goldenChance.level * UPGRADE_CHANCE_STEP,
+   );
 }
 
 function getBaseItemValue(level) {
@@ -670,7 +702,7 @@ function mergeItems(targetItem) {
    money +=
       getBaseItemValue(newLevel) *
       (newIsGolden ? 2 : 1) *
-      5 *
+      MERGE_REWARD_MULTIPLIER *
       getShardMultiplier();
    addMergeProgress();
    updateUI();
@@ -746,6 +778,10 @@ function updateUI() {
    levelProgressText.textContent = `${mergeProgress} / ${mergesNeeded} combinações`;
    levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
    levelBonusText.innerHTML = `Multiplicador por estilhaços: <strong>${getShardMultiplier().toFixed(1)}x</strong>`;
+   devAddPolygonsSmall.textContent = `Adicionar ${formatMoney(DEV_ADD_SMALL_MONEY)}`;
+   devAddPolygonsBig.textContent = `Adicionar ${formatMoney(DEV_ADD_BIG_MONEY)}`;
+   devAddShardsSmall.textContent = `Adicionar ${formatShards(DEV_ADD_SMALL_SHARDS)}`;
+   devAddShardsBig.textContent = `Adicionar ${formatShards(DEV_ADD_BIG_SHARDS)}`;
    renderUpgrades();
 }
 
@@ -947,23 +983,23 @@ function devSetSpawnToMinimum() {
 // 15. EVENTOS DEV TOOLS
 // ===============================
 
-devAddPolygons1K.addEventListener('click', () => {
-   money += 1000;
+devAddPolygonsSmall.addEventListener('click', () => {
+   money += DEV_ADD_SMALL_MONEY;
    devRefresh();
 });
 
-devAddPolygons100K.addEventListener('click', () => {
-   money += 100000;
+devAddPolygonsBig.addEventListener('click', () => {
+   money += DEV_ADD_BIG_MONEY;
    devRefresh();
 });
 
-devAddShards5.addEventListener('click', () => {
-   shards += 5;
+devAddShardsSmall.addEventListener('click', () => {
+   shards += DEV_ADD_SMALL_SHARDS;
    devRefresh();
 });
 
-devAddShards50.addEventListener('click', () => {
-   shards += 50;
+devAddShardsBig.addEventListener('click', () => {
+   shards += DEV_ADD_BIG_SHARDS;
    devRefresh();
 });
 
@@ -1144,7 +1180,7 @@ shopOverlay.addEventListener('click', closeShop);
 // 17. INICIALIZAÇÃO DO JOGO
 // ===============================
 
-setInterval(incomeTick, 1000);
+setInterval(incomeTick, MONEY_TICK_INTERVAL);
 setInterval(updateSpawnProgressBar, 100);
 
 createGrid();
