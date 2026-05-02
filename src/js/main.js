@@ -511,67 +511,14 @@ function resetDraggedStyles() {
 // 10. EFEITOS VISUAIS
 // ===============================
 
-function getElementCenter(element) {
-   const rect = element.getBoundingClientRect();
-   return {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-   };
-}
-
-function createRing(x, y, type = 'merge') {
-   const ring = document.createElement('div');
-   ring.className = `effectRing ${type === 'error' ? 'error' : ''}`;
-   ring.style.left = `${x}px`;
-   ring.style.top = `${y}px`;
-   document.body.appendChild(ring);
-   setTimeout(() => ring.remove(), 500);
-}
-
-function flashError(targetItem, targetCell) {
-   const center = getElementCenter(targetItem.element);
-   createRing(center.x, center.y, 'error');
-   targetCell.classList.add('errorFlash');
-   targetItem.element.classList.add('shakeError');
-   state.draggedItem.element.classList.add('shakeError');
-
-   setTimeout(() => {
-      targetCell.classList.remove('errorFlash');
-      targetItem.element.classList.remove('shakeError');
-      if (state.draggedItem) state.draggedItem.element.classList.remove('shakeError');
-   }, 360);
-}
-
-function showLevelUpPopup(oldLevel, newLevel, reward) {
-   levelUpPopup.innerHTML = TEXTS.level.up(oldLevel, newLevel, reward);
-
-   levelUpPopup.classList.remove('show');
-   void levelUpPopup.offsetWidth;
-   levelUpPopup.classList.add('show');
-}
-
-function shouldShowMoneyPopup(isDoubleTick, item) {
-   const compactMode = window.innerHeight <= 760 || window.innerWidth <= 520;
-
-   if (!compactMode) return true;
-
-   // Eventos especiais continuam tendo destaque.
-   if (isDoubleTick || item.isGolden) return true;
-
-   // Em modo compacto, mostra só parte dos popups comuns.
-   return Math.random() < 0.35;
-}
-
-function createMoneyPopup(item, amount, isDoubleTick) {
-   const rect = item.element.getBoundingClientRect();
-   const popup = document.createElement('div');
-   popup.className = `moneyPopup ${isDoubleTick ? 'double' : ''} ${item.isGolden ? 'goldenText' : ''}`;
-   popup.textContent = TEXTS.item.moneyPopup(formatMoney(amount), isDoubleTick);
-   popup.style.left = `${rect.left + rect.width / 2 - 24}px`;
-   popup.style.top = `${rect.top - 4}px`;
-   document.body.appendChild(popup);
-   setTimeout(() => popup.remove(), 900);
-}
+import {
+   getElementCenter,
+   createRing,
+   flashError,
+   showLevelUpPopup,
+   shouldShowMoneyPopup,
+   createMoneyPopup,
+} from './effects.js';
 
 // ===============================
 // 11. MERGE, LEVEL E ECONOMIA
@@ -616,7 +563,7 @@ function addMergeProgress() {
       const reward = getShardsReward();
       state.shards += reward;
 
-      showLevelUpPopup(oldLevel, state.playerLevel, reward);
+      showLevelUpPopup(levelUpPopup, oldLevel, state.playerLevel, reward);
 
       state.mergesNeeded = getNextMergeRequirement();
 
@@ -1044,7 +991,7 @@ document.addEventListener('pointerup', (event) => {
    }
 
    if (targetItem && targetItem.level !== state.draggedItem.level) {
-      flashError(targetItem, cell);
+      flashError(targetItem, cell, state.draggedItem);
       returnToOriginalCell();
       state.draggedItem = null;
       return;
