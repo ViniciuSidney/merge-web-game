@@ -185,57 +185,15 @@ function getSpawnContext() {
 // 9. DRAG AND DROP
 // ===============================
 
-function addDragEvents(item) {
-   item.element.addEventListener('pointerdown', (event) => {
-      state.draggedItem = item;
-      state.originalCellIndex = item.cellIndex;
-
-      const rect = item.element.getBoundingClientRect();
-      state.offsetX = event.clientX - rect.left;
-      state.offsetY = event.clientY - rect.top;
-
-      item.element.classList.add('dragging');
-      item.element.style.width = `${rect.width}px`;
-      item.element.style.height = `${rect.height}px`;
-      document.body.appendChild(item.element);
-
-      moveDraggedItem(event.clientX, event.clientY);
-   });
-}
-
-function moveDraggedItem(x, y) {
-   if (!state.draggedItem) return;
-   state.draggedItem.element.style.left = `${x - state.offsetX}px`;
-   state.draggedItem.element.style.top = `${y - state.offsetY}px`;
-}
-
-function getCellUnderPointer(x, y) {
-   return state.cells.find((cell) => {
-      const rect = cell.getBoundingClientRect();
-      return (
-         x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
-      );
-   });
-}
-
-function clearHighlights() {
-   state.cells.forEach((cell) => cell.classList.remove('highlight'));
-}
-
-function returnToOriginalCell() {
-   const originalCell = state.cells[state.originalCellIndex];
-   originalCell.appendChild(state.draggedItem.element);
-   state.draggedItem.cellIndex = state.originalCellIndex;
-   resetDraggedStyles();
-}
-
-function resetDraggedStyles() {
-   state.draggedItem.element.classList.remove('dragging');
-   state.draggedItem.element.style.left = '';
-   state.draggedItem.element.style.top = '';
-   state.draggedItem.element.style.width = '';
-   state.draggedItem.element.style.height = '';
-}
+import {
+   addDragEvents,
+   moveDraggedItem,
+   getCellUnderPointer,
+   clearHighlights,
+   returnToOriginalCell,
+   moveItemToCell,
+   clearDraggedItem,
+} from './drag.js';
 
 // ===============================
 // 10. EFEITOS VISUAIS
@@ -676,7 +634,11 @@ document.addEventListener('pointermove', (event) => {
    const cell = getCellUnderPointer(event.clientX, event.clientY);
    if (!cell) return;
 
-   const targetItem = getItemByCellIndex(Number(cell.dataset.index));
+   const targetItem = getItemByCellIndex(
+      Number(cell.dataset.index),
+      state.draggedItem,
+   );
+
    if (targetItem && targetItem.level === state.draggedItem.level) {
       cell.classList.add('highlight');
    }
@@ -690,12 +652,12 @@ document.addEventListener('pointerup', (event) => {
 
    if (!cell) {
       returnToOriginalCell();
-      state.draggedItem = null;
+      clearDraggedItem();
       return;
    }
 
    const targetCellIndex = Number(cell.dataset.index);
-   const targetItem = getItemByCellIndex(targetCellIndex);
+   const targetItem = getItemByCellIndex(targetCellIndex, state.draggedItem);
 
    if (targetItem && targetItem.level === state.draggedItem.level) {
       mergeItems(targetItem);
@@ -705,22 +667,19 @@ document.addEventListener('pointerup', (event) => {
    if (targetItem && targetItem.level !== state.draggedItem.level) {
       flashError(targetItem, cell, state.draggedItem);
       returnToOriginalCell();
-      state.draggedItem = null;
+      clearDraggedItem();
       return;
    }
 
    if (!targetItem) {
-      cell.appendChild(state.draggedItem.element);
-      state.draggedItem.cellIndex = targetCellIndex;
-      resetDraggedStyles();
-      state.draggedItem = null;
+      moveItemToCell(targetCellIndex);
       updateUI();
       saveGame();
       return;
    }
 
    returnToOriginalCell();
-   state.draggedItem = null;
+   clearDraggedItem();
 });
 
 resetInsideBtn.addEventListener('click', resetGame);
