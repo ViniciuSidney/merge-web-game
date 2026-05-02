@@ -821,7 +821,6 @@ function buyUpgrade(key) {
       showSpawnPopup(
          `⬆️ Formas melhoradas! Lv ${oldStartLevel} → Lv ${getStartLevel()}`,
          'upgrade',
-         1200,
       );
    }
    updateUI();
@@ -935,12 +934,12 @@ function unlockDevTools() {
 
 function devRefresh() {
    updateUI();
-   updateSpawnBarVisual?.();
+   updateSpawnBarVisual();
    saveGame(true);
 }
 
 function devSetSpawnToMinimum() {
-   const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 50);
+   const neededLevel = Math.ceil((BASE_SPAWN_TIME - 2000) / 100);
    upgrades.spawnSpeed.level = Math.max(upgrades.spawnSpeed.level, neededLevel);
 }
 
