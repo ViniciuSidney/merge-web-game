@@ -88,7 +88,6 @@ import {
    NUMBER_SUFFIXES,
 } from './config.js';
 
-
 // ===============================
 // 2.1 TEXTOS DO JOGO
 // ===============================
@@ -149,150 +148,17 @@ import {
 // 7. GRID E ITENS
 // ===============================
 
-function createGrid() {
-   grid.innerHTML = '';
-   state.cells = [];
-
-   for (let i = 0; i < GRID_SIZE; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.index = i;
-      grid.appendChild(cell);
-      state.cells.push(cell);
-   }
-}
-
-function getFreeCells() {
-   const occupied = state.items.map((item) => item.cellIndex);
-   return state.cells.filter((_, index) => !occupied.includes(index));
-}
-
-function isGridFull() {
-   return state.items.length >= GRID_SIZE;
-}
-
-function getLevelVisual(level) {
-   const colorIndex = (level - 1) % LEVEL_COLORS.length;
-   const cycle = Math.floor((level - 1) / LEVEL_COLORS.length);
-   const color = LEVEL_COLORS[colorIndex];
-
-   return {
-      bg: color.bg,
-      text: color.text,
-      cycle,
-   };
-}
-
-function getLevelShadow(cycle, isGolden) {
-   const baseShadow = `
-               inset 0 -6px rgba(0, 0, 0, 0.12),
-               0 6px 12px rgba(0, 0, 0, 0.16)
-            `;
-
-   const cycleEffects = [
-      '',
-      '0 0 0 3px rgba(255, 255, 255, 0.8)',
-      '0 0 0 3px rgba(108, 92, 231, 0.9), 0 0 16px rgba(108, 92, 231, 0.45)',
-      '0 0 0 3px rgba(255, 216, 77, 0.95), 0 0 20px rgba(255, 216, 77, 0.55)',
-      '0 0 0 4px rgba(255, 255, 255, 0.9), 0 0 24px rgba(31, 143, 72, 0.6)',
-   ];
-
-   const cycleShadow = cycleEffects[Math.min(cycle, cycleEffects.length - 1)];
-
-   const goldenShadow = isGolden ? '0 0 0 3px #ffd84d, 0 0 18px #ffd84d' : '';
-
-   return [goldenShadow, cycleShadow, baseShadow].filter(Boolean).join(',');
-}
-
-function updateItemElement(item) {
-   const visual = getLevelVisual(item.level);
-   const cycleBadge =
-      visual.cycle > 0
-         ? `<span class="cycleBadge">${getCycleRoman(visual.cycle)}</span>`
-         : '';
-
-   item.element.className = `item pop ${item.isGolden ? 'golden' : ''}`;
-   item.element.dataset.level = item.level;
-
-   item.element.style.background = `
-               linear-gradient(
-                  145deg,
-                  ${visual.bg},
-                  color-mix(in srgb, ${visual.bg} 70%, #000 30%)
-               )
-            `;
-
-   item.element.style.color = visual.text;
-
-   item.element.style.boxShadow = getLevelShadow(visual.cycle, item.isGolden);
-
-   item.element.innerHTML = `
-      ${cycleBadge}
-      <span class="itemLevelText">${TEXTS.item.level(item.level)}</span>
-      ${item.isGolden ? TEXTS.item.goldenBonus : ''}
-   `;
-}
-
-function createItem(
-   level = getStartLevel(),
-   cellIndex = null,
-   forcedGolden = null,
-) {
-   const freeCells = getFreeCells();
-   if (freeCells.length === 0 && cellIndex === null) return false;
-
-   const chosenCell =
-      cellIndex !== null
-         ? state.cells[cellIndex]
-         : freeCells[Math.floor(Math.random() * freeCells.length)];
-
-   const chosenIndex = Number(chosenCell.dataset.index);
-   const isGolden = forcedGolden ?? Math.random() < getGoldenChance();
-
-   if (isGolden && cellIndex === null) {
-      showSpawnPopup(TEXTS.spawn.goldenObject, 'golden');
-   }
-
-   const element = document.createElement('div');
-   const item = {
-      id: crypto.randomUUID(),
-      level,
-      cellIndex: chosenIndex,
-      isGolden,
-      element,
-   };
-
-   updateItemElement(item);
-   chosenCell.appendChild(element);
-   state.items.push(item);
-   addDragEvents(item);
-   updateUI();
-   saveGame();
-   return true;
-}
-
-function clearAllItems() {
-   state.items.forEach((item) => item.element.remove());
-   state.items = [];
-}
-
-function upgradeOldItemsToStartLevel() {
-   const startLevel = getStartLevel();
-   let changed = false;
-
-   state.items.forEach((item) => {
-      if (item.level < startLevel) {
-         item.level = startLevel;
-         updateItemElement(item);
-         changed = true;
-      }
-   });
-
-   if (changed) {
-      updateUI();
-      saveGame(true);
-   }
-}
+import {
+   createGrid,
+   createItem,
+   clearAllItems,
+   upgradeOldItemsToStartLevel,
+   updateItemElement,
+   getFreeCells,
+   isGridFull,
+   getItemByCellIndex,
+   getItemByExactCell,
+} from './grid.js';
 
 // ===============================
 // 8. SPAWN
@@ -336,17 +202,28 @@ function showSpawnPopup(message, type = '') {
 function spawnObjects() {
    if (isGridFull()) return false;
 
-   const firstSpawned = createItem();
+   const firstSpawned = createItem({
+      onCreated: addDragEvents,
+      onGoldenSpawn: () => showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+   });
 
    const canDoubleSpawn =
       !isGridFull() && Math.random() < getDoubleSpawnChance();
 
    if (canDoubleSpawn) {
-      createItem();
+      createItem({
+         onCreated: addDragEvents,
+         onGoldenSpawn: () =>
+            showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+      });
+
       showSpawnPopup(TEXTS.spawn.doubleDelivery, 'double');
    }
 
-   return firstSpawned;
+   updateUI();
+   saveGame();
+
+   return Boolean(firstSpawned);
 }
 
 function applySpawnSpeedUpgrade() {
@@ -406,16 +283,6 @@ function getCellUnderPointer(x, y) {
    });
 }
 
-function getItemByCellIndex(cellIndex) {
-   return state.items.find(
-      (item) => item.cellIndex === cellIndex && item !== state.draggedItem,
-   );
-}
-
-function getItemByExactCell(cellIndex) {
-   return state.items.find((item) => item.cellIndex === cellIndex);
-}
-
 function clearHighlights() {
    state.cells.forEach((cell) => cell.classList.remove('highlight'));
 }
@@ -460,10 +327,17 @@ function mergeItems(targetItem) {
 
    state.draggedItem.element.remove();
    targetItem.element.remove();
-   state.items = state.items.filter((item) => item !== state.draggedItem && item !== targetItem);
+   state.items = state.items.filter(
+      (item) => item !== state.draggedItem && item !== targetItem,
+   );
 
    state.draggedItem = null;
-   createItem(newLevel, targetCellIndex, newIsGolden);
+   createItem({
+      level: newLevel,
+      cellIndex: targetCellIndex,
+      forcedGolden: newIsGolden,
+      onCreated: addDragEvents,
+   });
 
    const newItem = getItemByExactCell(targetCellIndex);
    if (newItem) newItem.element.classList.add('mergeBurst');
@@ -640,7 +514,12 @@ function buyUpgrade(key) {
    if (key === 'startLevel') {
       const oldStartLevel = getStartLevel() - 1;
 
-      upgradeOldItemsToStartLevel();
+      upgradeOldItemsToStartLevel({
+         onChanged: () => {
+            updateUI();
+            saveGame(true);
+         },
+      });
 
       showSpawnPopup(
          TEXTS.spawn.upgradedForms(oldStartLevel, getStartLevel()),
@@ -704,11 +583,12 @@ function loadGame() {
 
       if (Array.isArray(saveData.items)) {
          saveData.items.forEach((savedItem) => {
-            createItem(
-               savedItem.level,
-               savedItem.cellIndex,
-               savedItem.isGolden,
-            );
+            createItem({
+               level: savedItem.level,
+               cellIndex: savedItem.cellIndex,
+               forcedGolden: savedItem.isGolden,
+               onCreated: addDragEvents,
+            });
          });
       }
 
@@ -733,8 +613,16 @@ function resetGame() {
    localStorage.removeItem(SAVE_KEY);
 
    resetUpgrades();
-   createItem(1, null, false);
-   createItem(1, null, false);
+   createItem({
+      level: 1,
+      forcedGolden: false,
+      onCreated: addDragEvents,
+   });
+   createItem({
+      level: 1,
+      forcedGolden: false,
+      onCreated: addDragEvents,
+   });
    restartSpawnTimer();
    updateUI();
    saveGame(true);
@@ -789,18 +677,31 @@ devAddShardsBig.addEventListener('click', () => {
 });
 
 devSpawnOne.addEventListener('click', () => {
-   createItem();
+   createItem({
+      onCreated: addDragEvents,
+      onGoldenSpawn: () => showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+   });
    devRefresh();
 });
 
 devSpawnGolden.addEventListener('click', () => {
-   createItem(getStartLevel(), null, true);
+   createItem({
+      level: getStartLevel(),
+      forcedGolden: true,
+      onCreated: addDragEvents,
+      onGoldenSpawn: () => showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+   });
+
    devRefresh();
 });
 
 devFillGrid.addEventListener('click', () => {
    while (!isGridFull()) {
-      createItem();
+      createItem({
+         onCreated: addDragEvents,
+         onGoldenSpawn: () =>
+            showSpawnPopup(TEXTS.spawn.goldenObject, 'golden'),
+      });
    }
 
    devRefresh();
@@ -819,7 +720,9 @@ devMaxSpawnSpeed.addEventListener('click', () => {
 
 devLevelUpForm.addEventListener('click', () => {
    increaseUpgradeLevel('startLevel');
-   upgradeOldItemsToStartLevel();
+   upgradeOldItemsToStartLevel({
+      onChanged: devRefresh,
+   });
    devRefresh();
 });
 
@@ -832,7 +735,9 @@ devResetUpgrades.addEventListener('click', () => {
 devAllUpgrades5.addEventListener('click', () => {
    setAllUpgradesLevel(5);
 
-   upgradeOldItemsToStartLevel();
+   upgradeOldItemsToStartLevel({
+      onChanged: devRefresh,
+   });
    restartSpawnTimer();
    devRefresh();
 });
@@ -963,12 +868,20 @@ shopOverlay.addEventListener('click', closeShop);
 setInterval(incomeTick, MONEY_TICK_INTERVAL);
 setInterval(updateSpawnProgressBar, SPAWN_TICK_RATE);
 
-createGrid();
+createGrid(grid);
 const loaded = loadGame();
 
 if (!loaded || state.items.length === 0) {
-   createItem(1, null, false);
-   createItem(1, null, false);
+   createItem({
+      level: 1,
+      forcedGolden: false,
+      onCreated: addDragEvents,
+   });
+   createItem({
+      level: 1,
+      forcedGolden: false,
+      onCreated: addDragEvents,
+   });
 }
 
 restartSpawnTimer();
