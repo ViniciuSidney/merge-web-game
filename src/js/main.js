@@ -193,8 +193,8 @@ import { addMergeProgress } from './level.js';
 
 function getLevelContext() {
    return {
-      levelUpPopup,
-      saveStatus,
+      levelUpPopup: DOM.level.popup,
+      saveStatus: DOM.game.saveStatus,
       onUpdateUI: () => updateUI(getUIContext()),
    };
 }
@@ -255,13 +255,13 @@ function buyUpgrade(key) {
             updateUI(getUIContext());
             saveGame({
                showText: true,
-               saveStatus,
+               saveStatus: DOM.game.saveStatus,
             });
          },
       });
 
       showSpawnPopup(
-         spawnPopup,
+         DOM.spawn.popup,
          TEXTS.spawn.upgradedForms(oldStartLevel, getStartLevel()),
          'upgrade',
       );
@@ -270,7 +270,7 @@ function buyUpgrade(key) {
    updateUI(getUIContext());
    saveGame({
       showText: true,
-      saveStatus,
+      saveStatus: DOM.game.saveStatus,
    });
 }
 
@@ -308,7 +308,7 @@ function resetGame() {
 
    saveGame({
       showText: true,
-      saveStatus,
+      saveStatus: DOM.game.saveStatus,
    });
 }
 
@@ -323,7 +323,7 @@ function devRefresh() {
    updateSpawnBarVisual(getSpawnContext());
    saveGame({
       showText: true,
-      saveStatus,
+      saveStatus: DOM.game.saveStatus,
    });
 }
 
@@ -349,7 +349,7 @@ function getDevToolsContext() {
       devLoginSection: DOM.dev.loginSection,
       devContent: DOM.dev.content,
 
-      spawnPopup,
+      spawnPopup: DOM.spawn.popup,
 
       onItemCreated: addDragEvents,
       onRefresh: devRefresh,
@@ -366,18 +366,18 @@ import { setupPanels } from './panels.js';
 
 function getPanelsContext() {
    return {
-      settingsTabs,
-      settingsContents,
+      settingsTabs: DOM.settings.tabs,
+      settingsContents: DOM.settings.contents,
 
-      openSettingsBtn,
-      closeSettingsBtn,
-      settingsPanel,
-      settingsOverlay,
+      openSettingsBtn: DOM.settings.openBtn,
+      closeSettingsBtn: DOM.settings.closeBtn,
+      settingsPanel: DOM.settings.panel,
+      settingsOverlay: DOM.settings.overlay,
 
-      openShopBtn,
-      closeShopBtn,
-      shop,
-      shopOverlay,
+      openShopBtn: DOM.shop.openBtn,
+      closeShopBtn: DOM.shop.closeBtn,
+      shop: DOM.shop.panel,
+      shopOverlay: DOM.shop.overlay,
    };
 }
 
@@ -438,7 +438,7 @@ document.addEventListener('pointerup', (event) => {
    clearDraggedItem();
 });
 
-resetInsideBtn.addEventListener('click', resetGame);
+DOM.settings.resetBtn.addEventListener('click', resetGame);
 
 // ===============================
 // 17. INICIALIZAÇÃO DO JOGO
@@ -457,7 +457,7 @@ setInterval(() => {
    updateSpawnProgressBar(getSpawnContext());
 }, SPAWN_TICK_RATE);
 
-createGrid(grid);
+createGrid(DOM.game.grid);
 const loaded = loadGame({
    onItemCreated: addDragEvents,
 });
