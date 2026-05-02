@@ -62,67 +62,32 @@ const devContent = document.getElementById('devContent');
 // 2. CONSTANTES E CONFIGURAÇÕES BASE
 // ===============================
 
-const GRID_SIZE = 16;
-const BASE_SPAWN_TIME = 6000;
-const SAVE_KEY = 'merge-clicker-prototype-save-v5';
-const SPAWN_TICK_RATE = 100;
-const DEV_PASSWORD = '67';
+import {
+   GRID_SIZE,
+   BASE_SPAWN_TIME,
+   SAVE_KEY,
+   SPAWN_TICK_RATE,
+   DEV_PASSWORD,
+   MAX_CHANCE,
+   UPGRADE_CHANCE_STEP,
+   SHARD_MULTIPLIER_STEP,
+   SHARD_REWARD_STEP,
+   MERGE_REWARD_MULTIPLIER,
+   MERGE_REQUIREMENT_MULTIPLIER,
+   MONEY_TICK_INTERVAL,
+   SAVE_FEEDBACK_DURATION,
+   LEVEL_UP_FEEDBACK_DURATION,
+   RING_REMOVE_DELAY,
+   ERROR_EFFECT_DURATION,
+   MONEY_POPUP_DURATION,
+   DEV_ADD_SMALL_MONEY,
+   DEV_ADD_BIG_MONEY,
+   DEV_ADD_SMALL_SHARDS,
+   DEV_ADD_BIG_SHARDS,
+   LEVEL_COLORS,
+   NUMBER_SUFFIXES,
+} from './config.js';
 
-const MAX_CHANCE = 0.5;
-const UPGRADE_CHANCE_STEP = 0.02;
-
-const SHARD_MULTIPLIER_STEP = 0.01;
-const SHARD_REWARD_STEP = 5;
-
-const MERGE_REWARD_MULTIPLIER = 5;
-const MERGE_REQUIREMENT_MULTIPLIER = 1.5;
-
-const MONEY_TICK_INTERVAL = 1000;
-
-const SAVE_FEEDBACK_DURATION = 1200;
-const LEVEL_UP_FEEDBACK_DURATION = 1600;
-
-const RING_REMOVE_DELAY = 500;
-const ERROR_EFFECT_DURATION = 360;
-const MONEY_POPUP_DURATION = 900;
-
-const DEV_ADD_SMALL_MONEY = 1000;
-const DEV_ADD_BIG_MONEY = 100000;
-const DEV_ADD_SMALL_SHARDS = 5;
-const DEV_ADD_BIG_SHARDS = 50;
-
-const LEVEL_COLORS = [
-   { name: 'Branco', bg: '#f8f9fa', text: '#1f2933' },
-   { name: 'Ciano', bg: '#22d3ee', text: '#06323a' },
-   { name: 'Azul claro', bg: '#60a5fa', text: '#0f2748' },
-   { name: 'Azul escuro', bg: '#2563eb', text: '#ffffff' },
-   { name: 'Roxo', bg: '#7c3aed', text: '#ffffff' },
-   { name: 'Vermelho claro', bg: '#f87171', text: '#4a1010' },
-   { name: 'Rosa', bg: '#ec4899', text: '#ffffff' },
-   { name: 'Vinho', bg: '#881337', text: '#ffffff' },
-   { name: 'Marrom', bg: '#92400e', text: '#ffffff' },
-   { name: 'Laranja', bg: '#f97316', text: '#ffffff' },
-   { name: 'Amarelo', bg: '#facc15', text: '#3f3300' },
-   { name: 'Verde claro', bg: '#86efac', text: '#064e3b' },
-   { name: 'Verde escuro', bg: '#15803d', text: '#ffffff' },
-   { name: 'Cinza', bg: '#6b7280', text: '#ffffff' },
-   { name: 'Preto', bg: '#111827', text: '#ffffff' },
-];
-
-const NUMBER_SUFFIXES = [
-   '', // unidade
-   'K', // mil
-   'M', // milhão
-   'B', // bilhão
-   'T', // trilhão
-   'Qd', // quadrilhão
-   'Qi', // quintilhão
-   'Sx', // sextilhão
-   'Sp', // septilhão
-   'Oc', // octilhão
-   'No', // nonilhão
-   'Dc', // decilhão
-];
 
 // ===============================
 // 2.1 TEXTOS DO JOGO
