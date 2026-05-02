@@ -64,27 +64,15 @@ const devContent = document.getElementById('devContent');
 
 import {
    GRID_SIZE,
-   BASE_SPAWN_TIME,
    SPAWN_TICK_RATE,
    DEV_PASSWORD,
-   MAX_CHANCE,
-   UPGRADE_CHANCE_STEP,
-   SHARD_MULTIPLIER_STEP,
-   SHARD_REWARD_STEP,
    MERGE_REWARD_MULTIPLIER,
-   MERGE_REQUIREMENT_MULTIPLIER,
    MONEY_TICK_INTERVAL,
-   SAVE_FEEDBACK_DURATION,
    LEVEL_UP_FEEDBACK_DURATION,
-   RING_REMOVE_DELAY,
-   ERROR_EFFECT_DURATION,
-   MONEY_POPUP_DURATION,
    DEV_ADD_SMALL_MONEY,
    DEV_ADD_BIG_MONEY,
    DEV_ADD_SMALL_SHARDS,
    DEV_ADD_BIG_SHARDS,
-   LEVEL_COLORS,
-   NUMBER_SUFFIXES,
 } from './config.js';
 
 // ===============================
@@ -123,12 +111,7 @@ import {
 // 5. FUNÇÕES UTILITÁRIAS
 // ===============================
 
-import {
-   formatNumber,
-   formatMoney,
-   formatShards,
-   getCycleRoman,
-} from './format.js';
+import { formatNumber } from './format.js';
 
 // ===============================
 // 6. FUNÇÕES DE CÁLCULO
@@ -139,8 +122,6 @@ import {
    getShardsReward,
    getNextMergeRequirement,
    getBaseItemValue,
-   getItemPotentialValue,
-   getTotalIncomePreview,
 } from './economy.js';
 
 // ===============================
@@ -152,8 +133,6 @@ import {
    createItem,
    clearAllItems,
    upgradeOldItemsToStartLevel,
-   updateItemElement,
-   getFreeCells,
    isGridFull,
    getItemByCellIndex,
    getItemByExactCell,
@@ -389,7 +368,6 @@ function resetGame() {
    resetUpgrades();
    clearSave();
 
-   resetUpgrades();
    createItem({
       level: 1,
       forcedGolden: false,
