@@ -1,47 +1,15 @@
-// ===============================
-// ELEMENTOS DO DOM
-// ===============================
 
 import { DOM } from './dom.js';
 
-// ===============================
-// CONSTANTES E CONFIGURAÇÕES BASE
-// ===============================
-
 import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './config.js';
-
-// ===============================
-// ESTADO DO JOGO
-// ===============================
 
 import { state } from './state.js';
 
-// ===============================
-// CONFIGURAÇÕES DE UPGRADES
-// ===============================
+import { resetUpgrades } from './upgrades.js';
 
-import {
-   resetUpgrades,
-} from './upgrades.js';
+import { createGrid, createItem } from './grid.js';
 
-// ===============================
-// GRID E ITENS
-// ===============================
-
-import {
-   createGrid,
-   createItem,
-} from './grid.js';
-
-// ===============================
-// SPAWN
-// ===============================
-
-import {
-   updateSpawnProgressBar,
-   updateSpawnBarVisual,
-   restartSpawnTimer,
-} from './spawn.js';
+import { updateSpawnProgressBar, updateSpawnBarVisual, restartSpawnTimer } from './spawn.js';
 
 function getSpawnContext() {
    return {
@@ -53,21 +21,7 @@ function getSpawnContext() {
    };
 }
 
-// ===============================
-// DRAG AND DROP
-// ===============================
-
-import {
-   addDragEvents,
-} from './drag.js';
-
-// ===============================
-// EFEITOS VISUAIS
-// ===============================
-
-// ===============================
-// MERGE, LEVEL E ECONOMIA
-// ===============================
+import { addDragEvents } from './drag.js';
 
 // Merge
 import { mergeItems } from './merge.js';
@@ -92,12 +46,8 @@ function getLevelContext() {
 // Economia
 import { incomeTick } from './income.js';
 
-// ===============================
-// INTERFACE E RENDERIZAÇÃO
-// ===============================
 
 import { updateUI } from './ui.js';
-
 function getUIContext() {
    return {
       moneyEl: DOM.top.money,
@@ -129,12 +79,7 @@ function getUIContext() {
    };
 }
 
-// ===============================
-// 12.1 AÇÕES DA LOJA
-// ===============================
-
 import { buyUpgrade } from './shopActions.js';
-
 function getShopActionsContext() {
    return {
       spawnPopup: DOM.spawn.popup,
@@ -143,17 +88,11 @@ function getShopActionsContext() {
       onUpdateUI: () => updateUI(getUIContext()),
    };
 }
-
 function handleBuyUpgrade(key) {
    buyUpgrade(key, getShopActionsContext());
 }
 
-// ===============================
-// SALVAMENTO
-// ===============================
-
 import { saveGame, loadGame, clearSave } from './save.js';
-
 function resetGame() {
    state.money = 0;
    state.shards = 0;
@@ -186,12 +125,7 @@ function resetGame() {
    });
 }
 
-// ===============================
-// DEV TOOLS
-// ===============================
-
 import { setupDevTools } from './devTools.js';
-
 function devRefresh() {
    updateUI(getUIContext());
    updateSpawnBarVisual(getSpawnContext());
@@ -200,7 +134,6 @@ function devRefresh() {
       saveStatus: DOM.game.saveStatus,
    });
 }
-
 function getDevToolsContext() {
    return {
       devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
@@ -237,7 +170,6 @@ function getDevToolsContext() {
 // ===============================
 
 import { setupPanels } from './panels.js';
-
 function getPanelsContext() {
    return {
       settingsTabs: DOM.settings.tabs,
@@ -256,7 +188,6 @@ function getPanelsContext() {
 }
 
 import { setupBoardInput } from './boardInput.js';
-
 function getBoardInputContext() {
    return {
       onMerge: (targetItem) => mergeItems(targetItem, getMergeContext()),
