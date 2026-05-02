@@ -99,19 +99,7 @@ import { TEXTS } from './texts.js';
 // 3. ESTADO DO JOGO
 // ===============================
 
-let money = 0;
-let shards = 0;
-let playerLevel = 1;
-let mergeProgress = 0;
-let mergesNeeded = 5;
-let cells = [];
-let items = [];
-let draggedItem = null;
-let originalCellIndex = null;
-let offsetX = 0;
-let offsetY = 0;
-let spawnProgress = 0;
-let saveTextTimer = null;
+import { state } from './state.js';
 
 // ===============================
 // 4. CONFIGURAÇÕES DE UPGRADES
@@ -154,15 +142,15 @@ import {
 // ===============================
 
 function getShardMultiplier() {
-   return 1 + shards * SHARD_MULTIPLIER_STEP;
+   return 1 + state.shards * SHARD_MULTIPLIER_STEP;
 }
 
 function getShardsReward() {
-   return (playerLevel - 1) * SHARD_REWARD_STEP;
+   return (state.playerLevel - 1) * SHARD_REWARD_STEP;
 }
 
 function getNextMergeRequirement() {
-   return Math.ceil(mergesNeeded * MERGE_REQUIREMENT_MULTIPLIER);
+   return Math.ceil(state.mergesNeeded * MERGE_REQUIREMENT_MULTIPLIER);
 }
 
 function getUpgradeCost(key) {
@@ -226,7 +214,7 @@ function getItemPotentialValue(item) {
 }
 
 function getTotalIncomePreview() {
-   return items.reduce((total, item) => total + getItemPotentialValue(item), 0);
+   return state.items.reduce((total, item) => total + getItemPotentialValue(item), 0);
 }
 
 // ===============================
@@ -235,24 +223,24 @@ function getTotalIncomePreview() {
 
 function createGrid() {
    grid.innerHTML = '';
-   cells = [];
+   state.cells = [];
 
    for (let i = 0; i < GRID_SIZE; i++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
       cell.dataset.index = i;
       grid.appendChild(cell);
-      cells.push(cell);
+      state.cells.push(cell);
    }
 }
 
 function getFreeCells() {
-   const occupied = items.map((item) => item.cellIndex);
-   return cells.filter((_, index) => !occupied.includes(index));
+   const occupied = state.items.map((item) => item.cellIndex);
+   return state.cells.filter((_, index) => !occupied.includes(index));
 }
 
 function isGridFull() {
-   return items.length >= GRID_SIZE;
+   return state.items.length >= GRID_SIZE;
 }
 
 function getLevelVisual(level) {
@@ -327,7 +315,7 @@ function createItem(
 
    const chosenCell =
       cellIndex !== null
-         ? cells[cellIndex]
+         ? state.cells[cellIndex]
          : freeCells[Math.floor(Math.random() * freeCells.length)];
 
    const chosenIndex = Number(chosenCell.dataset.index);
@@ -348,7 +336,7 @@ function createItem(
 
    updateItemElement(item);
    chosenCell.appendChild(element);
-   items.push(item);
+   state.items.push(item);
    addDragEvents(item);
    updateUI();
    saveGame();
@@ -356,15 +344,15 @@ function createItem(
 }
 
 function clearAllItems() {
-   items.forEach((item) => item.element.remove());
-   items = [];
+   state.items.forEach((item) => item.element.remove());
+   state.items = [];
 }
 
 function upgradeOldItemsToStartLevel() {
    const startLevel = getStartLevel();
    let changed = false;
 
-   items.forEach((item) => {
+   state.items.forEach((item) => {
       if (item.level < startLevel) {
          item.level = startLevel;
          updateItemElement(item);
@@ -385,14 +373,14 @@ function upgradeOldItemsToStartLevel() {
 function updateSpawnProgressBar() {
    const total = getSpawnTime();
 
-   spawnProgress += SPAWN_TICK_RATE;
+   state.spawnProgress += SPAWN_TICK_RATE;
 
-   if (spawnProgress >= total) {
-      spawnProgress = total;
+   if (state.spawnProgress >= total) {
+      state.spawnProgress = total;
 
       if (!isGridFull()) {
          spawnObjects();
-         spawnProgress = 0;
+         state.spawnProgress = 0;
       }
    }
 
@@ -401,8 +389,8 @@ function updateSpawnProgressBar() {
 
 function updateSpawnBarVisual() {
    const total = getSpawnTime();
-   const remaining = Math.max(0, total - spawnProgress);
-   const progress = Math.min(100, (spawnProgress / total) * 100);
+   const remaining = Math.max(0, total - state.spawnProgress);
+   const progress = Math.min(100, (state.spawnProgress / total) * 100);
 
    spawnProgressText.textContent = `${(remaining / 1000).toFixed(2)}s / ${(total / 1000).toFixed(2)}s`;
    spawnProgressFill.style.width = `${progress}%`;
@@ -436,12 +424,12 @@ function spawnObjects() {
 function applySpawnSpeedUpgrade() {
    const total = getSpawnTime();
 
-   if (spawnProgress >= total) {
-      spawnProgress = total;
+   if (state.spawnProgress >= total) {
+      state.spawnProgress = total;
 
       if (!isGridFull()) {
          spawnObjects();
-         spawnProgress = 0;
+         state.spawnProgress = 0;
       }
    }
 
@@ -449,7 +437,7 @@ function applySpawnSpeedUpgrade() {
 }
 
 function restartSpawnTimer() {
-   spawnProgress = 0;
+   state.spawnProgress = 0;
    updateSpawnBarVisual();
 }
 
@@ -459,12 +447,12 @@ function restartSpawnTimer() {
 
 function addDragEvents(item) {
    item.element.addEventListener('pointerdown', (event) => {
-      draggedItem = item;
-      originalCellIndex = item.cellIndex;
+      state.draggedItem = item;
+      state.originalCellIndex = item.cellIndex;
 
       const rect = item.element.getBoundingClientRect();
-      offsetX = event.clientX - rect.left;
-      offsetY = event.clientY - rect.top;
+      state.offsetX = event.clientX - rect.left;
+      state.offsetY = event.clientY - rect.top;
 
       item.element.classList.add('dragging');
       item.element.style.width = `${rect.width}px`;
@@ -476,13 +464,13 @@ function addDragEvents(item) {
 }
 
 function moveDraggedItem(x, y) {
-   if (!draggedItem) return;
-   draggedItem.element.style.left = `${x - offsetX}px`;
-   draggedItem.element.style.top = `${y - offsetY}px`;
+   if (!state.draggedItem) return;
+   state.draggedItem.element.style.left = `${x - state.offsetX}px`;
+   state.draggedItem.element.style.top = `${y - state.offsetY}px`;
 }
 
 function getCellUnderPointer(x, y) {
-   return cells.find((cell) => {
+   return state.cells.find((cell) => {
       const rect = cell.getBoundingClientRect();
       return (
          x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
@@ -491,32 +479,32 @@ function getCellUnderPointer(x, y) {
 }
 
 function getItemByCellIndex(cellIndex) {
-   return items.find(
-      (item) => item.cellIndex === cellIndex && item !== draggedItem,
+   return state.items.find(
+      (item) => item.cellIndex === cellIndex && item !== state.draggedItem,
    );
 }
 
 function getItemByExactCell(cellIndex) {
-   return items.find((item) => item.cellIndex === cellIndex);
+   return state.items.find((item) => item.cellIndex === cellIndex);
 }
 
 function clearHighlights() {
-   cells.forEach((cell) => cell.classList.remove('highlight'));
+   state.cells.forEach((cell) => cell.classList.remove('highlight'));
 }
 
 function returnToOriginalCell() {
-   const originalCell = cells[originalCellIndex];
-   originalCell.appendChild(draggedItem.element);
-   draggedItem.cellIndex = originalCellIndex;
+   const originalCell = state.cells[state.originalCellIndex];
+   originalCell.appendChild(state.draggedItem.element);
+   state.draggedItem.cellIndex = state.originalCellIndex;
    resetDraggedStyles();
 }
 
 function resetDraggedStyles() {
-   draggedItem.element.classList.remove('dragging');
-   draggedItem.element.style.left = '';
-   draggedItem.element.style.top = '';
-   draggedItem.element.style.width = '';
-   draggedItem.element.style.height = '';
+   state.draggedItem.element.classList.remove('dragging');
+   state.draggedItem.element.style.left = '';
+   state.draggedItem.element.style.top = '';
+   state.draggedItem.element.style.width = '';
+   state.draggedItem.element.style.height = '';
 }
 
 // ===============================
@@ -545,12 +533,12 @@ function flashError(targetItem, targetCell) {
    createRing(center.x, center.y, 'error');
    targetCell.classList.add('errorFlash');
    targetItem.element.classList.add('shakeError');
-   draggedItem.element.classList.add('shakeError');
+   state.draggedItem.element.classList.add('shakeError');
 
    setTimeout(() => {
       targetCell.classList.remove('errorFlash');
       targetItem.element.classList.remove('shakeError');
-      if (draggedItem) draggedItem.element.classList.remove('shakeError');
+      if (state.draggedItem) state.draggedItem.element.classList.remove('shakeError');
    }, 360);
 }
 
@@ -590,23 +578,23 @@ function createMoneyPopup(item, amount, isDoubleTick) {
 // ===============================
 
 function mergeItems(targetItem) {
-   const newLevel = draggedItem.level + 1;
+   const newLevel = state.draggedItem.level + 1;
    const targetCellIndex = targetItem.cellIndex;
-   const newIsGolden = draggedItem.isGolden || targetItem.isGolden;
+   const newIsGolden = state.draggedItem.isGolden || targetItem.isGolden;
    const center = getElementCenter(targetItem.element);
 
-   draggedItem.element.remove();
+   state.draggedItem.element.remove();
    targetItem.element.remove();
-   items = items.filter((item) => item !== draggedItem && item !== targetItem);
+   state.items = state.items.filter((item) => item !== state.draggedItem && item !== targetItem);
 
-   draggedItem = null;
+   state.draggedItem = null;
    createItem(newLevel, targetCellIndex, newIsGolden);
 
    const newItem = getItemByExactCell(targetCellIndex);
    if (newItem) newItem.element.classList.add('mergeBurst');
    createRing(center.x, center.y, 'merge');
 
-   money +=
+   state.money +=
       getBaseItemValue(newLevel) *
       (newIsGolden ? 2 : 1) *
       MERGE_REWARD_MULTIPLIER *
@@ -617,25 +605,25 @@ function mergeItems(targetItem) {
 }
 
 function addMergeProgress() {
-   mergeProgress++;
+   state.mergeProgress++;
 
-   if (mergeProgress >= mergesNeeded) {
-      mergeProgress -= mergesNeeded;
+   if (state.mergeProgress >= state.mergesNeeded) {
+      state.mergeProgress -= state.mergesNeeded;
 
-      const oldLevel = playerLevel;
-      playerLevel++;
+      const oldLevel = state.playerLevel;
+      state.playerLevel++;
 
       const reward = getShardsReward();
-      shards += reward;
+      state.shards += reward;
 
-      showLevelUpPopup(oldLevel, playerLevel, reward);
+      showLevelUpPopup(oldLevel, state.playerLevel, reward);
 
-      mergesNeeded = getNextMergeRequirement();
+      state.mergesNeeded = getNextMergeRequirement();
 
-      clearTimeout(saveTextTimer);
+      clearTimeout(state.saveTextTimer);
       saveStatus.textContent = TEXTS.level.status(reward);
 
-      saveTextTimer = setTimeout(() => {
+      state.saveTextTimer = setTimeout(() => {
          saveStatus.innerHTML = 'Salvamento automático <strong>ativo</strong>';
       }, 1600);
    }
@@ -645,7 +633,7 @@ function addMergeProgress() {
 }
 
 function incomeTick() {
-   items.forEach((item) => {
+   state.items.forEach((item) => {
       const base = getBaseItemValue(item.level);
       const goldenMultiplier = item.isGolden ? 2 : 1;
       const isDoubleTick = Math.random() < getDoubleMoneyChance();
@@ -653,7 +641,7 @@ function incomeTick() {
       const gained =
          base * goldenMultiplier * tickMultiplier * getShardMultiplier();
 
-      money += gained;
+      state.money += gained;
 
       if (shouldShowMoneyPopup(isDoubleTick, item)) {
          createMoneyPopup(item, gained, isDoubleTick);
@@ -669,12 +657,12 @@ function incomeTick() {
 // ===============================
 
 function updateUI() {
-   moneyEl.textContent = formatMoney(money);
+   moneyEl.textContent = formatMoney(state.money);
    incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-   shardsEl.textContent = formatShards(shards);
+   shardsEl.textContent = formatShards(state.shards);
    shopMoney.innerHTML = TEXTS.shop.balance(
-      formatMoney(money),
-      formatShards(shards),
+      formatMoney(state.money),
+      formatShards(state.shards),
    );
    spawnTimeStat.textContent = TEXTS.stats.spawnTime(getSpawnTime() / 1000);
    startLevelStat.textContent = TEXTS.stats.startLevel(getStartLevel());
@@ -682,14 +670,14 @@ function updateUI() {
    doubleMoneyStat.textContent = TEXTS.stats.chance(getDoubleMoneyChance());
    goldenChanceStat.textContent = TEXTS.stats.chance(getGoldenChance());
    multiplierStat.textContent = TEXTS.stats.multiplier(getShardMultiplier());
-   itemsStat.textContent = TEXTS.stats.items(items.length, GRID_SIZE);
-   levelStat.textContent = playerLevel;
-   playerLevelEl.textContent = playerLevel;
+   itemsStat.textContent = TEXTS.stats.items(state.items.length, GRID_SIZE);
+   levelStat.textContent = state.playerLevel;
+   playerLevelEl.textContent = state.playerLevel;
    levelProgressText.textContent = TEXTS.level.progress(
-      mergeProgress,
-      mergesNeeded,
+      state.mergeProgress,
+      state.mergesNeeded,
    );
-   levelProgressFill.style.width = `${Math.min(100, (mergeProgress / mergesNeeded) * 100)}%`;
+   levelProgressFill.style.width = `${Math.min(100, (state.mergeProgress / state.mergesNeeded) * 100)}%`;
    levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
    devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(
       formatNumber(DEV_ADD_SMALL_MONEY),
@@ -753,7 +741,7 @@ function renderUpgrades() {
 
                   <p>${upgrade.description}</p>
 
-                  <button ${money < cost ? 'disabled' : ''}>
+                  <button ${state.money < cost ? 'disabled' : ''}>
                      ${TEXTS.shop.buyButton(formatMoney(cost))}
                   </button>
                `;
@@ -767,9 +755,9 @@ function renderUpgrades() {
 
 function buyUpgrade(key) {
    const cost = getUpgradeCost(key);
-   if (money < cost) return;
+   if (state.money < cost) return;
 
-   money -= cost;
+   state.money -= cost;
    increaseUpgradeLevel(key);
 
    if (key === 'spawnSpeed') applySpawnSpeedUpgrade();
@@ -793,12 +781,12 @@ function buyUpgrade(key) {
 
 function saveGame(showText = false) {
    const saveData = {
-      money,
-      shards,
-      playerLevel,
-      mergeProgress,
-      mergesNeeded,
-      items: items.map((item) => ({
+      money: state.money,
+      shards: state.shards,
+      playerLevel: state.playerLevel,
+      mergeProgress: state.mergeProgress,
+      mergesNeeded: state.mergesNeeded,
+      items: state.items.map((item) => ({
          level: item.level,
          cellIndex: item.cellIndex,
          isGolden: item.isGolden,
@@ -811,9 +799,9 @@ function saveGame(showText = false) {
    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
 
    if (showText) {
-      clearTimeout(saveTextTimer);
+      clearTimeout(state.saveTextTimer);
       saveStatus.innerHTML = TEXTS.save.saved;
-      saveTextTimer = setTimeout(() => {
+      state.saveTextTimer = setTimeout(() => {
          saveStatus.innerHTML = TEXTS.save.autoActive;
       }, 1200);
    }
@@ -825,11 +813,11 @@ function loadGame() {
 
    try {
       const saveData = JSON.parse(rawSave);
-      money = saveData.money ?? 0;
-      shards = saveData.shards ?? 0;
-      playerLevel = saveData.playerLevel ?? 1;
-      mergeProgress = saveData.mergeProgress ?? 0;
-      mergesNeeded = saveData.mergesNeeded ?? 5;
+      state.money = saveData.money ?? 0;
+      state.shards = saveData.shards ?? 0;
+      state.playerLevel = saveData.playerLevel ?? 1;
+      state.mergeProgress = saveData.mergeProgress ?? 0;
+      state.mergesNeeded = saveData.mergesNeeded ?? 5;
 
       if (saveData.upgrades) {
          Object.entries(saveData.upgrades).forEach(([key, level]) => {
@@ -855,14 +843,14 @@ function loadGame() {
 }
 
 function resetGame() {
-   money = 0;
-   shards = 0;
-   playerLevel = 1;
-   mergeProgress = 0;
-   mergesNeeded = 5;
+   state.money = 0;
+   state.shards = 0;
+   state.playerLevel = 1;
+   state.mergeProgress = 0;
+   state.mergesNeeded = 5;
 
-   items.forEach((item) => item.element.remove());
-   items = [];
+   state.items.forEach((item) => item.element.remove());
+   state.items = [];
 
    Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
    localStorage.removeItem(SAVE_KEY);
@@ -915,22 +903,22 @@ function devSetSpawnToMinimum() {
 // ===============================
 
 devAddPolygonsSmall.addEventListener('click', () => {
-   money += DEV_ADD_SMALL_MONEY;
+   state.money += DEV_ADD_SMALL_MONEY;
    devRefresh();
 });
 
 devAddPolygonsBig.addEventListener('click', () => {
-   money += DEV_ADD_BIG_MONEY;
+   state.money += DEV_ADD_BIG_MONEY;
    devRefresh();
 });
 
 devAddShardsSmall.addEventListener('click', () => {
-   shards += DEV_ADD_SMALL_SHARDS;
+   state.shards += DEV_ADD_SMALL_SHARDS;
    devRefresh();
 });
 
 devAddShardsBig.addEventListener('click', () => {
-   shards += DEV_ADD_BIG_SHARDS;
+   state.shards += DEV_ADD_BIG_SHARDS;
    devRefresh();
 });
 
@@ -991,7 +979,7 @@ devAddMerge.addEventListener('click', () => {
 });
 
 devForceLevelUp.addEventListener('click', () => {
-   mergeProgress = mergesNeeded - 1;
+   state.mergeProgress = state.mergesNeeded - 1;
    addMergeProgress();
    devRefresh();
 });
@@ -1021,7 +1009,7 @@ settingsTabs.forEach((tab) => {
 });
 
 document.addEventListener('pointermove', (event) => {
-   if (!draggedItem) return;
+   if (!state.draggedItem) return;
 
    moveDraggedItem(event.clientX, event.clientY);
    clearHighlights();
@@ -1030,50 +1018,50 @@ document.addEventListener('pointermove', (event) => {
    if (!cell) return;
 
    const targetItem = getItemByCellIndex(Number(cell.dataset.index));
-   if (targetItem && targetItem.level === draggedItem.level) {
+   if (targetItem && targetItem.level === state.draggedItem.level) {
       cell.classList.add('highlight');
    }
 });
 
 document.addEventListener('pointerup', (event) => {
-   if (!draggedItem) return;
+   if (!state.draggedItem) return;
 
    const cell = getCellUnderPointer(event.clientX, event.clientY);
    clearHighlights();
 
    if (!cell) {
       returnToOriginalCell();
-      draggedItem = null;
+      state.draggedItem = null;
       return;
    }
 
    const targetCellIndex = Number(cell.dataset.index);
    const targetItem = getItemByCellIndex(targetCellIndex);
 
-   if (targetItem && targetItem.level === draggedItem.level) {
+   if (targetItem && targetItem.level === state.draggedItem.level) {
       mergeItems(targetItem);
       return;
    }
 
-   if (targetItem && targetItem.level !== draggedItem.level) {
+   if (targetItem && targetItem.level !== state.draggedItem.level) {
       flashError(targetItem, cell);
       returnToOriginalCell();
-      draggedItem = null;
+      state.draggedItem = null;
       return;
    }
 
    if (!targetItem) {
-      cell.appendChild(draggedItem.element);
-      draggedItem.cellIndex = targetCellIndex;
+      cell.appendChild(state.draggedItem.element);
+      state.draggedItem.cellIndex = targetCellIndex;
       resetDraggedStyles();
-      draggedItem = null;
+      state.draggedItem = null;
       updateUI();
       saveGame();
       return;
    }
 
    returnToOriginalCell();
-   draggedItem = null;
+   state.draggedItem = null;
 });
 
 resetInsideBtn.addEventListener('click', resetGame);
@@ -1114,7 +1102,7 @@ setInterval(updateSpawnProgressBar, SPAWN_TICK_RATE);
 createGrid();
 const loaded = loadGame();
 
-if (!loaded || items.length === 0) {
+if (!loaded || state.items.length === 0) {
    createItem(1, null, false);
    createItem(1, null, false);
 }
