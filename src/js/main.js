@@ -65,7 +65,6 @@ const devContent = document.getElementById('devContent');
 import {
    GRID_SIZE,
    BASE_SPAWN_TIME,
-   SAVE_KEY,
    SPAWN_TICK_RATE,
    DEV_PASSWORD,
    MAX_CHANCE,
@@ -373,12 +372,15 @@ function addMergeProgress() {
       saveStatus.textContent = TEXTS.level.status(reward);
 
       state.saveTextTimer = setTimeout(() => {
-         saveStatus.innerHTML = 'Salvamento automático <strong>ativo</strong>';
-      }, 1600);
+         saveStatus.innerHTML = TEXTS.save.autoActive;
+      }, LEVEL_UP_FEEDBACK_DURATION);
    }
 
    updateUI();
-   saveGame(true);
+   saveGame({
+      showText: true,
+      saveStatus,
+   });
 }
 
 function incomeTick() {
@@ -517,7 +519,10 @@ function buyUpgrade(key) {
       upgradeOldItemsToStartLevel({
          onChanged: () => {
             updateUI();
-            saveGame(true);
+            saveGame({
+               showText: true,
+               saveStatus,
+            });
          },
       });
 
@@ -528,76 +533,17 @@ function buyUpgrade(key) {
    }
 
    updateUI();
-   saveGame(true);
+   saveGame({
+      showText: true,
+      saveStatus,
+   });
 }
 
 // ===============================
 // 13. SALVAMENTO
 // ===============================
 
-function saveGame(showText = false) {
-   const saveData = {
-      money: state.money,
-      shards: state.shards,
-      playerLevel: state.playerLevel,
-      mergeProgress: state.mergeProgress,
-      mergesNeeded: state.mergesNeeded,
-      items: state.items.map((item) => ({
-         level: item.level,
-         cellIndex: item.cellIndex,
-         isGolden: item.isGolden,
-      })),
-      upgrades: Object.fromEntries(
-         Object.entries(upgrades).map(([key, upgrade]) => [key, upgrade.level]),
-      ),
-   };
-
-   localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
-
-   if (showText) {
-      clearTimeout(state.saveTextTimer);
-      saveStatus.innerHTML = TEXTS.save.saved;
-      state.saveTextTimer = setTimeout(() => {
-         saveStatus.innerHTML = TEXTS.save.autoActive;
-      }, 1200);
-   }
-}
-
-function loadGame() {
-   const rawSave = localStorage.getItem(SAVE_KEY);
-   if (!rawSave) return false;
-
-   try {
-      const saveData = JSON.parse(rawSave);
-      state.money = saveData.money ?? 0;
-      state.shards = saveData.shards ?? 0;
-      state.playerLevel = saveData.playerLevel ?? 1;
-      state.mergeProgress = saveData.mergeProgress ?? 0;
-      state.mergesNeeded = saveData.mergesNeeded ?? 5;
-
-      if (saveData.upgrades) {
-         Object.entries(saveData.upgrades).forEach(([key, level]) => {
-            if (upgrades[key]) upgrades[key].level = level;
-         });
-      }
-
-      if (Array.isArray(saveData.items)) {
-         saveData.items.forEach((savedItem) => {
-            createItem({
-               level: savedItem.level,
-               cellIndex: savedItem.cellIndex,
-               forcedGolden: savedItem.isGolden,
-               onCreated: addDragEvents,
-            });
-         });
-      }
-
-      return true;
-   } catch (error) {
-      console.warn(TEXTS.save.loadError, error);
-      return false;
-   }
-}
+import { saveGame, loadGame, clearSave } from './save.js';
 
 function resetGame() {
    state.money = 0;
@@ -609,8 +555,8 @@ function resetGame() {
    state.items.forEach((item) => item.element.remove());
    state.items = [];
 
-   Object.values(upgrades).forEach((upgrade) => (upgrade.level = 0));
-   localStorage.removeItem(SAVE_KEY);
+   resetUpgrades();
+   clearSave();
 
    resetUpgrades();
    createItem({
@@ -625,7 +571,11 @@ function resetGame() {
    });
    restartSpawnTimer();
    updateUI();
-   saveGame(true);
+   
+   saveGame({
+      showText: true,
+      saveStatus,
+   });
 }
 
 // ===============================
@@ -649,7 +599,10 @@ function unlockDevTools() {
 function devRefresh() {
    updateUI();
    updateSpawnBarVisual();
-   saveGame(true);
+   saveGame({
+      showText: true,
+      saveStatus,
+   });
 }
 
 // ===============================
@@ -869,7 +822,9 @@ setInterval(incomeTick, MONEY_TICK_INTERVAL);
 setInterval(updateSpawnProgressBar, SPAWN_TICK_RATE);
 
 createGrid(grid);
-const loaded = loadGame();
+const loaded = loadGame({
+   onItemCreated: addDragEvents,
+});
 
 if (!loaded || state.items.length === 0) {
    createItem({
