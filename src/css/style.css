@@ -2,6 +2,77 @@
    1. TOKENS / VARIÁVEIS
 ================================ */
 
+:root {
+   /* Cores principais */
+   --color-bg: #e8f5ec;
+   --color-surface: #ffffff;
+   --color-text: #16351f;
+   --color-muted: #45634d;
+
+   /* Cores específicas */
+   --color-save-status: #5c735f;
+   --color-progress-text: #2f5638;
+   --color-popup-purple-text: #2f235f;
+   --color-popup-gold-text: #8a6500;
+   --color-popup-blue-text: #163d6d;
+
+   --color-track: #dcebe0;
+   --color-grid-bg: #b7e3bf;
+   --color-highlight-bg: #fff7c2;
+   --color-highlight-border: #d8a900;
+
+   --color-money-gold: #d49b00;
+   --color-error: #e74c3c;
+
+   --color-button-shop: #23be88;
+   --color-button-settings: #5c5ee7;
+   --color-button-soft: #eef5f0;
+
+   /* Verde / tema principal */
+   --color-primary: #1f8f48;
+   --color-primary-soft: #dff3e5;
+   --color-primary-border: #b8dfc2;
+   --color-primary-light: #71d68b;
+
+   /* Painéis */
+   --color-panel: #f2f8f4;
+   --color-panel-border: #d7e8dc;
+   --color-cell-bg: rgba(255, 255, 255, 0.55);
+
+   /* Estados e destaques */
+   --color-purple: #6c5ce7;
+   --color-purple-soft: #a29bfe;
+   --color-gold: #ffd84d;
+   --color-blue: #236fbe;
+   --color-danger: #c0392b;
+   --color-dark: #111827;
+
+   /* Fundos especiais */
+   --color-upgrade-bg: #fbfffc;
+   --color-golden-bg: #fffaf0;
+   --color-danger-bg: #fff3f1;
+
+   /* Bordas especiais */
+   --color-upgrade-border: #e1eee5;
+   --color-golden-border: #ffe08a;
+   --color-danger-border: #f1b5ae;
+
+   /* Raios */
+   --radius-sm: 10px;
+   --radius-md: 12px;
+   --radius-lg: 14px;
+   --radius-xl: 16px;
+   --radius-2xl: 18px;
+   --radius-pill: 999px;
+
+   /* Sombras */
+   --shadow-game: 0 10px 30px rgba(0, 0, 0, 0.12);
+   --shadow-footer: 0 10px 28px rgba(0, 0, 0, 0.14);
+   --shadow-side-panel: -8px 0 30px rgba(0, 0, 0, 0.22);
+   --shadow-item:
+      inset 0 -6px rgba(0, 0, 0, 0.12), 0 6px 12px rgba(0, 0, 0, 0.16);
+}
+
 /* ===============================
    2. RESET E BASE
 ================================ */
@@ -22,13 +93,13 @@ body {
 }
 
 body {
-   background: #e8f5ec;
+   background: var(--color-bg);
    display: flex;
    justify-content: center;
    align-items: center;
    padding: 10px;
    padding-bottom: 92px;
-   color: #16351f;
+   color: var(--color-text);
 }
 
 /* ===============================
@@ -40,9 +111,9 @@ body {
    max-width: 410px;
    max-height: calc(100dvh - 104px);
 
-   background: #ffffff;
-   border-radius: 18px;
-   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+   background: var(--color-surface);
+   border-radius: var(--radius-2xl);
+   box-shadow: var(--shadow-game);
    padding: 18px;
 
    display: flex;
@@ -60,7 +131,7 @@ body {
 .saveStatus {
    text-align: center;
    font-size: 12px;
-   color: #5c735f;
+   color: var(--color-save-status);
    margin-bottom: 10px;
 }
 
@@ -72,9 +143,9 @@ body {
 }
 
 .panel {
-   background: #dff3e5;
-   border: 2px solid #b8dfc2;
-   border-radius: 12px;
+   background: var(--color-primary-soft);
+   border: 2px solid var(--color-primary-border);
+   border-radius: var(--radius-md);
    padding: 10px;
    text-align: center;
 }
@@ -102,10 +173,10 @@ body {
 ================================ */
 
 .progressPanel {
-   background: #f2f8f4;
-   border: 2px solid #d7e8dc;
+   background: var(--color-panel);
+   border: 2px solid var(--color-panel-border);
    padding: clamp(7px, 2vw, 10px);
-   border-radius: 14px;
+   border-radius: var(--radius-lg);
    margin-bottom: 10px;
 }
 
@@ -115,7 +186,7 @@ body {
    gap: 10px;
    font-size: clamp(12px, 3.2vw, 13px);
    margin-bottom: 6px;
-   color: #2f5638;
+   color: var(--color-progress-text);
 }
 
 .spawnPanel {
@@ -129,10 +200,10 @@ body {
    left: 50%;
    top: 50%;
    transform: translate(-50%, -50%);
-   background: #ffffff;
-   border: 2px solid #1f8f48;
-   color: #16351f;
-   border-radius: 14px;
+   background: var(--color-surface);
+   border: 2px solid var(--color-primary);
+   color: var(--color-text);
+   border-radius: var(--radius-lg);
    padding: 9px 13px;
    font-size: 65%;
    font-weight: bold;
@@ -148,37 +219,45 @@ body {
 }
 
 .spawnPopup.upgrade {
-   border-color: #6c5ce7;
-   color: #2f235f;
+   border-color: var(--color-purple);
+   color: var(--color-popup-purple-text);
 }
 
 .spawnPopup.golden {
-   border-color: #ffd84d;
-   color: #8a6500;
+   border-color: var(--color-gold);
+   color: var(--color-popup-gold-text);
 }
 
 .spawnPopup.double {
-   border-color: #236fbe;
-   color: #163d6d;
+   border-color: var(--color-blue);
+   color: var(--color-popup-blue-text);
 }
 
 .barTrack {
    height: 10px;
-   background: #dcebe0;
-   border-radius: 999px;
+   background: var(--color-track);
+   border-radius: var(--radius-pill);
    overflow: hidden;
 }
 
 .barFill {
    height: 100%;
    width: 0%;
-   background: linear-gradient(90deg, #1f8f48, #71d68b);
-   border-radius: 999px;
+   background: linear-gradient(
+      90deg,
+      var(--color-primary),
+      var(--color-primary-light)
+   );
+   border-radius: var(--radius-pill);
    transition: width 0.12s linear;
 }
 
 .levelFill {
-   background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+   background: linear-gradient(
+      90deg,
+      var(--color-purple),
+      var(--color-purple-soft)
+   );
 }
 
 .levelUpPanel {
@@ -191,10 +270,10 @@ body {
    left: 50%;
    top: 50%;
    transform: translate(-50%, -50%);
-   background: #ffffff;
-   border: 2px solid #8e7cff;
-   color: #2f235f;
-   border-radius: 14px;
+   background: var(--color-surface);
+   border: 2px solid var(--color-purple-soft);
+   color: var(--color-popup-purple-text);
+   border-radius: var(--radius-lg);
    padding: 10px 14px;
    font-weight: bold;
    text-align: center;
@@ -210,12 +289,12 @@ body {
 .levelUpPopup small {
    display: block;
    margin-top: 4px;
-   color: #1f8f48;
+   color: var(--color-primary);
 }
 
 .levelBonus {
    font-size: clamp(11px, 3vw, 12px);
-   color: #45634d;
+   color: var(--color-muted);
    margin-top: 5px;
    text-align: center;
 }
@@ -251,8 +330,8 @@ body {
    gap: clamp(6px, 1.6vw, 10px);
    padding: clamp(8px, 2vw, 12px);
 
-   background: #b7e3bf;
-   border-radius: 16px;
+   background: var(--color-grid-bg);
+   border-radius: var(--radius-xl);
 
    position: relative;
    touch-action: none;
@@ -264,9 +343,9 @@ body {
    min-width: 0;
    min-height: 0;
 
-   background: rgba(255, 255, 255, 0.55);
+   background: var(--color-cell-bg);
    border: 2px dashed rgba(30, 90, 45, 0.22);
-   border-radius: 12px;
+   border-radius: var(--radius-md);
 
    position: relative;
    display: flex;
@@ -275,8 +354,8 @@ body {
 }
 
 .cell.highlight {
-   background: #fff7c2;
-   border-color: #d8a900;
+   background: var(--color-highlight-bg);
+   border-color: var(--color-highlight-border);
 }
 
 .cell.errorFlash {
@@ -290,21 +369,19 @@ body {
 .item {
    width: min(76%, 54px);
    height: min(76%, 54px);
-   border-radius: 14px;
+   border-radius: var(--radius-lg);
    display: flex;
    align-items: center;
    justify-content: center;
    flex-direction: column;
    gap: 2px;
    font-weight: bold;
-   color: white;
+   color: var(--color-surface);
    cursor: grab;
    position: absolute;
    overflow: visible;
    z-index: 2;
-   box-shadow:
-      inset 0 -6px rgba(0, 0, 0, 0.12),
-      0 6px 12px rgba(0, 0, 0, 0.16);
+   box-shadow: var(--shadow-item);
    transition:
       transform 0.15s ease,
       box-shadow 0.15s ease;
@@ -312,10 +389,9 @@ body {
 
 .item.golden {
    box-shadow:
-      0 0 0 3px #ffd84d,
-      0 0 18px #ffd84d,
-      inset 0 -6px rgba(0, 0, 0, 0.12),
-      0 6px 12px rgba(0, 0, 0, 0.16);
+      0 0 0 3px var(--color-gold),
+      0 0 18px var(--color-gold),
+      var(--shadow-item);
    animation: goldenGlow 1.2s ease-in-out infinite alternate;
 }
 
@@ -357,8 +433,8 @@ body {
    height: 20px;
    padding: 0 5px;
    border-radius: 7px;
-   background: #ffffff;
-   color: #111827;
+   background: var(--color-surface);
+   color: var(--color-dark);
    border: 2px solid rgba(17, 24, 39, 0.25);
    font-size: 10px;
    font-weight: 900;
@@ -380,18 +456,18 @@ body {
    pointer-events: none;
    font-weight: bold;
    font-size: 13px;
-   color: #1f8f48;
-   text-shadow: 0 1px 0 #fff;
+   color: var(--color-primary);
+   text-shadow: 0 1px 0 var(--color-surface);
    animation: floatMoney 0.85s ease-out forwards;
 }
 
 .moneyPopup.double {
-   color: #236fbe;
+   color: var(--color-blue);
    font-size: 15px;
 }
 
 .moneyPopup.goldenText {
-   color: #d49b00;
+   color: var(--color-money-gold);
 }
 
 .effectRing {
@@ -399,7 +475,7 @@ body {
    width: 64px;
    height: 64px;
    border-radius: 50%;
-   border: 3px solid #ffd84d;
+   border: 3px solid var(--color-gold);
    pointer-events: none;
    z-index: 1500;
    transform: translate(-50%, -50%);
@@ -407,7 +483,7 @@ body {
 }
 
 .effectRing.error {
-   border-color: #e74c3c;
+   border-color: var(--color-error);
    animation: ringError 0.38s ease-out forwards;
 }
 
@@ -432,11 +508,11 @@ body {
    align-items: stretch;
 
    background: rgba(255, 255, 255, 0.86);
-   border: 2px solid #d7e8dc;
-   border-radius: 18px;
+   border: 2px solid var(--color-panel-border);
+   border-radius: var(--radius-2xl);
    padding: 10px;
    backdrop-filter: blur(10px);
-   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+   box-shadow: var(--shadow-footer);
    z-index: 900;
 }
 
@@ -445,7 +521,7 @@ body {
    min-height: 54px;
    padding: 8px;
    font-size: 13px;
-   border-radius: 12px;
+   border-radius: var(--radius-md);
    line-height: 1.1;
    text-align: center;
 }
@@ -469,13 +545,13 @@ body {
 button {
    flex: 1;
    border: none;
-   border-radius: 12px;
+   border-radius: var(--radius-md);
    padding: 12px;
    font-weight: bold;
    font-size: 70%;
    cursor: pointer;
-   background: #1f8f48;
-   color: white;
+   background: var(--color-primary);
+   color: var(--color-surface);
    transition:
       transform 0.15s ease,
       opacity 0.15s ease;
@@ -493,15 +569,15 @@ button:disabled {
 }
 
 .danger {
-   background: #c0392b;
+   background: var(--color-danger);
 }
 
 .shop-open {
-   background: #23be88;
+   background: var(--color-button-shop);
 }
 
 .settings-open {
-   background: #5c5ee7;
+   background: var(--color-button-settings);
 }
 
 .closeBtn {
@@ -509,9 +585,9 @@ button:disabled {
    width: 40px;
    height: 40px;
    padding: 0;
-   background: #eef5f0;
-   color: #16351f;
-   border: 1px solid #d7e8dc;
+   background: var(--color-button-soft);
+   color: var(--color-text);
+   border: 1px solid var(--color-panel-border);
 }
 
 /* ===============================
@@ -554,9 +630,9 @@ button:disabled {
    right: 0;
    height: 100vh;
    width: min(360px, 92vw);
-   background: #ffffff;
+   background: var(--color-surface);
    opacity: 0.92;
-   box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+   box-shadow: var(--shadow-side-panel);
    padding: 18px;
    transform: translateX(100%);
    transition: transform 0.25s ease;
@@ -574,9 +650,9 @@ button:disabled {
    right: 0;
    height: 100vh;
    width: min(380px, 94vw);
-   background: #ffffff;
+   background: var(--color-surface);
    opacity: 0.94;
-   box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+   box-shadow: var(--shadow-side-panel);
    padding: 18px;
    transform: translateX(100%);
    transition: transform 0.25s ease;
@@ -595,7 +671,7 @@ button:disabled {
    margin-bottom: 12px;
    position: sticky;
    top: 0;
-   background: #ffffff;
+   background: var(--color-surface);
    padding-bottom: 10px;
    z-index: 5;
 }
@@ -609,9 +685,9 @@ button:disabled {
 ================================ */
 
 .shopMoney {
-   background: #dff3e5;
-   border: 2px solid #b8dfc2;
-   border-radius: 12px;
+   background: var(--color-primary-soft);
+   border: 2px solid var(--color-primary-border);
+   border-radius: var(--radius-md);
    padding: 10px;
    margin-bottom: 12px;
    font-weight: bold;
@@ -632,16 +708,16 @@ button:disabled {
 }
 
 .upgrade {
-   border: 2px solid #e1eee5;
-   border-radius: 14px;
+   border: 2px solid var(--color-upgrade-border);
+   border-radius: var(--radius-lg);
    padding: 12px;
    margin-bottom: 10px;
-   background: #fbfffc;
+   background: var(--color-upgrade-bg);
 }
 
 .upgrade.goldenUpgrade {
-   border-color: #ffe08a;
-   background: #fffaf0;
+   border-color: var(--color-golden-border);
+   background: var(--color-golden-bg);
 }
 
 .upgradeTop {
@@ -674,7 +750,7 @@ button:disabled {
 .upgradeLevel {
    font-size: 12px;
    font-weight: 800;
-   color: #1f8f48;
+   color: var(--color-primary);
    white-space: nowrap;
 }
 
@@ -682,7 +758,7 @@ button:disabled {
    font-size: 13px;
    font-weight: 500;
    line-height: 1.2;
-   color: #45634d;
+   color: var(--color-muted);
    margin-bottom: 8px;
 }
 
@@ -690,7 +766,7 @@ button:disabled {
    width: 100%;
    min-height: 34px;
    padding: 8px 10px;
-   border-radius: 10px;
+   border-radius: var(--radius-sm);
    font-size: 11px;
 }
 
@@ -705,7 +781,7 @@ button:disabled {
    margin-bottom: 12px;
    position: sticky;
    top: 58px;
-   background: #ffffff;
+   background: var(--color-surface);
    padding-bottom: 8px;
    z-index: 4;
 }
@@ -713,15 +789,15 @@ button:disabled {
 .settingsTab {
    min-height: 36px;
    padding: 7px 5px;
-   border-radius: 10px;
-   background: #eef5f0;
-   color: #16351f;
+   border-radius: var(--radius-sm);
+   background: var(--color-button-soft);
+   color: var(--color-text);
    font-size: 11px;
 }
 
 .settingsTab.active {
-   background: #1f8f48;
-   color: #ffffff;
+   background: var(--color-primary);
+   color: var(--color-surface);
 }
 
 .settingsContent {
@@ -733,11 +809,11 @@ button:disabled {
 }
 
 .guideSection {
-   border: 2px solid #e1eee5;
-   border-radius: 14px;
+   border: 2px solid var(--color-upgrade-border);
+   border-radius: var(--radius-lg);
    padding: 12px;
    margin-bottom: 10px;
-   background: #fbfffc;
+   background: var(--color-upgrade-bg);
 }
 
 .guideSection h3 {
@@ -748,7 +824,7 @@ button:disabled {
 .guideSection p,
 .guideSection li {
    font-size: 13px;
-   color: #45634d;
+   color: var(--color-muted);
    line-height: 1.45;
 }
 
@@ -757,8 +833,8 @@ button:disabled {
 }
 
 .dangerSection {
-   border-color: #f1b5ae;
-   background: #fff3f1;
+   border-color: var(--color-danger-border);
+   background: var(--color-danger-bg);
 }
 
 .resetInsideBtn {
@@ -774,9 +850,9 @@ button:disabled {
 }
 
 .statCard {
-   background: #f2f8f4;
-   border: 2px solid #d7e8dc;
-   border-radius: 12px;
+   background: var(--color-panel);
+   border: 2px solid var(--color-panel-border);
+   border-radius: var(--radius-md);
    padding: 12px;
    text-align: center;
    font-size: 12px;
@@ -793,11 +869,11 @@ button:disabled {
 ================================ */
 
 .devSection {
-   border: 2px solid #e1eee5;
-   border-radius: 14px;
+   border: 2px solid var(--color-upgrade-border);
+   border-radius: var(--radius-lg);
    padding: 12px;
    margin-bottom: 10px;
-   background: #fbfffc;
+   background: var(--color-upgrade-bg);
 }
 
 .devSection h3 {
@@ -814,26 +890,26 @@ button:disabled {
 .devGrid button {
    padding: 10px;
    font-size: 12px;
-   border-radius: 10px;
-   background: #111827;
+   border-radius: var(--radius-sm);
+   background: var(--color-dark);
 }
 
 .devInput {
    width: 100%;
    padding: 11px;
-   border: 2px solid #e1eee5;
-   border-radius: 10px;
+   border: 2px solid var(--color-upgrade-border);
+   border-radius: var(--radius-sm);
    margin-bottom: 8px;
    outline: none;
 }
 
 .devInput:focus {
-   border-color: #111827;
+   border-color: var(--color-dark);
 }
 
 .devError {
    font-size: 12px;
-   color: #c0392b;
+   color: var(--color-danger);
    margin-top: 8px;
    min-height: 16px;
 }
@@ -871,7 +947,7 @@ button:disabled {
 
    .panel {
       padding: 7px 6px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       min-height: 40px;
    }
 
@@ -887,7 +963,7 @@ button:disabled {
 
    .progressPanel {
       padding: 7px 10px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       margin-bottom: 0;
    }
 
@@ -938,7 +1014,7 @@ button:disabled {
    .item {
       width: 72%;
       height: 72%;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
       font-size: 14px;
    }
 
@@ -967,7 +1043,7 @@ button:disabled {
       max-height: calc(100dvh - 92px);
       padding: 12px;
       gap: 8px;
-      border-radius: 16px;
+      border-radius: var(--radius-xl);
    }
 
    .saveStatus {
@@ -998,7 +1074,7 @@ button:disabled {
    .progressPanel {
       padding: 8px 9px;
       margin-bottom: 0;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
    }
 
    .progressHeader {
@@ -1021,11 +1097,11 @@ button:disabled {
    .grid {
       gap: 7px;
       padding: 9px;
-      border-radius: 14px;
+      border-radius: var(--radius-lg);
    }
 
    .cell {
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
    }
 
    .item {
@@ -1153,7 +1229,7 @@ button:disabled {
       grid-template-columns: repeat(2, 1fr);
       gap: 6px;
       padding: 8px;
-      border-radius: 16px;
+      border-radius: var(--radius-xl);
       bottom: max(6px, env(safe-area-inset-bottom));
    }
 
@@ -1161,7 +1237,7 @@ button:disabled {
       min-height: 52px;
       padding: 6px 4px;
       font-size: 18px;
-      border-radius: 12px;
+      border-radius: var(--radius-md);
    }
 
    .desktopLabel {
@@ -1184,7 +1260,7 @@ button:disabled {
       padding: 9px;
       gap: 6px;
       max-height: calc(100dvh - 78px);
-      border-radius: 16px;
+      border-radius: var(--radius-xl);
    }
 
    .saveStatus {
@@ -1200,7 +1276,7 @@ button:disabled {
    .panel {
       padding: 5px 4px;
       min-height: 42px;
-      border-radius: 10px;
+      border-radius: var(--radius-sm);
    }
 
    .label {
@@ -1371,11 +1447,11 @@ button:disabled {
 @keyframes errorCell {
    0%,
    100% {
-      background: rgba(255, 255, 255, 0.55);
+      background: var(--color-cell-bg);
    }
    50% {
       background: rgba(231, 76, 60, 0.25);
-      border-color: #e74c3c;
+      border-color: var(--color-error);
    }
 }
 
