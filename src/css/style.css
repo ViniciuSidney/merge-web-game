@@ -1,6 +1,5 @@
-/* ===============================
-   1. TOKENS / VARIÁVEIS
-================================ */
+
+/* 1. TOKENS / VARIÁVEIS */
 
 :root {
    /* Cores principais */
@@ -73,9 +72,7 @@
       inset 0 -6px rgba(0, 0, 0, 0.12), 0 6px 12px rgba(0, 0, 0, 0.16);
 }
 
-/* ===============================
-   2. RESET E BASE
-================================ */
+/* 2. RESET E BASE */
 
 * {
    box-sizing: border-box;
@@ -102,9 +99,7 @@ body {
    color: var(--color-text);
 }
 
-/* ===============================
-   3. LAYOUT PRINCIPAL
-================================ */
+/* 3. LAYOUT PRINCIPAL */
 
 .game {
    width: min(100%, 410px);
@@ -124,9 +119,7 @@ body {
    overflow: visible;
 }
 
-/* ===============================
-   4. HUD / TOPO
-================================ */
+/* 4. HUD / TOPO */
 
 .saveStatus {
    text-align: center;
@@ -168,9 +161,7 @@ body {
    font-weight: bold;
 }
 
-/* ===============================
-   5. PROGRESSO / SPAWN / LEVEL
-================================ */
+/* 5. PROGRESSO / SPAWN / LEVEL */
 
 .progressPanel {
    background: var(--color-panel);
@@ -314,9 +305,8 @@ body {
    line-height: 1.2;
 }
 
-/* ===============================
-   6. GRID E CÉLULAS
-================================ */
+
+/* 6. GRID E CÉLULAS */
 
 .grid {
    width: 100%;
@@ -362,9 +352,7 @@ body {
    animation: errorCell 0.35s ease;
 }
 
-/* ===============================
-   7. ITENS
-================================ */
+/* 7. ITENS */
 
 .item {
    width: min(76%, 54px);
@@ -446,9 +434,8 @@ body {
    z-index: 4;
 }
 
-/* ===============================
-   8. EFEITOS VISUAIS
-================================ */
+
+/* 8. EFEITOS VISUAIS */
 
 .moneyPopup {
    position: fixed;
@@ -491,9 +478,7 @@ body {
    animation: pop 0.25s ease;
 }
 
-/* ===============================
-   9. FOOTER / NAVEGAÇÃO
-================================ */
+/* 9. FOOTER / NAVEGAÇÃO */
 
 .footer {
    position: fixed;
@@ -538,9 +523,8 @@ body {
    display: none;
 }
 
-/* ===============================
-   10. BOTÕES
-================================ */
+
+/* 10. BOTÕES */
 
 button {
    flex: 1;
@@ -590,9 +574,8 @@ button:disabled {
    border: 1px solid var(--color-panel-border);
 }
 
-/* ===============================
-   11. PAINÉIS LATERAIS
-================================ */
+
+/* 11. PAINÉIS LATERAIS */
 
 .shopOverlay {
    position: fixed;
@@ -680,9 +663,8 @@ button:disabled {
    font-size: 22px;
 }
 
-/* ===============================
-   12. LOJA / UPGRADES
-================================ */
+
+/* 12. LOJA / UPGRADES */
 
 .shopMoney {
    background: var(--color-primary-soft);
@@ -770,9 +752,7 @@ button:disabled {
    font-size: 11px;
 }
 
-/* ===============================
-   13. CONFIGURAÇÕES
-================================ */
+/* 13. CONFIGURAÇÕES */
 
 .settingsTabs {
    display: grid;
@@ -864,9 +844,7 @@ button:disabled {
    font-size: 16px;
 }
 
-/* ===============================
-   14. DEV TOOLS
-================================ */
+/* 14. DEV TOOLS */
 
 .devSection {
    border: 2px solid var(--color-upgrade-border);
