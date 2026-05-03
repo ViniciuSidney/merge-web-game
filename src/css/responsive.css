@@ -1,0 +1,459 @@
+/* ===============================
+   RESPONSIVIDADE
+================================ */
+
+/* Desktop */
+@media (min-width: 1025px) {
+   body {
+      padding-bottom: 92px;
+   }
+
+   .game {
+      width: min(410px, calc(100vw - 32px));
+      padding: 12px;
+      gap: 7px;
+      overflow: visible;
+   }
+
+   .saveStatus {
+      font-size: 12px;
+      margin-bottom: 1px;
+   }
+
+   .top {
+      gap: 8px;
+      margin-bottom: 0;
+   }
+
+   .panel {
+      padding: 7px 6px;
+      border-radius: var(--radius-md);
+      min-height: 40px;
+   }
+
+   .label {
+      font-size: 10px;
+      line-height: 1.05;
+   }
+
+   .value {
+      font-size: 15px;
+      line-height: 1.05;
+   }
+
+   .progressPanel {
+      padding: 7px 10px;
+      border-radius: var(--radius-md);
+      margin-bottom: 0;
+   }
+
+   .progressHeader {
+      font-size: 12px;
+      margin-bottom: 5px;
+      line-height: 1.1;
+   }
+
+   .barTrack {
+      height: 6px;
+   }
+
+   #levelBonusText,
+   .levelBonus {
+      font-size: 10px;
+      margin-top: 4px;
+      line-height: 1.1;
+   }
+
+   .levelUpPopup {
+      min-width: unset;
+      width: min(85%, 260px);
+      max-width: 85%;
+      font-size: 10px;
+      padding: 7px 10px;
+   }
+
+   .spawnPopup {
+      min-width: unset;
+      width: min(85%, 260px);
+      max-width: 85%;
+      left: 50%;
+      top: 50%;
+      font-size: 10px;
+      padding: 7px 10px;
+   }
+
+   .grid {
+      width: min(100%, calc(100dvh - 315px));
+      aspect-ratio: 1 / 1;
+      align-self: center;
+      flex: none;
+      gap: 8px;
+      padding: 12px;
+   }
+
+   .item {
+      width: 72%;
+      height: 72%;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+   }
+
+   .footer {
+      width: min(600px, calc(100vw - 28px));
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 10px;
+   }
+
+   .footer button {
+      min-height: 50px;
+      font-size: 13px;
+   }
+}
+
+/* Mobile Compacto */
+@media (min-width: 520px) and (max-height: 700px) {
+   body {
+      padding: 8px;
+      padding-bottom: 82px;
+   }
+
+   .game {
+      width: min(100%, 390px);
+      max-height: calc(100dvh - 92px);
+      padding: 12px;
+      gap: 8px;
+      border-radius: var(--radius-xl);
+   }
+
+   .saveStatus {
+      font-size: 11px;
+      margin-bottom: 0;
+   }
+
+   .top {
+      gap: 7px;
+      margin-bottom: 0;
+   }
+
+   .panel {
+      padding: 7px 5px;
+      border-radius: 11px;
+   }
+
+   .label {
+      font-size: 11px;
+      line-height: 1.05;
+   }
+
+   .value {
+      font-size: 15px;
+      line-height: 1.1;
+   }
+
+   .progressPanel {
+      padding: 8px 9px;
+      margin-bottom: 0;
+      border-radius: var(--radius-md);
+   }
+
+   .progressHeader {
+      font-size: 12px;
+      margin-bottom: 5px;
+      line-height: 1.1;
+   }
+
+   .barTrack {
+      height: 8px;
+   }
+
+   #levelBonusText,
+   .levelBonus {
+      font-size: 10.5px;
+      margin-top: 4px;
+      line-height: 1.1;
+   }
+
+   .grid {
+      gap: 7px;
+      padding: 9px;
+      border-radius: var(--radius-lg);
+   }
+
+   .cell {
+      border-radius: var(--radius-sm);
+   }
+
+   .item {
+      width: min(74%, 48px);
+      height: min(74%, 48px);
+      border-radius: 11px;
+      font-size: 13px;
+   }
+
+   .itemLevelText {
+      font-size: 13px;
+   }
+
+   .item small {
+      font-size: 8px;
+   }
+
+   .footer {
+      width: min(300px, calc(100vw - 16px));
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 8px;
+   }
+
+   .footer button {
+      min-height: 50px;
+      font-size: 18px;
+   }
+
+   .desktopLabel {
+      display: none;
+   }
+
+   .mobileLabel {
+      display: inline-block;
+   }
+
+   .spawnPopup,
+   .levelUpPopup {
+      max-width: min(240px, calc(100vw - 32px));
+      min-width: min(210px, calc(100vw - 32px));
+      padding: 7px 10px;
+      font-size: 9px;
+      border-radius: 11px;
+   }
+
+   .levelUpPopup small {
+      font-size: 9px;
+   }
+}
+
+/* Mobile Compacto Extremo */
+@media (max-width: 340px) {
+   body {
+      padding: 6px;
+      padding-bottom: 76px;
+   }
+
+   .game {
+      width: min(100%, 292px);
+      padding: 9px;
+      gap: 6px;
+      max-height: calc(100dvh - 84px);
+   }
+
+   .panel {
+      padding: 5px 3px;
+   }
+
+   .label {
+      font-size: 9.5px;
+   }
+
+   .value {
+      font-size: 13.5px;
+   }
+
+   .progressPanel {
+      padding: 7px;
+   }
+
+   .progressHeader {
+      font-size: 10.5px;
+   }
+
+   #levelBonusText,
+   .levelBonus {
+      font-size: 9.5px;
+   }
+
+   .grid {
+      gap: 5px;
+      padding: 7px;
+   }
+
+   .item {
+      width: min(74%, 44px);
+      height: min(74%, 44px);
+      font-size: 12px;
+   }
+
+   .footer {
+      width: min(300px, calc(100vw - 12px));
+      gap: 5px;
+      padding: 7px;
+   }
+
+   .footer button {
+      min-height: 48px;
+      font-size: 17px;
+   }
+
+   .desktopLabel {
+      display: none;
+   }
+
+   .mobileLabel {
+      display: inline-block;
+   }
+}
+
+@media (min-width: 370px) and (max-width: 520px) {
+   .footer {
+      width: min(390px, calc(100vw - 16px));
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      padding: 8px;
+      border-radius: var(--radius-xl);
+      bottom: max(6px, env(safe-area-inset-bottom));
+   }
+
+   .footer button {
+      min-height: 52px;
+      padding: 6px 4px;
+      font-size: 18px;
+      border-radius: var(--radius-md);
+   }
+
+   .desktopLabel {
+      display: none;
+   }
+
+   .mobileLabel {
+      display: inline-block;
+   }
+}
+
+/* MODO COMPACTO — ZOOM ALTO / TELA APERTADA */
+@media (max-height: 750px), (max-width: 520px) {
+   body {
+      padding: 6px;
+      padding-bottom: 72px;
+   }
+
+   .game {
+      padding: 9px;
+      gap: 6px;
+      max-height: calc(100dvh - 78px);
+      border-radius: var(--radius-xl);
+   }
+
+   .saveStatus {
+      font-size: 10px;
+      margin-bottom: 0;
+   }
+
+   .top {
+      gap: 6px;
+      margin-bottom: 0;
+   }
+
+   .panel {
+      padding: 5px 4px;
+      min-height: 42px;
+      border-radius: var(--radius-sm);
+   }
+
+   .label {
+      font-size: 9px;
+      line-height: 1;
+   }
+
+   .value {
+      font-size: 13px;
+      line-height: 1.05;
+   }
+
+   .progressPanel {
+      padding: 6px 8px;
+      border-radius: 11px;
+      margin-bottom: 0;
+   }
+
+   .progressHeader {
+      font-size: 10px;
+      margin-bottom: 4px;
+      line-height: 1.05;
+   }
+
+   .barTrack {
+      height: 6px;
+   }
+
+   #levelBonusText,
+   .levelBonus {
+      font-size: 9px;
+      margin-top: 3px;
+      line-height: 1.05;
+   }
+
+   .grid {
+      width: min(100%, calc(100dvh - 285px));
+      align-self: center;
+      gap: 5px;
+      padding: 7px;
+      border-radius: 13px;
+   }
+
+   .cell {
+      border-radius: 9px;
+   }
+
+   .item {
+      width: 68%;
+      height: 68%;
+      border-radius: 9px;
+   }
+
+   .itemLevelText {
+      font-size: 8px;
+   }
+
+   .item small {
+      font-size: 6px;
+   }
+
+   .cycleBadge {
+      min-width: 12px;
+      height: 13px;
+      padding: 0 4px;
+      font-size: 6px;
+      line-height: 12px;
+      top: -4px;
+      right: -4px;
+      border-radius: 5px;
+   }
+
+   .moneyPopup {
+      font-size: 9px;
+      max-width: 78px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      opacity: 0.88;
+   }
+
+   .moneyPopup.double {
+      font-size: 10px;
+      max-width: 95px;
+   }
+
+   .footer {
+      width: min(390px, calc(100vw - 14px));
+      padding: 7px;
+      gap: 5px;
+      bottom: max(5px, env(safe-area-inset-bottom));
+   }
+
+   .footer button {
+      min-height: 46px;
+      padding: 5px;
+      font-size: 17px;
+      border-radius: 11px;
+   }
+}
