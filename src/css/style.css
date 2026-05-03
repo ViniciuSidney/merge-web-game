@@ -1,4 +1,3 @@
-
 /* ===============================
    1. TOKENS / VARIÁVEIS
 ================================ */
@@ -15,7 +14,8 @@
    user-select: none;
 }
 
-html, body {
+html,
+body {
    width: 100%;
    min-height: 100dvh;
    overflow: hidden;
@@ -225,6 +225,16 @@ body {
    font-weight: 500;
 }
 
+/* Spawn e Level Up */
+.spawnPopup,
+.levelUpPopup {
+   z-index: 80;
+   max-width: min(360px, calc(100vw - 48px));
+   min-width: min(280px, calc(100vw - 48px));
+   white-space: normal;
+   line-height: 1.2;
+}
+
 /* ===============================
    6. GRID E CÉLULAS
 ================================ */
@@ -364,70 +374,6 @@ body {
    8. EFEITOS VISUAIS
 ================================ */
 
-/* ===============================
-   9. FOOTER / NAVEGAÇÃO
-================================ */
-
-/* ===============================
-   10. BOTÕES
-================================ */
-
-/* ===============================
-   11. PAINÉIS LATERAIS
-================================ */
-
-/* ===============================
-   12. LOJA / UPGRADES
-================================ */
-
-/* ===============================
-   13. CONFIGURAÇÕES
-================================ */
-
-/* ===============================
-   14. DEV TOOLS
-================================ */
-
-/* ===============================
-   15. RESPONSIVIDADE
-================================ */
-
-/* ===============================
-   16. ANIMAÇÕES
-================================ */
-
-
-
-
-
-
-
-.spawnPopup.valuable {
-   border-color: #6c5ce7;
-   color: #2f235f;
-}
-
-
-
-.spawnPopup,
-.levelUpPopup {
-   z-index: 80;
-   max-width: min(360px, calc(100vw - 48px));
-   min-width: min(280px, calc(100vw - 48px));
-   white-space: normal;
-   line-height: 1.2;
-}
-
-
-
-
-
-
-
-
-
-
-
 .moneyPopup {
    position: fixed;
    z-index: 1000;
@@ -465,6 +411,14 @@ body {
    animation: ringError 0.38s ease-out forwards;
 }
 
+.pop {
+   animation: pop 0.25s ease;
+}
+
+/* ===============================
+   9. FOOTER / NAVEGAÇÃO
+================================ */
+
 .footer {
    position: fixed;
    left: 50%;
@@ -496,9 +450,21 @@ body {
    text-align: center;
 }
 
-.settings-open {
-   background: #5c5ee7;
+.footer button span {
+   overflow-wrap: anywhere;
 }
+
+.desktopLabel {
+   display: inline;
+}
+
+.mobileLabel {
+   display: none;
+}
+
+/* ===============================
+   10. BOTÕES
+================================ */
 
 button {
    flex: 1;
@@ -529,17 +495,30 @@ button:disabled {
 .danger {
    background: #c0392b;
 }
+
 .shop-open {
    background: #23be88;
 }
-.guide-open {
+
+.settings-open {
    background: #5c5ee7;
 }
 
-.shopOverlay,
-.statsOverlay,
-.devOverlay,
-.guideOverlay {
+.closeBtn {
+   flex: unset;
+   width: 40px;
+   height: 40px;
+   padding: 0;
+   background: #eef5f0;
+   color: #16351f;
+   border: 1px solid #d7e8dc;
+}
+
+/* ===============================
+   11. PAINÉIS LATERAIS
+================================ */
+
+.shopOverlay {
    position: fixed;
    inset: 0;
    background: rgba(0, 0, 0, 0.25);
@@ -549,18 +528,27 @@ button:disabled {
    z-index: 1000;
 }
 
-.shopOverlay.active,
-.statsOverlay.active,
-.devOverlay.active,
-.guideOverlay.active {
+.shopOverlay.active {
    opacity: 1;
    pointer-events: auto;
 }
 
-.guide,
-.shop,
-.statsPanel,
-.devPanel {
+.settingsOverlay {
+   position: fixed;
+   inset: 0;
+   background: rgba(0, 0, 0, 0.25);
+   opacity: 0;
+   pointer-events: none;
+   transition: opacity 0.25s ease;
+   z-index: 1000;
+}
+
+.settingsOverlay.active {
+   opacity: 1;
+   pointer-events: auto;
+}
+
+.shop {
    position: fixed;
    top: 0;
    right: 0;
@@ -576,35 +564,28 @@ button:disabled {
    overflow-y: auto;
 }
 
-.guide.active,
-.shop.active,
-.statsPanel.active,
-.devPanel.active {
+.shop.active {
    transform: translateX(0);
 }
 
-.guideSection {
-   border: 2px solid #e1eee5;
-   border-radius: 14px;
-   padding: 12px;
-   margin-bottom: 10px;
-   background: #fbfffc;
+.settingsPanel {
+   position: fixed;
+   top: 0;
+   right: 0;
+   height: 100vh;
+   width: min(380px, 94vw);
+   background: #ffffff;
+   opacity: 0.94;
+   box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
+   padding: 18px;
+   transform: translateX(100%);
+   transition: transform 0.25s ease;
+   z-index: 1001;
+   overflow-y: auto;
 }
 
-.guideSection h3 {
-   font-size: 15px;
-   margin-bottom: 6px;
-}
-
-.guideSection p,
-.guideSection li {
-   font-size: 13px;
-   color: #45634d;
-   line-height: 1.45;
-}
-
-.guideSection ul {
-   padding-left: 18px;
+.settingsPanel.active {
+   transform: translateX(0);
 }
 
 .shopHeader {
@@ -619,41 +600,13 @@ button:disabled {
    z-index: 5;
 }
 
-.shopBalance {
-   display: grid;
-   grid-template-columns: 1fr;
-   gap: 8px;
-   margin-bottom: 12px;
-}
-
-.balancePill {
-   background: #dff3e5;
-   border: 2px solid #b8dfc2;
-   border-radius: 12px;
-   padding: 10px 12px;
-   font-weight: bold;
-   text-align: center;
-}
-
-.upgradeList {
-   display: flex;
-   flex-direction: column;
-   gap: 10px;
-}
-
 .shopHeader h2 {
    font-size: 22px;
 }
 
-.closeBtn {
-   flex: unset;
-   width: 40px;
-   height: 40px;
-   padding: 0;
-   background: #eef5f0;
-   color: #16351f;
-   border: 1px solid #d7e8dc;
-}
+/* ===============================
+   12. LOJA / UPGRADES
+================================ */
 
 .shopMoney {
    background: #dff3e5;
@@ -663,6 +616,19 @@ button:disabled {
    margin-bottom: 12px;
    font-weight: bold;
    text-align: center;
+}
+
+.shopBalance {
+   display: grid;
+   grid-template-columns: 1fr;
+   gap: 8px;
+   margin-bottom: 12px;
+}
+
+.upgradeList {
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
 }
 
 .upgrade {
@@ -728,6 +694,79 @@ button:disabled {
    font-size: 11px;
 }
 
+/* ===============================
+   13. CONFIGURAÇÕES
+================================ */
+
+.settingsTabs {
+   display: grid;
+   grid-template-columns: repeat(4, 1fr);
+   gap: 6px;
+   margin-bottom: 12px;
+   position: sticky;
+   top: 58px;
+   background: #ffffff;
+   padding-bottom: 8px;
+   z-index: 4;
+}
+
+.settingsTab {
+   min-height: 36px;
+   padding: 7px 5px;
+   border-radius: 10px;
+   background: #eef5f0;
+   color: #16351f;
+   font-size: 11px;
+}
+
+.settingsTab.active {
+   background: #1f8f48;
+   color: #ffffff;
+}
+
+.settingsContent {
+   display: none;
+}
+
+.settingsContent.active {
+   display: block;
+}
+
+.guideSection {
+   border: 2px solid #e1eee5;
+   border-radius: 14px;
+   padding: 12px;
+   margin-bottom: 10px;
+   background: #fbfffc;
+}
+
+.guideSection h3 {
+   font-size: 15px;
+   margin-bottom: 6px;
+}
+
+.guideSection p,
+.guideSection li {
+   font-size: 13px;
+   color: #45634d;
+   line-height: 1.45;
+}
+
+.guideSection ul {
+   padding-left: 18px;
+}
+
+.dangerSection {
+   border-color: #f1b5ae;
+   background: #fff3f1;
+}
+
+.resetInsideBtn {
+   width: 100%;
+   margin-top: 10px;
+   min-height: 44px;
+}
+
 .statsPageGrid {
    display: grid;
    grid-template-columns: 1fr 1fr;
@@ -749,50 +788,9 @@ button:disabled {
    font-size: 16px;
 }
 
-.stats {
-   display: grid;
-   grid-template-columns: 1fr 1fr;
-   gap: 8px;
-   margin-bottom: 12px;
-}
-
-.stat {
-   background: #f2f8f4;
-   border-radius: 10px;
-   padding: 8px;
-   font-size: 12px;
-   text-align: center;
-}
-
-.stat strong {
-   display: block;
-   font-size: 14px;
-   margin-top: 3px;
-}
-
-.pop {
-   animation: pop 0.25s ease;
-}
-
-.dev-open {
-   background: #111827;
-}
-
-.devPanel {
-   opacity: 0.87;
-   position: fixed;
-   top: 0;
-   right: 0;
-   height: 100vh;
-   width: min(380px, 94vw);
-   background: #ffffff;
-   box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
-   padding: 18px;
-   transform: translateX(100%);
-   transition: transform 0.25s ease;
-   z-index: 1001;
-   overflow-y: auto;
-}
+/* ===============================
+   14. DEV TOOLS
+================================ */
 
 .devSection {
    border: 2px solid #e1eee5;
@@ -844,96 +842,9 @@ button:disabled {
    display: none;
 }
 
-.footer button span {
-   overflow-wrap: anywhere;
-}
-.desktopLabel {
-   display: inline;
-}
-
-.mobileLabel {
-   display: none;
-}
-
-.settingsOverlay {
-   position: fixed;
-   inset: 0;
-   background: rgba(0, 0, 0, 0.25);
-   opacity: 0;
-   pointer-events: none;
-   transition: opacity 0.25s ease;
-   z-index: 1000;
-}
-
-.settingsOverlay.active {
-   opacity: 1;
-   pointer-events: auto;
-}
-
-.settingsPanel {
-   position: fixed;
-   top: 0;
-   right: 0;
-   height: 100vh;
-   width: min(380px, 94vw);
-   background: #ffffff;
-   opacity: 0.94;
-   box-shadow: -8px 0 30px rgba(0, 0, 0, 0.22);
-   padding: 18px;
-   transform: translateX(100%);
-   transition: transform 0.25s ease;
-   z-index: 1001;
-   overflow-y: auto;
-}
-
-.settingsPanel.active {
-   transform: translateX(0);
-}
-
-.settingsTabs {
-   display: grid;
-   grid-template-columns: repeat(4, 1fr);
-   gap: 6px;
-   margin-bottom: 12px;
-   position: sticky;
-   top: 58px;
-   background: #ffffff;
-   padding-bottom: 8px;
-   z-index: 4;
-}
-
-.settingsTab {
-   min-height: 36px;
-   padding: 7px 5px;
-   border-radius: 10px;
-   background: #eef5f0;
-   color: #16351f;
-   font-size: 11px;
-}
-
-.settingsTab.active {
-   background: #1f8f48;
-   color: #ffffff;
-}
-
-.settingsContent {
-   display: none;
-}
-
-.settingsContent.active {
-   display: block;
-}
-
-.dangerSection {
-   border-color: #f1b5ae;
-   background: #fff3f1;
-}
-
-.resetInsideBtn {
-   width: 100%;
-   margin-top: 10px;
-   min-height: 44px;
-}
+/* ===============================
+   15. RESPONSIVIDADE
+================================ */
 
 /* Desktop */
 @media (min-width: 1025px) {
@@ -1390,6 +1301,10 @@ button:disabled {
       border-radius: 11px;
    }
 }
+
+/* ===============================
+   16. ANIMAÇÕES
+================================ */
 
 @keyframes pop {
    0% {
