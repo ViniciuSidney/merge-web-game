@@ -1,3 +1,12 @@
+
+/* ===============================
+   1. TOKENS / VARIÁVEIS
+================================ */
+
+/* ===============================
+   2. RESET E BASE
+================================ */
+
 * {
    box-sizing: border-box;
    margin: 0;
@@ -6,8 +15,7 @@
    user-select: none;
 }
 
-html,
-body {
+html, body {
    width: 100%;
    min-height: 100dvh;
    overflow: hidden;
@@ -22,6 +30,10 @@ body {
    padding-bottom: 92px;
    color: #16351f;
 }
+
+/* ===============================
+   3. LAYOUT PRINCIPAL
+================================ */
 
 .game {
    width: min(100%, 410px);
@@ -41,10 +53,9 @@ body {
    overflow: visible;
 }
 
-.top,
-.progressPanel {
-   margin-bottom: 0;
-}
+/* ===============================
+   4. HUD / TOPO
+================================ */
 
 .saveStatus {
    text-align: center;
@@ -81,15 +92,14 @@ body {
    margin-bottom: 3px;
 }
 
-#levelBonusText {
-   font-size: 12px;
-   font-weight: 500;
-}
-
 .value {
    font-size: 17px;
    font-weight: bold;
 }
+
+/* ===============================
+   5. PROGRESSO / SPAWN / LEVEL
+================================ */
 
 .progressPanel {
    background: #f2f8f4;
@@ -152,11 +162,6 @@ body {
    color: #163d6d;
 }
 
-.spawnPopup.valuable {
-   border-color: #6c5ce7;
-   color: #2f235f;
-}
-
 .barTrack {
    height: 10px;
    background: #dcebe0;
@@ -215,14 +220,14 @@ body {
    text-align: center;
 }
 
-.spawnPopup,
-.levelUpPopup {
-   z-index: 80;
-   max-width: min(360px, calc(100vw - 48px));
-   min-width: min(280px, calc(100vw - 48px));
-   white-space: normal;
-   line-height: 1.2;
+#levelBonusText {
+   font-size: 12px;
+   font-weight: 500;
 }
+
+/* ===============================
+   6. GRID E CÉLULAS
+================================ */
 
 .grid {
    width: 100%;
@@ -268,6 +273,10 @@ body {
    animation: errorCell 0.35s ease;
 }
 
+/* ===============================
+   7. ITENS
+================================ */
+
 .item {
    width: min(76%, 54px);
    height: min(76%, 54px);
@@ -289,37 +298,6 @@ body {
    transition:
       transform 0.15s ease,
       box-shadow 0.15s ease;
-}
-
-.cycleBadge {
-   position: absolute;
-   top: -6px;
-   right: -6px;
-   min-width: 20px;
-   height: 20px;
-   padding: 0 5px;
-   border-radius: 7px;
-   background: #ffffff;
-   color: #111827;
-   border: 2px solid rgba(17, 24, 39, 0.25);
-   font-size: 10px;
-   font-weight: 900;
-   line-height: 16px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
-   z-index: 4;
-}
-
-.itemLevelText {
-   font-size: 14px;
-   font-weight: 900;
-}
-
-.item small {
-   font-size: 10px;
-   opacity: 0.92;
 }
 
 .item.golden {
@@ -350,6 +328,105 @@ body {
    transform: scale(1.08);
    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
 }
+
+.itemLevelText {
+   font-size: 14px;
+   font-weight: 900;
+}
+
+.item small {
+   font-size: 10px;
+   opacity: 0.92;
+}
+
+.cycleBadge {
+   position: absolute;
+   top: -6px;
+   right: -6px;
+   min-width: 20px;
+   height: 20px;
+   padding: 0 5px;
+   border-radius: 7px;
+   background: #ffffff;
+   color: #111827;
+   border: 2px solid rgba(17, 24, 39, 0.25);
+   font-size: 10px;
+   font-weight: 900;
+   line-height: 16px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
+   z-index: 4;
+}
+
+/* ===============================
+   8. EFEITOS VISUAIS
+================================ */
+
+/* ===============================
+   9. FOOTER / NAVEGAÇÃO
+================================ */
+
+/* ===============================
+   10. BOTÕES
+================================ */
+
+/* ===============================
+   11. PAINÉIS LATERAIS
+================================ */
+
+/* ===============================
+   12. LOJA / UPGRADES
+================================ */
+
+/* ===============================
+   13. CONFIGURAÇÕES
+================================ */
+
+/* ===============================
+   14. DEV TOOLS
+================================ */
+
+/* ===============================
+   15. RESPONSIVIDADE
+================================ */
+
+/* ===============================
+   16. ANIMAÇÕES
+================================ */
+
+
+
+
+
+
+
+.spawnPopup.valuable {
+   border-color: #6c5ce7;
+   color: #2f235f;
+}
+
+
+
+.spawnPopup,
+.levelUpPopup {
+   z-index: 80;
+   max-width: min(360px, calc(100vw - 48px));
+   min-width: min(280px, calc(100vw - 48px));
+   white-space: normal;
+   line-height: 1.2;
+}
+
+
+
+
+
+
+
+
+
+
 
 .moneyPopup {
    position: fixed;
