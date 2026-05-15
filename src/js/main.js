@@ -5,7 +5,11 @@ import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from "./core/config.js";
 
 import { state } from "./core/state.js";
 
-import { createGrid, createItem } from "./systems/grid.js";
+import {
+  createGrid,
+  createItem,
+  refreshAllItemElements,
+} from "./systems/grid.js";
 
 import {
   updateSpawnProgressBar,
@@ -194,6 +198,8 @@ function handleBuySpecialUpgrade(key) {
 
   if (!bought) return;
 
+  refreshAllItemElements();
+
   updateUI(getUIContext());
 
   saveGame({
@@ -265,6 +271,8 @@ function startGame() {
   });
 
   createInitialItemsIfNeeded(loaded);
+
+  refreshAllItemElements();
 
   restartSpawnTimer(getSpawnContext());
   updateUI(getUIContext());

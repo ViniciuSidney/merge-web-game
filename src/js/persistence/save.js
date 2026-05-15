@@ -62,6 +62,12 @@ export function loadGame({ onItemCreated = null } = {}) {
       });
     }
 
+    if (saveData.specialUpgrades) {
+      Object.keys(state.specialUpgrades).forEach((key) => {
+        state.specialUpgrades[key] = saveData.specialUpgrades[key] ?? 0;
+      });
+    }
+
     if (Array.isArray(saveData.items)) {
       saveData.items.forEach((savedItem) => {
         createItem({
@@ -70,12 +76,6 @@ export function loadGame({ onItemCreated = null } = {}) {
           forcedGolden: savedItem.isGolden,
           onCreated: onItemCreated,
         });
-      });
-    }
-
-    if (saveData.specialUpgrades) {
-      Object.keys(state.specialUpgrades).forEach((key) => {
-        state.specialUpgrades[key] = saveData.specialUpgrades[key] ?? 0;
       });
     }
 
