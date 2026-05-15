@@ -169,20 +169,57 @@ export function renderUpgrades({ upgradesEl, onBuyUpgrade }) {
   });
 }
 
-function getSpecialUpgradeEffectText(key) {
+function getSpecialUpgradeEffectText(key, level = null) {
+  const currentLevel = level ?? getSpecialUpgradeLevel(key);
+
   if (key === "polygonBoost") {
-    return `${getPolygonBoostMultiplier().toFixed(2)}x`;
+    const effect = SPECIAL_UPGRADES.polygonBoost.effectPerLevel;
+    return `${(1 + currentLevel * effect).toFixed(2)}x`;
   }
 
   if (key === "shardRewardBoost") {
-    return `+${getExtraShardReward()} ✦`;
+    const effect = SPECIAL_UPGRADES.shardRewardBoost.effectPerLevel;
+    return `+${currentLevel * effect} ✦`;
   }
 
   if (key === "goldenPower") {
-    return `${getGoldenMultiplier().toFixed(1)}x dourado`;
+    const effect = SPECIAL_UPGRADES.goldenPower.effectPerLevel;
+    return `${(2 + currentLevel * effect).toFixed(1)}x dourado`;
   }
 
   return "";
+}
+
+function getSpecialUpgradeProgressText(key, level, isMaxed) {
+  const currentEffect = getSpecialUpgradeEffectText(key, level);
+
+  if (isMaxed) {
+    return `
+      <div class="upgradeEffectBox">
+        <span>Atual</span>
+        <strong>${currentEffect}</strong>
+      </div>
+
+      <div class="upgradeEffectBox maxed">
+        <span>Status</span>
+        <strong>Máximo</strong>
+      </div>
+    `;
+  }
+
+  const nextEffect = getSpecialUpgradeEffectText(key, level + 1);
+
+  return `
+    <div class="upgradeEffectBox">
+      <span>Atual</span>
+      <strong>${currentEffect}</strong>
+    </div>
+
+    <div class="upgradeEffectBox next">
+      <span>Próximo</span>
+      <strong>${nextEffect}</strong>
+    </div>
+  `;
 }
 
 export function renderSpecialUpgrades({
@@ -203,21 +240,26 @@ export function renderSpecialUpgrades({
     card.className = "upgrade specialUpgrade";
 
     card.innerHTML = `
-         <div class="upgradeTop">
-            <h3>${upgrade.name}</h3>
+      <div class="upgradeTop">
+        <h3>${upgrade.name}</h3>
 
-            <div class="upgradeInfo">
-               <span class="upgradeEffectCompact">[${getSpecialUpgradeEffectText(key)}]</span>
-               <span class="upgradeLevel">Nv. ${level}${upgrade.maxLevel ? `/${upgrade.maxLevel}` : ""}</span>
-            </div>
-         </div>
+        <div class="upgradeInfo">
+          <span class="upgradeLevel">
+            Nv. ${level}${upgrade.maxLevel ? `/${upgrade.maxLevel}` : ""}
+          </span>
+        </div>
+      </div>
 
-         <p>${upgrade.description}</p>
+      <p>${upgrade.description}</p>
 
-         <button ${!canBuy || isMaxed ? "disabled" : ""}>
-            ${isMaxed ? "Máximo" : `Comprar — ${formatShards(cost)}`}
-         </button>
-      `;
+      <div class="specialUpgradeEffects">
+        ${getSpecialUpgradeProgressText(key, level, isMaxed)}
+      </div>
+
+      <button ${!canBuy || isMaxed ? "disabled" : ""}>
+        ${isMaxed ? "Máximo" : `Comprar — ${formatShards(cost)}`}
+      </button>
+    `;
 
     card.querySelector("button").addEventListener("click", () => {
       onBuySpecialUpgrade(key);
