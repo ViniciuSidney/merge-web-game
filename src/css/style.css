@@ -896,3 +896,46 @@ button:disabled {
    display: none;
 }
 
+.shopTabs {
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 8px;
+   margin-bottom: 12px;
+   position: sticky;
+   top: 62px;
+   background: #ffffff;
+   padding-bottom: 8px;
+   z-index: 4;
+}
+
+.shopTab {
+   min-height: 38px;
+   padding: 8px;
+   border-radius: 10px;
+   background: #eef5f0;
+   color: #16351f;
+   font-size: 12px;
+}
+
+.shopTab.active {
+   background: #1f8f48;
+   color: #ffffff;
+}
+
+.shopContent {
+   display: none;
+}
+
+.shopContent.active {
+   display: block;
+}
+
+.specialUpgrade {
+   border-color: #c7bfff;
+   background: #f7f5ff;
+}
+
+.specialUpgrade .upgradeEffectCompact,
+.specialUpgrade .upgradeLevel {
+   color: #6c5ce7;
+}

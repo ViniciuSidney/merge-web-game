@@ -2,6 +2,8 @@
 // PANELS — LOJA E CONFIGURAÇÕES
 // ===============================
 
+import { DOM } from '../core/dom.js';
+
 // ===============================
 // 1. FUNÇÕES GENÉRICAS
 // ===============================
@@ -20,6 +22,8 @@ function closePanel(panel, overlay) {
 // 2. ABAS DE CONFIGURAÇÕES
 // ===============================
 
+
+// 2.1 ABAS DE CONFIGURAÇÕES
 export function setupSettingsTabs({ settingsTabs, settingsContents }) {
    settingsTabs.forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -40,6 +44,21 @@ export function setupSettingsTabs({ settingsTabs, settingsContents }) {
          if (selectedContent) {
             selectedContent.classList.add('active');
          }
+      });
+   });
+}
+
+// 2.2 ABAS DA LOJA
+export function setupShopTabs() {
+   DOM.shop.shopTabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+         const selectedTab = tab.dataset.shopTab;
+
+         DOM.shop.shopTabs.forEach((item) => item.classList.remove('active'));
+         DOM.shop.shopContents.forEach((content) => content.classList.remove('active'));
+
+         tab.classList.add('active');
+         document.getElementById(`shop-${selectedTab}`).classList.add('active');
       });
    });
 }
@@ -113,6 +132,8 @@ export function setupPanels({
       settingsContents,
    });
 
+   setupShopTabs();
+
    setupSettingsPanel({
       openSettingsBtn,
       closeSettingsBtn,
@@ -126,4 +147,5 @@ export function setupPanels({
       shop,
       shopOverlay,
    });
+
 }

@@ -2,39 +2,53 @@
 // UI — INTERFACE E RENDERIZAÇÃO
 // ===============================
 
-import { GRID_SIZE } from '../core/config.js';
+import { GRID_SIZE } from "../core/config.js";
 import {
-   DEV_ADD_SMALL_MONEY,
-   DEV_ADD_BIG_MONEY,
-   DEV_ADD_SMALL_SHARDS,
-   DEV_ADD_BIG_SHARDS,
-} from '../core/config.js';
+  DEV_ADD_SMALL_MONEY,
+  DEV_ADD_BIG_MONEY,
+  DEV_ADD_SMALL_SHARDS,
+  DEV_ADD_BIG_SHARDS,
+} from "../core/config.js";
 
-import { TEXTS } from '../core/texts.js';
-import { state } from '../core/state.js';
+import { TEXTS } from "../core/texts.js";
+import { state } from "../core/state.js";
 
-import { formatNumber, formatMoney, formatShards } from '../utils/format.js';
+import { formatNumber, formatMoney, formatShards } from "../utils/format.js";
 
 import {
-   upgrades,
-   getUpgradeCost,
-   getSpawnTime,
-   getStartLevel,
-   getDoubleSpawnChance,
-   getDoubleMoneyChance,
-   getGoldenChance,
-} from '../systems/upgrades.js';
+  upgrades,
+  getUpgradeCost,
+  getSpawnTime,
+  getStartLevel,
+  getDoubleSpawnChance,
+  getDoubleMoneyChance,
+  getGoldenChance,
+} from "../systems/upgrades.js";
 
-import { getShardMultiplier, getTotalIncomePreview } from '../systems/economy.js';
+import { SPECIAL_UPGRADES } from "../config/specialUpgradeConfig.js";
+import {
+  canBuySpecialUpgrade,
+  getSpecialUpgradeCost,
+  getSpecialUpgradeLevel,
+  isSpecialUpgradeMaxed,
+  getPolygonBoostMultiplier,
+  getExtraShardReward,
+  getGoldenMultiplier,
+} from "../systems/specialUpgrades.js";
+
+import {
+  getShardMultiplier,
+  getTotalIncomePreview,
+} from "../systems/economy.js";
 
 // ===============================
 // 1. PAINEL PRINCIPAL
 // ===============================
 
 export function updateTopPanel({ moneyEl, incomeEl, shardsEl }) {
-   moneyEl.textContent = formatMoney(state.money);
-   incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
-   shardsEl.textContent = formatShards(state.shards);
+  moneyEl.textContent = formatMoney(state.money);
+  incomeEl.textContent = `${formatMoney(getTotalIncomePreview())}/s`;
+  shardsEl.textContent = formatShards(state.shards);
 }
 
 // ===============================
@@ -42,23 +56,23 @@ export function updateTopPanel({ moneyEl, incomeEl, shardsEl }) {
 // ===============================
 
 export function updateStatsPanel({
-   spawnTimeStat,
-   startLevelStat,
-   doubleSpawnStat,
-   doubleMoneyStat,
-   goldenChanceStat,
-   multiplierStat,
-   itemsStat,
-   levelStat,
+  spawnTimeStat,
+  startLevelStat,
+  doubleSpawnStat,
+  doubleMoneyStat,
+  goldenChanceStat,
+  multiplierStat,
+  itemsStat,
+  levelStat,
 }) {
-   spawnTimeStat.textContent = TEXTS.stats.spawnTime(getSpawnTime() / 1000);
-   startLevelStat.textContent = TEXTS.stats.startLevel(getStartLevel());
-   doubleSpawnStat.textContent = TEXTS.stats.chance(getDoubleSpawnChance());
-   doubleMoneyStat.textContent = TEXTS.stats.chance(getDoubleMoneyChance());
-   goldenChanceStat.textContent = TEXTS.stats.chance(getGoldenChance());
-   multiplierStat.textContent = TEXTS.stats.multiplier(getShardMultiplier());
-   itemsStat.textContent = TEXTS.stats.items(state.items.length, GRID_SIZE);
-   levelStat.textContent = state.playerLevel;
+  spawnTimeStat.textContent = TEXTS.stats.spawnTime(getSpawnTime() / 1000);
+  startLevelStat.textContent = TEXTS.stats.startLevel(getStartLevel());
+  doubleSpawnStat.textContent = TEXTS.stats.chance(getDoubleSpawnChance());
+  doubleMoneyStat.textContent = TEXTS.stats.chance(getDoubleMoneyChance());
+  goldenChanceStat.textContent = TEXTS.stats.chance(getGoldenChance());
+  multiplierStat.textContent = TEXTS.stats.multiplier(getShardMultiplier());
+  itemsStat.textContent = TEXTS.stats.items(state.items.length, GRID_SIZE);
+  levelStat.textContent = state.playerLevel;
 }
 
 // ===============================
@@ -66,24 +80,24 @@ export function updateStatsPanel({
 // ===============================
 
 export function updateLevelPanel({
-   playerLevelEl,
-   levelProgressText,
-   levelProgressFill,
-   levelBonusText,
+  playerLevelEl,
+  levelProgressText,
+  levelProgressFill,
+  levelBonusText,
 }) {
-   playerLevelEl.textContent = state.playerLevel;
+  playerLevelEl.textContent = state.playerLevel;
 
-   levelProgressText.textContent = TEXTS.level.progress(
-      state.mergeProgress,
-      state.mergesNeeded,
-   );
+  levelProgressText.textContent = TEXTS.level.progress(
+    state.mergeProgress,
+    state.mergesNeeded,
+  );
 
-   levelProgressFill.style.width = `${Math.min(
-      100,
-      (state.mergeProgress / state.mergesNeeded) * 100,
-   )}%`;
+  levelProgressFill.style.width = `${Math.min(
+    100,
+    (state.mergeProgress / state.mergesNeeded) * 100,
+  )}%`;
 
-   levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
+  levelBonusText.innerHTML = TEXTS.level.shardMultiplier(getShardMultiplier());
 }
 
 // ===============================
@@ -91,46 +105,46 @@ export function updateLevelPanel({
 // ===============================
 
 export function updateShopBalance({ shopMoney }) {
-   shopMoney.innerHTML = TEXTS.shop.balance(
-      formatMoney(state.money),
-      formatShards(state.shards),
-   );
+  shopMoney.innerHTML = TEXTS.shop.balance(
+    formatMoney(state.money),
+    formatShards(state.shards),
+  );
 }
 
 export function getUpgradeEffectText(key) {
-   if (key === 'spawnSpeed') {
-      return `${(getSpawnTime() / 1000).toFixed(1)}s/2.0s`;
-   }
+  if (key === "spawnSpeed") {
+    return `${(getSpawnTime() / 1000).toFixed(1)}s/2.0s`;
+  }
 
-   if (key === 'startLevel') {
-      return `Lv ${getStartLevel()}`;
-   }
+  if (key === "startLevel") {
+    return `Lv ${getStartLevel()}`;
+  }
 
-   if (key === 'doubleSpawn') {
-      return `${Math.round(getDoubleSpawnChance() * 100)}%/50%`;
-   }
+  if (key === "doubleSpawn") {
+    return `${Math.round(getDoubleSpawnChance() * 100)}%/50%`;
+  }
 
-   if (key === 'doubleMoney') {
-      return `${Math.round(getDoubleMoneyChance() * 100)}%/50%`;
-   }
+  if (key === "doubleMoney") {
+    return `${Math.round(getDoubleMoneyChance() * 100)}%/50%`;
+  }
 
-   if (key === 'goldenChance') {
-      return `${Math.round(getGoldenChance() * 100)}%/50%`;
-   }
+  if (key === "goldenChance") {
+    return `${Math.round(getGoldenChance() * 100)}%/50%`;
+  }
 
-   return '';
+  return "";
 }
 
 export function renderUpgrades({ upgradesEl, onBuyUpgrade }) {
-   upgradesEl.innerHTML = '';
+  upgradesEl.innerHTML = "";
 
-   Object.entries(upgrades).forEach(([key, upgrade]) => {
-      const cost = getUpgradeCost(key);
-      const card = document.createElement('div');
+  Object.entries(upgrades).forEach(([key, upgrade]) => {
+    const cost = getUpgradeCost(key);
+    const card = document.createElement("div");
 
-      card.className = `upgrade ${upgrade.golden ? 'goldenUpgrade' : ''}`;
+    card.className = `upgrade ${upgrade.golden ? "goldenUpgrade" : ""}`;
 
-      card.innerHTML = `
+    card.innerHTML = `
          <div class="upgradeTop">
             <h3>${upgrade.name}</h3>
 
@@ -142,17 +156,75 @@ export function renderUpgrades({ upgradesEl, onBuyUpgrade }) {
 
          <p>${upgrade.description}</p>
 
-         <button ${state.money < cost ? 'disabled' : ''}>
+         <button ${state.money < cost ? "disabled" : ""}>
             ${TEXTS.shop.buyButton(formatMoney(cost))}
          </button>
       `;
 
-      card
-         .querySelector('button')
-         .addEventListener('click', () => onBuyUpgrade(key));
+    card
+      .querySelector("button")
+      .addEventListener("click", () => onBuyUpgrade(key));
 
-      upgradesEl.appendChild(card);
-   });
+    upgradesEl.appendChild(card);
+  });
+}
+
+function getSpecialUpgradeEffectText(key) {
+  if (key === "polygonBoost") {
+    return `${getPolygonBoostMultiplier().toFixed(2)}x`;
+  }
+
+  if (key === "shardRewardBoost") {
+    return `+${getExtraShardReward()} ✦`;
+  }
+
+  if (key === "goldenPower") {
+    return `${getGoldenMultiplier().toFixed(1)}x dourado`;
+  }
+
+  return "";
+}
+
+export function renderSpecialUpgrades({
+  specialUpgradesEl,
+  onBuySpecialUpgrade,
+}) {
+  if (!specialUpgradesEl) return;
+
+  specialUpgradesEl.innerHTML = "";
+
+  Object.entries(SPECIAL_UPGRADES).forEach(([key, upgrade]) => {
+    const cost = getSpecialUpgradeCost(key);
+    const level = getSpecialUpgradeLevel(key);
+    const isMaxed = isSpecialUpgradeMaxed(key);
+    const canBuy = canBuySpecialUpgrade(key);
+
+    const card = document.createElement("div");
+    card.className = "upgrade specialUpgrade";
+
+    card.innerHTML = `
+         <div class="upgradeTop">
+            <h3>${upgrade.name}</h3>
+
+            <div class="upgradeInfo">
+               <span class="upgradeEffectCompact">[${getSpecialUpgradeEffectText(key)}]</span>
+               <span class="upgradeLevel">Nv. ${level}${upgrade.maxLevel ? `/${upgrade.maxLevel}` : ""}</span>
+            </div>
+         </div>
+
+         <p>${upgrade.description}</p>
+
+         <button ${!canBuy || isMaxed ? "disabled" : ""}>
+            ${isMaxed ? "Máximo" : `Comprar — ${formatShards(cost)}`}
+         </button>
+      `;
+
+    card.querySelector("button").addEventListener("click", () => {
+      onBuySpecialUpgrade(key);
+    });
+
+    specialUpgradesEl.appendChild(card);
+  });
 }
 
 // ===============================
@@ -160,26 +232,26 @@ export function renderUpgrades({ upgradesEl, onBuyUpgrade }) {
 // ===============================
 
 export function updateDevButtons({
-   devAddPolygonsSmall,
-   devAddPolygonsBig,
-   devAddShardsSmall,
-   devAddShardsBig,
+  devAddPolygonsSmall,
+  devAddPolygonsBig,
+  devAddShardsSmall,
+  devAddShardsBig,
 }) {
-   devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(
-      formatNumber(DEV_ADD_SMALL_MONEY),
-   );
+  devAddPolygonsSmall.textContent = TEXTS.dev.addPolygonsSmall(
+    formatNumber(DEV_ADD_SMALL_MONEY),
+  );
 
-   devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(
-      formatNumber(DEV_ADD_BIG_MONEY),
-   );
+  devAddPolygonsBig.textContent = TEXTS.dev.addPolygonsBig(
+    formatNumber(DEV_ADD_BIG_MONEY),
+  );
 
-   devAddShardsSmall.textContent = TEXTS.dev.addShardsSmall(
-      formatNumber(DEV_ADD_SMALL_SHARDS),
-   );
+  devAddShardsSmall.textContent = TEXTS.dev.addShardsSmall(
+    formatNumber(DEV_ADD_SMALL_SHARDS),
+  );
 
-   devAddShardsBig.textContent = TEXTS.dev.addShardsBig(
-      formatNumber(DEV_ADD_BIG_SHARDS),
-   );
+  devAddShardsBig.textContent = TEXTS.dev.addShardsBig(
+    formatNumber(DEV_ADD_BIG_SHARDS),
+  );
 }
 
 // ===============================
@@ -187,70 +259,75 @@ export function updateDevButtons({
 // ===============================
 
 export function updateUI({
-   moneyEl,
-   incomeEl,
-   shardsEl,
+  moneyEl,
+  incomeEl,
+  shardsEl,
 
-   shopMoney,
-   upgradesEl,
-   onBuyUpgrade,
+  shopMoney,
+  upgradesEl,
+  onBuyUpgrade,
 
-   spawnTimeStat,
-   startLevelStat,
-   doubleSpawnStat,
-   doubleMoneyStat,
-   goldenChanceStat,
-   multiplierStat,
-   itemsStat,
-   levelStat,
+  specialUpgradesEl,
+  onBuySpecialUpgrade,
 
-   playerLevelEl,
-   levelProgressText,
-   levelProgressFill,
-   levelBonusText,
+  spawnTimeStat,
+  startLevelStat,
+  doubleSpawnStat,
+  doubleMoneyStat,
+  goldenChanceStat,
+  multiplierStat,
+  itemsStat,
+  levelStat,
 
-   devAddPolygonsSmall,
-   devAddPolygonsBig,
-   devAddShardsSmall,
-   devAddShardsBig,
+  playerLevelEl,
+  levelProgressText,
+  levelProgressFill,
+  levelBonusText,
+
+  devAddPolygonsSmall,
+  devAddPolygonsBig,
+  devAddShardsSmall,
+  devAddShardsBig,
 }) {
-   updateTopPanel({
-      moneyEl,
-      incomeEl,
-      shardsEl,
-   });
+  updateTopPanel({
+    moneyEl,
+    incomeEl,
+    shardsEl,
+  });
 
-   updateShopBalance({
-      shopMoney,
-   });
+  updateShopBalance({
+    shopMoney,
+  });
 
-   updateStatsPanel({
-      spawnTimeStat,
-      startLevelStat,
-      doubleSpawnStat,
-      doubleMoneyStat,
-      goldenChanceStat,
-      multiplierStat,
-      itemsStat,
-      levelStat,
-   });
+  updateStatsPanel({
+    spawnTimeStat,
+    startLevelStat,
+    doubleSpawnStat,
+    doubleMoneyStat,
+    goldenChanceStat,
+    multiplierStat,
+    itemsStat,
+    levelStat,
+  });
 
-   updateLevelPanel({
-      playerLevelEl,
-      levelProgressText,
-      levelProgressFill,
-      levelBonusText,
-   });
+  updateLevelPanel({
+    playerLevelEl,
+    levelProgressText,
+    levelProgressFill,
+    levelBonusText,
+  });
 
-   updateDevButtons({
-      devAddPolygonsSmall,
-      devAddPolygonsBig,
-      devAddShardsSmall,
-      devAddShardsBig,
-   });
+  updateDevButtons({
+    devAddPolygonsSmall,
+    devAddPolygonsBig,
+    devAddShardsSmall,
+    devAddShardsBig,
+  });
 
-   renderUpgrades({
-      upgradesEl,
-      onBuyUpgrade,
-   });
+  renderUpgrades({
+    upgradesEl,
+    onBuyUpgrade,
+  });
+
+  renderSpecialUpgrades({ specialUpgradesEl, onBuySpecialUpgrade });
 }

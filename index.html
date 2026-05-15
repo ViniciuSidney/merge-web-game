@@ -1,275 +1,274 @@
 <!doctype html>
 <html lang="pt-BR">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      <link
-         href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-         rel="stylesheet"
-      />
-      <link rel="stylesheet" href="src/css/style.css" />
-      <link rel="stylesheet" href="src/css/responsive.css" />
-      <link rel="stylesheet" href="src/css/animations.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/css/style.css" />
+    <link rel="stylesheet" href="src/css/responsive.css" />
+    <link rel="stylesheet" href="src/css/animations.css" />
 
-      <title>Merge Clicker - V5</title>
-   </head>
-   <body>
-      <main class="game">
-         <div class="saveStatus" id="saveStatus">
-            Salvamento automático <strong>ativo</strong>
-         </div>
+    <title>Merge Clicker - V5</title>
+  </head>
+  <body>
+    <main class="game">
+      <div class="saveStatus" id="saveStatus">
+        Salvamento automático <strong>ativo</strong>
+      </div>
 
-         <section class="top">
-            <div class="panel">
-               <div class="label">
-                  <span class="desktopLabel">Polígonos</span>
-                  <span class="mobileLabel">◆</span>
-               </div>
-               <div class="value" id="money">◆0</div>
-            </div>
+      <section class="top">
+        <div class="panel">
+          <div class="label">
+            <span class="desktopLabel">Polígonos</span>
+            <span class="mobileLabel">◆</span>
+          </div>
+          <div class="value" id="money">◆0</div>
+        </div>
 
-            <div class="panel">
-               <div class="label">
-                  <span class="desktopLabel">Ganho / segundo</span>
-                  <span class="mobileLabel">◆/s</span>
-               </div>
-               <div class="value" id="income">◆0/s</div>
-            </div>
+        <div class="panel">
+          <div class="label">
+            <span class="desktopLabel">Ganho / segundo</span>
+            <span class="mobileLabel">◆/s</span>
+          </div>
+          <div class="value" id="income">◆0/s</div>
+        </div>
 
-            <div class="panel">
-               <div class="label">
-                  <span class="desktopLabel">Estilhaços</span>
-                  <span class="mobileLabel">✦</span>
-               </div>
-               <div class="value" id="shards">✦0</div>
-            </div>
-         </section>
-
-         <section class="progressPanel spawnPanel">
-            <div class="progressHeader">
-               <span class="label-2">⏳ Próximo objeto</span>
-               <strong id="spawnProgressText">3.00s / 3.00s</strong>
-            </div>
-            <div class="barTrack">
-               <div class="barFill" id="spawnProgressFill"></div>
-            </div>
-            <div class="spawnPopup" id="spawnPopup"></div>
-         </section>
-
-         <section class="progressPanel levelUpPanel">
-            <div class="progressHeader">
-               <span class="label-2"
-                  >⭐ Level <strong id="playerLevel">1</strong></span
-               >
-               <strong id="levelProgressText">0 / 5 combinações</strong>
-            </div>
-            <div class="barTrack">
-               <div class="barFill levelFill" id="levelProgressFill"></div>
-            </div>
-            <p class="levelBonus" id="levelBonusText">
-               Multiplicador por estilhaços: <strong>1.0x</strong>
-            </p>
-            <div class="levelUpPopup" id="levelUpPopup"></div>
-         </section>
-
-         <section class="grid" id="grid"></section>
-      </main>
-
-      <section class="footer">
-         <button class="shop-open" id="openShopBtn">
-            <span class="desktopLabel">Melhorias ⬆️</span>
-            <span class="mobileLabel">⬆️</span>
-         </button>
-
-         <button class="settings-open" id="openSettingsBtn">
-            <span class="desktopLabel">Configurações ⚙️</span>
-            <span class="mobileLabel">⚙️</span>
-         </button>
+        <div class="panel">
+          <div class="label">
+            <span class="desktopLabel">Estilhaços</span>
+            <span class="mobileLabel">✦</span>
+          </div>
+          <div class="value" id="shards">✦0</div>
+        </div>
       </section>
 
-      <div class="shopOverlay" id="shopOverlay"></div>
-      <div class="settingsOverlay" id="settingsOverlay"></div>
+      <section class="progressPanel spawnPanel">
+        <div class="progressHeader">
+          <span class="label-2">⏳ Próximo objeto</span>
+          <strong id="spawnProgressText">3.00s / 3.00s</strong>
+        </div>
+        <div class="barTrack">
+          <div class="barFill" id="spawnProgressFill"></div>
+        </div>
+        <div class="spawnPopup" id="spawnPopup"></div>
+      </section>
 
-      <aside class="shop" id="shop">
-         <div class="shopHeader">
-            <h2>Melhorias Básicas</h2>
-            <button class="closeBtn" id="closeShopBtn">✕</button>
-         </div>
+      <section class="progressPanel levelUpPanel">
+        <div class="progressHeader">
+          <span class="label-2"
+            >⭐ Level <strong id="playerLevel">1</strong></span
+          >
+          <strong id="levelProgressText">0 / 5 combinações</strong>
+        </div>
+        <div class="barTrack">
+          <div class="barFill levelFill" id="levelProgressFill"></div>
+        </div>
+        <p class="levelBonus" id="levelBonusText">
+          Multiplicador por estilhaços: <strong>1.0x</strong>
+        </p>
+        <div class="levelUpPopup" id="levelUpPopup"></div>
+      </section>
 
-         <div class="shopMoney shopBalance" id="shopMoney">
-            Polígonos: ◆0 | Estilhaços: ✦0
-         </div>
+      <section class="grid" id="grid"></section>
+    </main>
 
-         <div class="upgradeList" id="upgrades"></div>
-      </aside>
+    <section class="footer">
+      <button class="shop-open" id="openShopBtn">
+        <span class="desktopLabel">Melhorias ⬆️</span>
+        <span class="mobileLabel">⬆️</span>
+      </button>
 
-      <aside class="settingsPanel" id="settingsPanel">
-         <div class="shopHeader">
-            <h2>Configurações</h2>
-            <button class="closeBtn" id="closeSettingsBtn">✕</button>
-         </div>
+      <button class="settings-open" id="openSettingsBtn">
+        <span class="desktopLabel">Configurações ⚙️</span>
+        <span class="mobileLabel">⚙️</span>
+      </button>
+    </section>
 
-         <nav class="settingsTabs">
-            <button class="settingsTab active" data-tab="stats">
-               📊 Stats
-            </button>
-            <button class="settingsTab" data-tab="guide">📘 Ajuda</button>
-            <button class="settingsTab" data-tab="reset">⚠️ Reset</button>
-            <button class="settingsTab" data-tab="dev">🛠️ Dev</button>
-         </nav>
+    <div class="shopOverlay" id="shopOverlay"></div>
+    <div class="settingsOverlay" id="settingsOverlay"></div>
 
-         <section class="settingsContent active" id="tab-stats">
-            <div class="statsPageGrid">
-               <div class="statCard">
-                  Spawn<strong id="spawnTimeStat">3.00s</strong>
-               </div>
-               <div class="statCard">
-                  Nível inicial<strong id="startLevelStat">Lv 1</strong>
-               </div>
-               <div class="statCard">
-                  Chance dupla<strong id="doubleSpawnStat">0%</strong>
-               </div>
-               <div class="statCard">
-                  Bônus 2x<strong id="doubleMoneyStat">0%</strong>
-               </div>
-               <div class="statCard">
-                  Dourado<strong id="goldenChanceStat">0%</strong>
-               </div>
-               <div class="statCard">
-                  Multiplicador<strong id="multiplierStat">1.0x</strong>
-               </div>
-               <div class="statCard">
-                  Objetos<strong id="itemsStat">0/16</strong>
-               </div>
-               <div class="statCard">
-                  Level<strong id="levelStat">1</strong>
-               </div>
+    <aside class="shop" id="shop">
+      <div class="shopHeader">
+        <h2>Melhorias</h2>
+        <button class="closeBtn" id="closeShopBtn">✕</button>
+      </div>
+
+      <div class="shopMoney shopBalance" id="shopMoney">
+        Polígonos: ◆0 | Estilhaços: ✦0
+      </div>
+
+      <nav class="shopTabs">
+        <button class="shopTab active" data-shop-tab="basic">Básicas</button>
+        <button class="shopTab" data-shop-tab="special">Especiais</button>
+      </nav>
+
+      <section class="shopContent active" id="shop-basic">
+        <div class="upgradeList" id="upgrades"></div>
+      </section>
+
+      <section class="shopContent" id="shop-special">
+        <div class="upgradeList" id="specialUpgrades"></div>
+      </section>
+    </aside>
+
+    <aside class="settingsPanel" id="settingsPanel">
+      <div class="shopHeader">
+        <h2>Configurações</h2>
+        <button class="closeBtn" id="closeSettingsBtn">✕</button>
+      </div>
+
+      <nav class="settingsTabs">
+        <button class="settingsTab active" data-tab="stats">📊 Stats</button>
+        <button class="settingsTab" data-tab="guide">📘 Ajuda</button>
+        <button class="settingsTab" data-tab="reset">⚠️ Reset</button>
+        <button class="settingsTab" data-tab="dev">🛠️ Dev</button>
+      </nav>
+
+      <section class="settingsContent active" id="tab-stats">
+        <div class="statsPageGrid">
+          <div class="statCard">
+            Spawn<strong id="spawnTimeStat">3.00s</strong>
+          </div>
+          <div class="statCard">
+            Nível inicial<strong id="startLevelStat">Lv 1</strong>
+          </div>
+          <div class="statCard">
+            Chance dupla<strong id="doubleSpawnStat">0%</strong>
+          </div>
+          <div class="statCard">
+            Bônus 2x<strong id="doubleMoneyStat">0%</strong>
+          </div>
+          <div class="statCard">
+            Dourado<strong id="goldenChanceStat">0%</strong>
+          </div>
+          <div class="statCard">
+            Multiplicador<strong id="multiplierStat">1.0x</strong>
+          </div>
+          <div class="statCard">
+            Objetos<strong id="itemsStat">0/16</strong>
+          </div>
+          <div class="statCard">Level<strong id="levelStat">1</strong></div>
+        </div>
+      </section>
+
+      <section class="settingsContent" id="tab-guide">
+        <section class="guideSection">
+          <h3>🎯 Objetivo</h3>
+          <p>
+            Combine objetos iguais para criar objetos de nível maior, gerar mais
+            polígonos e subir de level.
+          </p>
+        </section>
+
+        <section class="guideSection">
+          <h3>🔁 Merge</h3>
+          <ul>
+            <li>Arraste um objeto sobre outro do mesmo nível.</li>
+            <li>Solte para combinar os dois em um objeto de nível superior.</li>
+            <li>Cada merge aumenta a barra de Level Up.</li>
+            <li>
+              Objetos de níveis diferentes não combinam e geram um aviso
+              vermelho.
+            </li>
+          </ul>
+        </section>
+
+        <section class="guideSection">
+          <h3>💠 Polígonos</h3>
+          <ul>
+            <li>Cada objeto gera polígonos automaticamente a cada segundo.</li>
+            <li>O popup acima do objeto mostra quanto ele gerou no tick.</li>
+            <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
+          </ul>
+        </section>
+
+        <section class="guideSection">
+          <h3>✦ Estilhaços</h3>
+          <ul>
+            <li>Você ganha estilhaços ao subir de level.</li>
+            <li>A recompensa é múltipla de 5 e aumenta conforme seu level.</li>
+            <li>Cada estilhaço aumenta em 0.01x o ganho de polígonos.</li>
+          </ul>
+        </section>
+      </section>
+
+      <section class="settingsContent" id="tab-reset">
+        <section class="guideSection dangerSection">
+          <h3>⚠️ Resetar progresso</h3>
+          <p>
+            Essa ação apaga polígonos, estilhaços, objetos, level e melhorias
+            compradas.
+          </p>
+
+          <button class="danger resetInsideBtn" id="resetInsideBtn">
+            Resetar Tudo
+          </button>
+        </section>
+      </section>
+
+      <section class="settingsContent" id="tab-dev">
+        <section class="devSection" id="devLoginSection">
+          <h3>🔐 Restrito a Desenvolvedores 👀</h3>
+
+          <input
+            type="password"
+            id="devPasswordInput"
+            placeholder="Digite a senha de desenvolvedor"
+            class="devInput"
+          />
+
+          <button id="devLoginBtn">Entrar</button>
+          <p class="devError" id="devErrorText"></p>
+        </section>
+
+        <div id="devContent" class="devContent locked">
+          <section class="devSection">
+            <h3>💠 Economia</h3>
+            <div class="devGrid">
+              <button id="devAddPolygonsSmall">+# Polígonos</button>
+              <button id="devAddPolygonsBig">+# Polígonos</button>
+              <button id="devAddShardsSmall">+# Estilhaços</button>
+              <button id="devAddShardsBig">+# Estilhaços</button>
             </div>
-         </section>
+          </section>
 
-         <section class="settingsContent" id="tab-guide">
-            <section class="guideSection">
-               <h3>🎯 Objetivo</h3>
-               <p>
-                  Combine objetos iguais para criar objetos de nível maior,
-                  gerar mais polígonos e subir de level.
-               </p>
-            </section>
-
-            <section class="guideSection">
-               <h3>🔁 Merge</h3>
-               <ul>
-                  <li>Arraste um objeto sobre outro do mesmo nível.</li>
-                  <li>
-                     Solte para combinar os dois em um objeto de nível superior.
-                  </li>
-                  <li>Cada merge aumenta a barra de Level Up.</li>
-                  <li>
-                     Objetos de níveis diferentes não combinam e geram um aviso
-                     vermelho.
-                  </li>
-               </ul>
-            </section>
-
-            <section class="guideSection">
-               <h3>💠 Polígonos</h3>
-               <ul>
-                  <li>
-                     Cada objeto gera polígonos automaticamente a cada segundo.
-                  </li>
-                  <li>
-                     O popup acima do objeto mostra quanto ele gerou no tick.
-                  </li>
-                  <li>Quando o bônus 2x ativa, o popup fica destacado.</li>
-               </ul>
-            </section>
-
-            <section class="guideSection">
-               <h3>✦ Estilhaços</h3>
-               <ul>
-                  <li>Você ganha estilhaços ao subir de level.</li>
-                  <li>
-                     A recompensa é múltipla de 5 e aumenta conforme seu level.
-                  </li>
-                  <li>Cada estilhaço aumenta em 0.01x o ganho de polígonos.</li>
-               </ul>
-            </section>
-         </section>
-
-         <section class="settingsContent" id="tab-reset">
-            <section class="guideSection dangerSection">
-               <h3>⚠️ Resetar progresso</h3>
-               <p>
-                  Essa ação apaga polígonos, estilhaços, objetos, level e
-                  melhorias compradas.
-               </p>
-
-               <button class="danger resetInsideBtn" id="resetInsideBtn">
-                  Resetar Tudo
-               </button>
-            </section>
-         </section>
-
-         <section class="settingsContent" id="tab-dev">
-            <section class="devSection" id="devLoginSection">
-               <h3>🔐 Restrito a Desenvolvedores 👀</h3>
-
-               <input
-                  type="password"
-                  id="devPasswordInput"
-                  placeholder="Digite a senha de desenvolvedor"
-                  class="devInput"
-               />
-
-               <button id="devLoginBtn">Entrar</button>
-               <p class="devError" id="devErrorText"></p>
-            </section>
-
-            <div id="devContent" class="devContent locked">
-               <section class="devSection">
-                  <h3>💠 Economia</h3>
-                  <div class="devGrid">
-                     <button id="devAddPolygonsSmall">+# Polígonos</button>
-                     <button id="devAddPolygonsBig">+# Polígonos</button>
-                     <button id="devAddShardsSmall">+# Estilhaços</button>
-                     <button id="devAddShardsBig">+# Estilhaços</button>
-                  </div>
-               </section>
-
-               <section class="devSection">
-                  <h3>🔁 Spawn e Grade</h3>
-                  <div class="devGrid">
-                     <button id="devSpawnOne">Gerar 1</button>
-                     <button id="devSpawnGolden">Gerar Dourado</button>
-                     <button id="devFillGrid">Preencher Grid</button>
-                     <button id="devClearGrid">Limpar Grid</button>
-                  </div>
-               </section>
-
-               <section class="devSection">
-                  <h3>⚙️ Upgrades</h3>
-                  <div class="devGrid">
-                     <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
-                     <button id="devLevelUpForm">+1 Forma</button>
-                     <button id="devResetUpgrades">Reset Upgrades</button>
-                     <button id="devAllUpgrades5">Todos Nv. 5</button>
-                  </div>
-               </section>
-
-               <section class="devSection">
-                  <h3>⭐ Level</h3>
-                  <div class="devGrid">
-                     <button id="devAddMerge">+1 Merge</button>
-                     <button id="devForceLevelUp">Forçar Level Up</button>
-                  </div>
-               </section>
+          <section class="devSection">
+            <h3>🔁 Spawn e Grade</h3>
+            <div class="devGrid">
+              <button id="devSpawnOne">Gerar 1</button>
+              <button id="devSpawnGolden">Gerar Dourado</button>
+              <button id="devFillGrid">Preencher Grid</button>
+              <button id="devClearGrid">Limpar Grid</button>
             </div>
-         </section>
-      </aside>
+          </section>
 
-      <script type="module" src="src/js/main.js"></script>
-   </body>
+          <section class="devSection">
+            <h3>⚙️ Upgrades</h3>
+            <div class="devGrid">
+              <button id="devMaxSpawnSpeed">Spawn Mínimo</button>
+              <button id="devLevelUpForm">+1 Forma</button>
+              <button id="devResetUpgrades">Reset Upgrades</button>
+              <button id="devAllUpgrades5">Todos Nv. 5</button>
+            </div>
+          </section>
+
+          <section class="devSection">
+            <h3>⭐ Level</h3>
+            <div class="devGrid">
+              <button id="devAddMerge">+1 Merge</button>
+              <button id="devForceLevelUp">Forçar Level Up</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </aside>
+
+    <script type="module" src="src/js/main.js"></script>
+  </body>
 </html>

@@ -1,7 +1,5 @@
 import { SPECIAL_UPGRADES } from "../config/specialUpgradeConfig.js";
 import { state } from "../core/state.js";
-import { saveGame } from "../persistence/save.js";
-import { updateUI } from "../ui/ui.js";
 
 export function getSpecialUpgradeLevel(key) {
   return state.specialUpgrades[key] ?? 0;
@@ -34,20 +32,17 @@ export function canBuySpecialUpgrade(key) {
 }
 
 export function buySpecialUpgrade(key) {
-  const upgrade = SPECIAL_UPGRADES[key];
+   const upgrade = SPECIAL_UPGRADES[key];
 
-  if (!upgrade) return false;
-  if (!canBuySpecialUpgrade(key)) return false;
+   if (!upgrade) return false;
+   if (!canBuySpecialUpgrade(key)) return false;
 
-  const cost = getSpecialUpgradeCost(key);
+   const cost = getSpecialUpgradeCost(key);
 
-  state.shards -= cost;
-  state.specialUpgrades[key]++;
+   state.shards -= cost;
+   state.specialUpgrades[key]++;
 
-  updateUI();
-  saveGame(true);
-
-  return true;
+   return true;
 }
 
 export function getPolygonBoostMultiplier() {

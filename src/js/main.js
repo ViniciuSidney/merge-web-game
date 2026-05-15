@@ -1,243 +1,271 @@
 // IMPORTS
-import { DOM } from './core/dom.js';
+import { DOM } from "./core/dom.js";
 
-import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from './core/config.js';
+import { SPAWN_TICK_RATE, MONEY_TICK_INTERVAL } from "./core/config.js";
 
-import { state } from './core/state.js';
+import { state } from "./core/state.js";
 
-import { createGrid, createItem } from './systems/grid.js';
+import { createGrid, createItem } from "./systems/grid.js";
 
 import {
-   updateSpawnProgressBar,
-   updateSpawnBarVisual,
-   restartSpawnTimer,
-} from './systems/spawn.js';
+  updateSpawnProgressBar,
+  updateSpawnBarVisual,
+  restartSpawnTimer,
+} from "./systems/spawn.js";
 
-import { addDragEvents } from './systems/drag.js';
+import { addDragEvents } from "./systems/drag.js";
 
-import { mergeItems } from './systems/merge.js';
+import { mergeItems } from "./systems/merge.js";
 
-import { addMergeProgress } from './systems/level.js';
+import { addMergeProgress } from "./systems/level.js";
 
-import { incomeTick } from './systems/income.js';
+import { incomeTick } from "./systems/income.js";
 
-import { updateUI } from './ui/ui.js';
+import { updateUI } from "./ui/ui.js";
 
-import { buyUpgrade } from './actions/shopActions.js';
+import { buyUpgrade } from "./actions/shopActions.js";
 
-import { saveGame, loadGame } from './persistence/save.js';
+import { buySpecialUpgrade } from "./systems/specialUpgrades.js";
 
-import { resetGame } from './actions/gameActions.js';
+import { saveGame, loadGame } from "./persistence/save.js";
 
-import { setupDevTools } from './dev/devTools.js';
+import { resetGame } from "./actions/gameActions.js";
 
-import { setupPanels } from './ui/panels.js';
+import { setupDevTools } from "./dev/devTools.js";
 
-import { setupBoardInput } from './systems/boardInput.js';
+import { setupPanels } from "./ui/panels.js";
+
+import { setupBoardInput } from "./systems/boardInput.js";
+
+import { setupShopTabs } from "./ui/panels.js";
 
 // CONTEXTOS
 function getUIContext() {
-   return {
-      moneyEl: DOM.top.money,
-      incomeEl: DOM.top.income,
-      shardsEl: DOM.top.shards,
+  return {
+    moneyEl: DOM.top.money,
+    incomeEl: DOM.top.income,
+    shardsEl: DOM.top.shards,
 
-      shopMoney: DOM.shop.money,
-      upgradesEl: DOM.shop.upgrades,
-      onBuyUpgrade: handleBuyUpgrade,
+    shopMoney: DOM.shop.money,
+    upgradesEl: DOM.shop.upgrades,
+    onBuyUpgrade: handleBuyUpgrade,
 
-      spawnTimeStat: DOM.stats.spawnTime,
-      startLevelStat: DOM.stats.startLevel,
-      doubleSpawnStat: DOM.stats.doubleSpawn,
-      doubleMoneyStat: DOM.stats.doubleMoney,
-      goldenChanceStat: DOM.stats.goldenChance,
-      multiplierStat: DOM.stats.multiplier,
-      itemsStat: DOM.stats.items,
-      levelStat: DOM.stats.level,
+    specialUpgradesEl: DOM.shop.specialUpgradesEl,
+    onBuySpecialUpgrade: handleBuySpecialUpgrade,
 
-      playerLevelEl: DOM.level.playerLevel,
-      levelProgressText: DOM.level.progressText,
-      levelProgressFill: DOM.level.progressFill,
-      levelBonusText: DOM.level.bonusText,
+    spawnTimeStat: DOM.stats.spawnTime,
+    startLevelStat: DOM.stats.startLevel,
+    doubleSpawnStat: DOM.stats.doubleSpawn,
+    doubleMoneyStat: DOM.stats.doubleMoney,
+    goldenChanceStat: DOM.stats.goldenChance,
+    multiplierStat: DOM.stats.multiplier,
+    itemsStat: DOM.stats.items,
+    levelStat: DOM.stats.level,
 
-      devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
-      devAddPolygonsBig: DOM.dev.addPolygonsBig,
-      devAddShardsSmall: DOM.dev.addShardsSmall,
-      devAddShardsBig: DOM.dev.addShardsBig,
-   };
+    playerLevelEl: DOM.level.playerLevel,
+    levelProgressText: DOM.level.progressText,
+    levelProgressFill: DOM.level.progressFill,
+    levelBonusText: DOM.level.bonusText,
+
+    devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
+    devAddPolygonsBig: DOM.dev.addPolygonsBig,
+    devAddShardsSmall: DOM.dev.addShardsSmall,
+    devAddShardsBig: DOM.dev.addShardsBig,
+  };
 }
 
 function getSpawnContext() {
-   return {
-      spawnProgressText: DOM.spawn.progressText,
-      spawnProgressFill: DOM.spawn.progressFill,
-      spawnPopupElement: DOM.spawn.popup,
-      onItemCreated: addDragEvents,
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
+  return {
+    spawnProgressText: DOM.spawn.progressText,
+    spawnProgressFill: DOM.spawn.progressFill,
+    spawnPopupElement: DOM.spawn.popup,
+    onItemCreated: addDragEvents,
+    onUpdateUI: () => updateUI(getUIContext()),
+  };
 }
 
 function getLevelContext() {
-   return {
-      levelUpPopup: DOM.level.popup,
-      saveStatus: DOM.game.saveStatus,
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
+  return {
+    levelUpPopup: DOM.level.popup,
+    saveStatus: DOM.game.saveStatus,
+    onUpdateUI: () => updateUI(getUIContext()),
+  };
 }
 
 function getMergeContext() {
-   return {
-      onItemCreated: addDragEvents,
-      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
+  return {
+    onItemCreated: addDragEvents,
+    onAddMergeProgress: () => addMergeProgress(getLevelContext()),
+    onUpdateUI: () => updateUI(getUIContext()),
+  };
 }
 
 function getShopActionsContext() {
-   return {
-      spawnPopup: DOM.spawn.popup,
-      saveStatus: DOM.game.saveStatus,
-      spawnContext: getSpawnContext(),
-      onUpdateUI: () => updateUI(getUIContext()),
-   };
+  return {
+    spawnPopup: DOM.spawn.popup,
+    saveStatus: DOM.game.saveStatus,
+    spawnContext: getSpawnContext(),
+    onUpdateUI: () => updateUI(getUIContext()),
+  };
 }
 
 function getGameActionsContext() {
-   return {
-      onItemCreated: addDragEvents,
-      onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
-      onUpdateUI: () => updateUI(getUIContext()),
-      saveStatus: DOM.game.saveStatus,
-   };
+  return {
+    onItemCreated: addDragEvents,
+    onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
+    onUpdateUI: () => updateUI(getUIContext()),
+    saveStatus: DOM.game.saveStatus,
+  };
 }
 
 function getDevToolsContext() {
-   return {
-      devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
-      devAddPolygonsBig: DOM.dev.addPolygonsBig,
-      devAddShardsSmall: DOM.dev.addShardsSmall,
-      devAddShardsBig: DOM.dev.addShardsBig,
-      devSpawnOne: DOM.dev.spawnOne,
-      devSpawnGolden: DOM.dev.spawnGolden,
-      devFillGrid: DOM.dev.fillGrid,
-      devClearGrid: DOM.dev.clearGrid,
-      devMaxSpawnSpeed: DOM.dev.maxSpawnSpeed,
-      devLevelUpForm: DOM.dev.levelUpForm,
-      devResetUpgrades: DOM.dev.resetUpgrades,
-      devAllUpgrades5: DOM.dev.allUpgrades5,
-      devAddMerge: DOM.dev.addMerge,
-      devForceLevelUp: DOM.dev.forceLevelUp,
-      devLoginBtn: DOM.dev.loginBtn,
-      devPasswordInput: DOM.dev.passwordInput,
-      devErrorText: DOM.dev.errorText,
-      devLoginSection: DOM.dev.loginSection,
-      devContent: DOM.dev.content,
+  return {
+    devAddPolygonsSmall: DOM.dev.addPolygonsSmall,
+    devAddPolygonsBig: DOM.dev.addPolygonsBig,
+    devAddShardsSmall: DOM.dev.addShardsSmall,
+    devAddShardsBig: DOM.dev.addShardsBig,
+    devSpawnOne: DOM.dev.spawnOne,
+    devSpawnGolden: DOM.dev.spawnGolden,
+    devFillGrid: DOM.dev.fillGrid,
+    devClearGrid: DOM.dev.clearGrid,
+    devMaxSpawnSpeed: DOM.dev.maxSpawnSpeed,
+    devLevelUpForm: DOM.dev.levelUpForm,
+    devResetUpgrades: DOM.dev.resetUpgrades,
+    devAllUpgrades5: DOM.dev.allUpgrades5,
+    devAddMerge: DOM.dev.addMerge,
+    devForceLevelUp: DOM.dev.forceLevelUp,
+    devLoginBtn: DOM.dev.loginBtn,
+    devPasswordInput: DOM.dev.passwordInput,
+    devErrorText: DOM.dev.errorText,
+    devLoginSection: DOM.dev.loginSection,
+    devContent: DOM.dev.content,
 
-      spawnPopup: DOM.spawn.popup,
+    spawnPopup: DOM.spawn.popup,
 
-      onItemCreated: addDragEvents,
-      onRefresh: devRefresh,
-      onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
-      onAddMergeProgress: () => addMergeProgress(getLevelContext()),
-   };
+    onItemCreated: addDragEvents,
+    onRefresh: devRefresh,
+    onRestartSpawnTimer: () => restartSpawnTimer(getSpawnContext()),
+    onAddMergeProgress: () => addMergeProgress(getLevelContext()),
+  };
 }
 
 function getPanelsContext() {
-   return {
-      settingsTabs: DOM.settings.tabs,
-      settingsContents: DOM.settings.contents,
+  return {
+    settingsTabs: DOM.settings.tabs,
+    settingsContents: DOM.settings.contents,
 
-      openSettingsBtn: DOM.settings.openBtn,
-      closeSettingsBtn: DOM.settings.closeBtn,
-      settingsPanel: DOM.settings.panel,
-      settingsOverlay: DOM.settings.overlay,
+    openSettingsBtn: DOM.settings.openBtn,
+    closeSettingsBtn: DOM.settings.closeBtn,
+    settingsPanel: DOM.settings.panel,
+    settingsOverlay: DOM.settings.overlay,
 
-      openShopBtn: DOM.shop.openBtn,
-      closeShopBtn: DOM.shop.closeBtn,
-      shop: DOM.shop.panel,
-      shopOverlay: DOM.shop.overlay,
-   };
+    openShopBtn: DOM.shop.openBtn,
+    closeShopBtn: DOM.shop.closeBtn,
+    shop: DOM.shop.panel,
+    shopOverlay: DOM.shop.overlay,
+  };
+}
+
+function getShopTabsContext() {
+  return {
+    shopTabs: DOM.shop.shopTabs,
+    shopContents: DOM.shop.shopContents,
+  };
 }
 
 function getBoardInputContext() {
-   return {
-      onMerge: (targetItem) => mergeItems(targetItem, getMergeContext()),
-      onUpdateUI: () => updateUI(getUIContext()),
-      onSave: () => saveGame(),
-   };
+  return {
+    onMerge: (targetItem) => mergeItems(targetItem, getMergeContext()),
+    onUpdateUI: () => updateUI(getUIContext()),
+    onSave: () => saveGame(),
+  };
 }
 
 // HANDLERS
 function handleBuyUpgrade(key) {
-   buyUpgrade(key, getShopActionsContext());
+  buyUpgrade(key, getShopActionsContext());
+}
+
+function handleBuySpecialUpgrade(key) {
+  const bought = buySpecialUpgrade(key);
+
+  if (!bought) return;
+
+  updateUI(getUIContext());
+
+  saveGame({
+    showText: true,
+    saveStatus: DOM.game.saveStatus,
+  });
 }
 
 function handleResetGame() {
-   resetGame(getGameActionsContext());
+  resetGame(getGameActionsContext());
 }
 
 function devRefresh() {
-   updateUI(getUIContext());
-   updateSpawnBarVisual(getSpawnContext());
-   saveGame({
-      showText: true,
-      saveStatus: DOM.game.saveStatus,
-   });
+  updateUI(getUIContext());
+  updateSpawnBarVisual(getSpawnContext());
+  saveGame({
+    showText: true,
+    saveStatus: DOM.game.saveStatus,
+  });
 }
 
 // SETUP DE EVENTOS
 function setupEvents() {
-   setupPanels(getPanelsContext());
-   setupDevTools(getDevToolsContext());
-   setupBoardInput(getBoardInputContext());
+  setupPanels(getPanelsContext());
+  setupShopTabs(getShopTabsContext());
+  setupDevTools(getDevToolsContext());
+  setupBoardInput(getBoardInputContext());
 
-   DOM.settings.resetBtn.addEventListener('click', handleResetGame);
+  DOM.settings.resetBtn.addEventListener("click", handleResetGame);
 }
 
 // LOOPS DO JOGO
 function setupGameLoops() {
-   setInterval(() => {
-      incomeTick({
-         onUpdateUI: () => updateUI(getUIContext()),
-      });
-   }, MONEY_TICK_INTERVAL);
+  setInterval(() => {
+    incomeTick({
+      onUpdateUI: () => updateUI(getUIContext()),
+    });
+  }, MONEY_TICK_INTERVAL);
 
-   setInterval(() => {
-      updateSpawnProgressBar(getSpawnContext());
-   }, SPAWN_TICK_RATE);
+  setInterval(() => {
+    updateSpawnProgressBar(getSpawnContext());
+  }, SPAWN_TICK_RATE);
 }
 
 // INICIALIZAÇÃO
 function createInitialItemsIfNeeded(loaded) {
-   if (loaded && state.items.length > 0) return;
+  if (loaded && state.items.length > 0) return;
 
-   createItem({
-      level: 1,
-      forcedGolden: false,
-      onCreated: addDragEvents,
-   });
-   createItem({
-      level: 1,
-      forcedGolden: false,
-      onCreated: addDragEvents,
-   });
+  createItem({
+    level: 1,
+    forcedGolden: false,
+    onCreated: addDragEvents,
+  });
+  createItem({
+    level: 1,
+    forcedGolden: false,
+    onCreated: addDragEvents,
+  });
 }
 
 function startGame() {
-   setupEvents();
-   setupGameLoops();
+  setupEvents();
+  setupGameLoops();
 
-   createGrid(DOM.game.grid);
+  createGrid(DOM.game.grid);
 
-   const loaded = loadGame({
-      onItemCreated: addDragEvents,
-   });
+  const loaded = loadGame({
+    onItemCreated: addDragEvents,
+  });
 
-   createInitialItemsIfNeeded(loaded);
+  createInitialItemsIfNeeded(loaded);
 
-   restartSpawnTimer(getSpawnContext());
-   updateUI(getUIContext());
-   updateSpawnProgressBar(getSpawnContext());
+  restartSpawnTimer(getSpawnContext());
+  updateUI(getUIContext());
+  updateSpawnProgressBar(getSpawnContext());
 }
 
 startGame();
