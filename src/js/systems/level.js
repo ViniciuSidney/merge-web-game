@@ -5,11 +5,10 @@
 import { LEVEL_UP_FEEDBACK_DURATION } from '../core/config.js';
 import { TEXTS } from '../core/texts.js';
 import { state } from '../core/state.js';
-
 import { getShardsReward, getNextMergeRequirement } from './economy.js';
-
 import { showLevelUpPopup } from '../ui/effects.js';
 import { saveGame } from '../persistence/save.js';
+import { getExtraShardReward } from './specialUpgrades.js';
 
 export function addMergeProgress({ levelUpPopup, saveStatus, onUpdateUI }) {
    state.mergeProgress++;

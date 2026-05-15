@@ -15,7 +15,10 @@ export function getShardMultiplier() {
 }
 
 export function getShardsReward() {
-   return (state.playerLevel - 1) * SHARD_REWARD_STEP;
+   const baseReward = (state.playerLevel - 1) * SHARD_REWARD_STEP;
+   const extraReward = getExtraShardReward();
+
+   return Math.floor(baseReward + extraReward);
 }
 
 export function getNextMergeRequirement() {
