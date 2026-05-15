@@ -60,6 +60,9 @@ export const DOM = {
     multiplier: document.getElementById("multiplierStat"),
     items: document.getElementById("itemsStat"),
     level: document.getElementById("levelStat"),
+    polygonBoost: document.getElementById("polygonBoostStat"),
+    shardBoost: document.getElementById("shardBoostStat"),
+    goldenPower: document.getElementById("goldenPowerStat"),
   },
 
   dev: {

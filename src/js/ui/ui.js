@@ -64,6 +64,10 @@ export function updateStatsPanel({
   multiplierStat,
   itemsStat,
   levelStat,
+
+  polygonBoostStat,
+  shardBoostStat,
+  goldenPowerStat,
 }) {
   spawnTimeStat.textContent = TEXTS.stats.spawnTime(getSpawnTime() / 1000);
   startLevelStat.textContent = TEXTS.stats.startLevel(getStartLevel());
@@ -73,6 +77,10 @@ export function updateStatsPanel({
   multiplierStat.textContent = TEXTS.stats.multiplier(getShardMultiplier());
   itemsStat.textContent = TEXTS.stats.items(state.items.length, GRID_SIZE);
   levelStat.textContent = state.playerLevel;
+
+  polygonBoostStat.textContent = `${getPolygonBoostMultiplier().toFixed(2)}x`;
+  shardBoostStat.textContent = `+${getExtraShardReward()} ✦`;
+  goldenPowerStat.textContent = `${getGoldenMultiplier().toFixed(1)}x`;
 }
 
 // ===============================
@@ -320,6 +328,9 @@ export function updateUI({
   multiplierStat,
   itemsStat,
   levelStat,
+  polygonBoostStat,
+  shardBoostStat,
+  goldenPowerStat,
 
   playerLevelEl,
   levelProgressText,
@@ -350,6 +361,9 @@ export function updateUI({
     multiplierStat,
     itemsStat,
     levelStat,
+    polygonBoostStat,
+    shardBoostStat,
+    goldenPowerStat,
   });
 
   updateLevelPanel({

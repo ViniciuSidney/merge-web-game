@@ -61,6 +61,9 @@ function getUIContext() {
     multiplierStat: DOM.stats.multiplier,
     itemsStat: DOM.stats.items,
     levelStat: DOM.stats.level,
+    polygonBoostStat: DOM.stats.polygonBoost,
+    shardBoostStat: DOM.stats.shardBoost,
+    goldenPowerStat: DOM.stats.goldenPower,
 
     playerLevelEl: DOM.level.playerLevel,
     levelProgressText: DOM.level.progressText,

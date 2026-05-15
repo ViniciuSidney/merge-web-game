@@ -806,6 +806,15 @@ button:disabled {
   padding-left: 18px;
 }
 
+.specialStat {
+  background: #f7f5ff;
+  border-color: #c7bfff;
+}
+
+.specialStat strong {
+  color: #6c5ce7;
+}
+
 .dangerSection {
   border-color: var(--color-danger-border);
   background: var(--color-danger-bg);
